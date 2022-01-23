@@ -3,6 +3,12 @@
 #include <vector>
 #include <string>
 #include <cassert>
+
+
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
+
 MyDirectX::MyDirectX()
 {
 }
@@ -457,4 +463,15 @@ bool MyDirectX::CreateFence()
 		return false;
 	}
 	return true;
+}
+
+void MyDirectX::CheckAliveObject()
+{
+	ID3D12DebugDevice *debugInterface;
+
+	if (SUCCEEDED(dev.Get()->QueryInterface(&debugInterface)))
+	{
+		debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+		debugInterface->Release();
+	}
 }

@@ -4,8 +4,6 @@
 #include <dxgi1_6.h>
 #include <wrl.h>
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
 class MyDirectX
 {
 private:
@@ -64,4 +62,7 @@ private://各種項目の初期化処理
 
 	//フェンス生成
 	bool CreateFence();
+
+	//どこでメモリリークを起こしているかを確認してくれた
+	void CheckAliveObject();
 };
