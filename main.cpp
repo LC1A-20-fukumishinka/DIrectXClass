@@ -1,5 +1,3 @@
-#include "Base/WinAPI.h"
-#include "Base/MyDirectX.h"
 #include "Input/DirectInput.h"
 #include "2D/Sprite.h"
 #include "2D/DebugText.h"
@@ -15,10 +13,6 @@
 #include "particleManager.h"
 #include "Game.h"
 using namespace DirectX;
-
-const int window_width = 1280;
-const int window_height = 720;
-
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -40,7 +34,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region DirectInput
 	Input *input = Input::GetInstance();
 
-	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
 #pragma endregion
 
 	Camera cam;
@@ -104,7 +97,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion
 		game.Update();
 
-		input->Update();
 
 		//XV
 

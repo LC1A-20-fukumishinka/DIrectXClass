@@ -10,17 +10,21 @@ void Game::Init()
 	myDirectX = MyDirectX::GetInstance();
 	myDirectX->Init();
 	isEnd = false;
+	Input *input = Input::GetInstance();
+
+	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
 }
 
 void Game::Finalize()
 {
 	Win->end();
-
 }
 
 void Game::Update()
 {
 	Win->msgCheck();
+	Input::GetInstance()->Update();
+
 	if (Input::GetInstance()->Key(DIK_K))
 	{
 		isEnd = true;
