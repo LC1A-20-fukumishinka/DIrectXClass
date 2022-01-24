@@ -4,7 +4,6 @@
 #include "Object3DCommon.h"
 #include "../Camera.h"
 #include "IGraphicsPipeline.h"
-
 struct ModelObject;
 
 class Object3D
@@ -24,13 +23,11 @@ public:
 	};
 	Object3D();
 
-	void Init(const Camera &camera, Object3D *parent = nullptr);
+	void Init(Camera *camera, Object3D *parent = nullptr);
 
 	DirectX::XMMATRIX GetMatWorld();
 
-	void Update(const Camera &camera);
-
-	void SetConstBuffer(const Camera &camera);
+	void Update();
 
 	void Draw(const Object3DCommon &object3DCommon, PipeClass::PipelineSet pipelineSet, int textureNumber);
 
@@ -42,6 +39,8 @@ public:
 	void modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture = false, int textureNumber = -1);
 
 	void SetParent(Object3D *parent);
+
+	void SetCamera(Camera *camera);
 	//色(RGBA)
 	DirectX::XMFLOAT4 color;
 	//大きさ
@@ -67,29 +66,7 @@ private:
 
 	Object3D *parent;
 	//非表示
-
-
-
-
-	//要らない
-
-	//struct Vertex
-	//{
-	//	DirectX::XMFLOAT3 pos;	//xyz座標
-	//	DirectX::XMFLOAT3 normal;
-	//	DirectX::XMFLOAT2 uv;	//uv座標
-	//};
-	//Microsoft::WRL::ComPtr<ID3D12Resource> vertBuff;				//頂点バッファ
-	//Microsoft::WRL::ComPtr<ID3D12Resource> indexBuff;
-	//D3D12_VERTEX_BUFFER_VIEW vBView{};			//頂点バッファビュー
-	//D3D12_INDEX_BUFFER_VIEW iBView{};
-
-	//void CornInit(const Object3DCommon &object3DCommon);
-	//void BoxInit(const Object3DCommon &object3DCommon);
-
-
-
-	//void CornTransferIndexBufferVertexBuffer(const Object3DCommon &object3DCommon);
+	Camera *camera;
 };
 
 //深度値リセット

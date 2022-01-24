@@ -17,14 +17,14 @@ Object3D::Object3D()
 	
 }
 
-void Object3D::Init( const Camera &camera, Object3D *parent)
+void Object3D::Init(Camera *camera, Object3D *parent)
 {
 	this->parent = parent;
 
 	HRESULT result = S_FALSE;
 	MyDirectX *myD = MyDirectX::GetInstance();
 
-
+	SetCamera(camera);
 	//定数バッファの生成
 	result = myD->GetDevice()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -41,7 +41,7 @@ void Object3D::Init( const Camera &camera, Object3D *parent)
 	ConstBufferData *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = XMFLOAT4(1, 1, 1, 1);//色指定(RGBA)
-	constMap->mat = matWorld * camera.matView * camera.matProjection;	//平行透視投影
+	constMap->mat = matWorld * this->camera->matView * this->camera->matProjection;	//平行透視投影
 	constBuff->Unmap(0, nullptr);
 
 }
@@ -76,7 +76,7 @@ XMMATRIX Object3D::GetMatWorld()
 	return matTmp;
 }
 
-void Object3D::Update(const Camera &camera)
+void Object3D::Update()
 {
 	//ワールド行列を設定する
 	matWorld = GetMatWorld();
@@ -85,22 +85,7 @@ void Object3D::Update(const Camera &camera)
 
 	HRESULT result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = XMFLOAT4(1, 1, 1, 1);//色指定(RGBA)
-	constMap->mat = matWorld * camera.matView * camera.matProjection;	//透視投影
-	constBuff->Unmap(0, nullptr);
-
-}
-
-void Object3D::SetConstBuffer( const Camera &camera)
-{
-	ConstBufferData *constMap = nullptr;
-
-	XMMATRIX matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
-
-	matWorld = matScale * matWorld;
-
-	HRESULT result = constBuff->Map(0, nullptr, (void **)&constMap);
-	constMap->color = XMFLOAT4(1, 1, 1, 1);//色指定(RGBA)
-	constMap->mat = matWorld * camera.matView * camera.matProjection;	//透視投影
+	constMap->mat = matWorld * camera->matView * camera->matProjection;	//透視投影
 	constBuff->Unmap(0, nullptr);
 
 }
@@ -240,6 +225,15 @@ void Object3D::SetParent(Object3D *parent)
 {
 	if (parent == nullptr) return;
 	this->parent = parent;
+}
+
+void Object3D::SetCamera(Camera *camera)
+{
+	if (camera == nullptr)
+	{
+		assert(0);
+	}
+	this->camera = camera;
 }
 
 void DepthReset()
