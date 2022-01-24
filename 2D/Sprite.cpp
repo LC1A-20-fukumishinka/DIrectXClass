@@ -158,7 +158,7 @@ void Sprite::SpriteTransferVertexBuffer()
 }
 
 
-void Sprite::SpriteDraw()
+void Sprite::Draw()
 {
 
 	//描画フラグがtrueじゃなかったら早期リターン
@@ -202,7 +202,7 @@ void Sprite::SpriteDraw()
 }
 
 //定数バッファ系の設定(色とアフィン変換)
-void Sprite::SpriteUpdate()
+void Sprite::Update()
 {
 	//ワールド行列の更新
 	matWorld = DirectX::XMMatrixIdentity();
@@ -219,5 +219,7 @@ void Sprite::SpriteUpdate()
 	constMap->mat = matWorld * SpriteCommon::Instance()->matProjection;
 	constMap->color = color;
 	constBuff->Unmap(0, nullptr);
+
+	SpriteTransferVertexBuffer();
 
 }

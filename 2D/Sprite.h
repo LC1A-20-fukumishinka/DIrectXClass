@@ -13,9 +13,9 @@ public:
 	void SpriteTransferVertexBuffer();
 
 	//スプライトの描画コマンド
-	void SpriteDraw();
+	void Draw();
 	//スプライト情報の更新(行列計算や、色変更など)
-	void SpriteUpdate();
+	void Update();
 
 
 	//座標

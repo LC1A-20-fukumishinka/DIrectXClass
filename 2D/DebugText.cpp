@@ -49,7 +49,7 @@ void DebugText::Print( const std::string &text, float x, float y, float scale)
 		//頂点バッファ転送
 		sprites[spriteIndex].SpriteTransferVertexBuffer();
 		//更新
-		sprites[spriteIndex].SpriteUpdate();
+		sprites[spriteIndex].Update();
 		//文字を一つ進める
 		spriteIndex++;
 	}
@@ -61,7 +61,7 @@ void DebugText::DrawAll()
 	for (int i = 0; i < spriteIndex; i++)
 	{
 		//スプライト描画
-		sprites[i].SpriteDraw();
+		sprites[i].Draw();
 	}
 
 	spriteIndex = 0;
