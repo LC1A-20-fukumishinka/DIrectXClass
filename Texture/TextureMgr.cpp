@@ -1,6 +1,7 @@
 #include "TextureMgr.h"
 #include <cassert>
 #include <DirectXTex.h>
+#include "MyDirectX.h"
 TextureMgr::TextureMgr()
 {
 	MyDirectX *myDirectX = MyDirectX::GetInstance();
