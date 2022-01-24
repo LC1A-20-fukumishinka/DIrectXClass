@@ -12,6 +12,7 @@
 #include "TextureMgr.h"
 #include "Model.h"
 #include "ModelPipeline.h"
+#include "particleManager.h"
 using namespace DirectX;
 
 const int window_width = 1280;
@@ -32,14 +33,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Sound::StaticInitialize();
 	int alarmIndex = Sound::SoundLoadWave("Resources/Alarm01.wav");
 
-	Sound alarm(alarmIndex);
+	Sound alarm;
+	alarm.Init(alarmIndex);
 #pragma endregion
 
 	//DirectX初期化処理 ここまで
 	MyDirectX *myDirectX = MyDirectX::GetInstance();
 	//DirectInputの初期化処理ここから
 #pragma region DirectInput
-		Input * input = Input::GetInstance();
+	Input *input = Input::GetInstance();
 
 	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
 #pragma endregion
@@ -74,12 +76,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	box.scale = { 0.1f, 0.1f, 0.1f };
 	box.position = { -10,0,0 };
-	box.Init(cam);
+	box.Init(&cam);
 	box.type = Object3D::Box;
 
 
 	Object3D DrawTriangle;
-	DrawTriangle.Init(cam);
+	DrawTriangle.Init(&cam);
 	DrawTriangle.scale = { 100.0f, 100.0f, 100.0f };
 	DrawTriangle.position = { 10, 0,0 };
 
@@ -91,8 +93,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	bool isTexture = false;
-#pragma endregion
-	//描画初期化処理 ここまで
+
+	ParticleManager::StaticInitialize(&cam);
+
+	ParticleManager part;
+
+	part.Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
 	while (Win->loopBreak()) //ゲームループ
 	{
 		//ウィンドウメッセージ処理
@@ -103,6 +109,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//更新
 
+		part.Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
 		if (input->KeyTrigger(DIK_SPACE))
 		{
 			alarm.Play();
@@ -133,9 +140,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			boxQuaternion = XMQuaternionMultiply(boxQuaternion, quaternion2);
 		}
 
-		box.Update( cam);
+		box.Update();
 
-		DrawTriangle.Update(cam);
+		DrawTriangle.Update();
 
 
 		//コマンドリストに追加
@@ -156,6 +163,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		cam.Update();
+		part.Update();
+
 #pragma endregion
 
 		myDirectX->PreDraw();
@@ -164,8 +173,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		box.modelDraw(dome.GetModel(), ModelPipeline::GetInstance()->GetPipeLine(), isTexture, test);
 		DrawTriangle.modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
 
-
-					debugText.DrawAll();
+		part.Draw(spriteTex);
+		debugText.DrawAll();
 		//描画コマンドここまで
 	//⑤リソースバリアを戻す
 
