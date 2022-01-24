@@ -65,9 +65,9 @@ void WinAPI::Init(const int winWidth, const int winHeight)
 	//ウィンドウ表示
 	ShowWindow(hwnd, SW_SHOW);
 
-	MyDirectX *instance = MyDirectX::GetInstance();
+	//MyDirectX *instance = MyDirectX::GetInstance();
 
-	instance->Init();
+	//instance->Init();
 }
 
 WinAPI *WinAPI::GetInstance()

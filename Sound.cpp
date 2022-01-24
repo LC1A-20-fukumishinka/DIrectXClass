@@ -4,7 +4,7 @@
 #include "SafeDelete.h"
 
 Microsoft::WRL::ComPtr<IXAudio2> Sound::xAudio2;
-IXAudio2MasteringVoice *Sound::masterVoice;
+IXAudio2MasteringVoice *Sound::masterVoice = nullptr;
 std::vector<Sound::SoundData> Sound::soundData;
 
 bool Sound::StaticInitialize()

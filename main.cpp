@@ -13,6 +13,7 @@
 #include "Model.h"
 #include "ModelPipeline.h"
 #include "particleManager.h"
+#include "Game.h"
 using namespace DirectX;
 
 const int window_width = 1280;
@@ -21,13 +22,10 @@ const int window_height = 720;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	//WindowsAPI初期化処理
-#pragma region WindowsAPI
+	Game game;
+	game.Init();
 
-	WinAPI *Win = WinAPI::GetInstance();
 
-	Win->Init(window_width, window_height);
-#pragma endregion
 #pragma region sound(xAudioInstance)
 	//宣言
 	Sound::StaticInitialize();
@@ -38,7 +36,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion
 
 	//DirectX初期化処理 ここまで
-	MyDirectX *myDirectX = MyDirectX::GetInstance();
 	//DirectInputの初期化処理ここから
 #pragma region DirectInput
 	Input *input = Input::GetInstance();
@@ -99,12 +96,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ParticleManager part;
 
 	part.Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
-	while (Win->loopBreak()) //ゲームループ
+
+	while (!game.isEnd) //ゲームループ
 	{
 		//ウィンドウメッセージ処理
 #pragma region WindowMessage
-		Win->msgCheck();
 #pragma endregion
+		game.Update();
+
 		input->Update();
 
 		//更新
@@ -164,30 +163,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		cam.Update();
 		part.Update();
-
 #pragma endregion
 
-		myDirectX->PreDraw();
 		//描画コマンド
-
+		game.PreDraw();
 		box.modelDraw(dome.GetModel(), ModelPipeline::GetInstance()->GetPipeLine(), isTexture, test);
 		DrawTriangle.modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
-
+		game.Draw();
 		part.Draw(spriteTex);
 		debugText.DrawAll();
 		//描画コマンドここまで
+		game.PostDraw();
 	//⑤リソースバリアを戻す
 
-		myDirectX->PostDraw();
 		// DirectX毎フレーム処理 ここまで
 	}
+
 	//xAudio2解放
 	Sound::xAudioDelete();
 	//音声データ解放
 	Sound::SoundUnload();
 	//ウィンドウクラスを登録解除
 #pragma region WindowsAPI
-	Win->end();
+	game.Finalize();
+
 #pragma endregion
 	return 0;
 }
