@@ -126,11 +126,11 @@ void MyDirectX::PostDraw()
 	cmdList->Close();
 #pragma endregion
 
-#pragma region ExecuteCommand
 	//コマンドリストの実行
 	ID3D12CommandList *cmdLists[] = { cmdList.Get() };//コマンドリストの配列
 	cmdQueue->ExecuteCommandLists(1, cmdLists);
-#pragma endregion
+
+
 
 #pragma region ExecuteCommandWait
 	cmdQueue->Signal(fence.Get(), ++fenceVal);
@@ -148,11 +148,8 @@ void MyDirectX::PostDraw()
 	cmdList->Reset(cmdAllocator.Get(), nullptr);//再びコマンドリストをためる準備
 #pragma endregion
 
-#pragma region Screenflip
-		//バッファをフリップ(裏表の入れ替え)
+	//バッファをフリップ(裏表の入れ替え)
 	swapchain->Present(1, 0);
-#pragma endregion
-
 }
 
 void MyDirectX::ClearRenderTarget()
