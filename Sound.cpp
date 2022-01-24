@@ -133,6 +133,21 @@ void Sound::SoundUnload()
 	}
 }
 
+void Sound::Init(const int soundIndex)
+{
+	if (soundIndex >= soundData.size() || soundIndex < 0)
+	{
+		assert(0);
+	}
+
+	this->soundIndex = soundIndex;
+
+	HRESULT result;
+
+	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData[this->soundIndex].wfex);
+	assert(SUCCEEDED(result));
+}
+
 void Sound::Play()
 {
 	HRESULT result;
@@ -170,14 +185,12 @@ void Sound::Stop()
 	pSourceVoice->FlushSourceBuffers();
 }
 
-Sound::Sound(const int soundIndex)
+Sound::Sound()
 {
-	this->soundIndex = soundIndex;
+	this->soundIndex = -1;
 
-	HRESULT result;
 	//波形フォーマットをもとにSourceVolでの生成
 	pSourceVoice = nullptr;
-	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData[this->soundIndex].wfex);
-	assert(SUCCEEDED(result));
+
 }
 

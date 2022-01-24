@@ -60,8 +60,8 @@ private:
 
 
 public://ƒƒ“ƒoŠÖ”
-	Sound(const int soundIndex);
-
+	Sound();
+	void Init(const int soundIndex);
 	//‰¹ºÄ¶
 	void Play();
 
