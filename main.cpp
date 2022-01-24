@@ -4,7 +4,6 @@
 #include "3D/Object3D.h"
 #include "Camera.h"
 #include "EaseClass.h"
-#include "Sound.h"
 #include "Base/GraphicsPipeline3D.h"
 #include "IGraphicsPipeline.h"
 #include "TextureMgr.h"
@@ -20,14 +19,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	game.Init();
 
 
-#pragma region sound(xAudioInstance)
-	//宣言
-	Sound::StaticInitialize();
-	int alarmIndex = Sound::SoundLoadWave("Resources/Alarm01.wav");
 
-	Sound alarm;
-	alarm.Init(alarmIndex);
-#pragma endregion
 
 	//DirectX初期化処理 ここまで
 	//DirectInputの初期化処理ここから
@@ -101,14 +93,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//更新
 
 		part.Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
-		if (input->KeyTrigger(DIK_SPACE))
-		{
-			alarm.Play();
-		}
-		if (input->KeyTrigger(DIK_8))
-		{
-			alarm.Stop();
-		}
+
 		if (input->Key(DIK_RIGHT) || input->Key(DIK_LEFT) || input->Key(DIK_UP) || input->Key(DIK_DOWN))
 		{
 			quaternion2 = XMQuaternionIdentity();
@@ -171,10 +156,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// DirectX毎フレーム処理 ここまで
 	}
 
-	//xAudio2解放
-	Sound::xAudioDelete();
-	//音声データ解放
-	Sound::SoundUnload();
+
 	//ウィンドウクラスを登録解除
 #pragma region WindowsAPI
 	game.Finalize();

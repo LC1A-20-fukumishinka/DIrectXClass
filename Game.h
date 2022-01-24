@@ -1,6 +1,7 @@
 #pragma once
 #include "WinAPI.h"
 #include "MyDirectX.h"
+#include "Sound.h"
 class Game
 {
 public:
@@ -15,4 +16,7 @@ bool isEnd;
 private:
 	WinAPI *Win;
 		MyDirectX *myDirectX;
+
+		Sound alarm;
+
 };
