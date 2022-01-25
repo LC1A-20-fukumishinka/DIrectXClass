@@ -8,6 +8,7 @@
 #include "particleManager.h"
 #include "2D/Sprite.h"
 #include "TextureMgr.h"
+#include "2D/DebugText.h"
 
 class Game
 {
@@ -35,4 +36,5 @@ private:
 		ParticleManager *part;
 		int spriteTex;
 		Sprite sprite;
+		DebugText *debugText;
 };

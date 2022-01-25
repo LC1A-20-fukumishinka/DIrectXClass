@@ -36,6 +36,8 @@ void Game::Init()
 	ParticleManager::StaticInitialize(&cam);
 
 	part = ParticleManager::Create();
+	debugText = DebugText::Create();
+
 	spriteTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
 	sprite.Init(spriteTex);
 }
@@ -43,6 +45,7 @@ void Game::Init()
 void Game::Finalize()
 {
 	delete part;
+	delete debugText;
 	//xAudio2‰ð•ú
 	Sound::xAudioDelete();
 	//‰¹ºƒf[ƒ^‰ð•ú
@@ -109,7 +112,7 @@ void Game::Update()
 
 	part->Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
 	part->Update();
-
+	debugText->Print("banana", 100, 100, 10);
 	sprite.position.x++;
 	sprite.Update();
 }
@@ -126,6 +129,8 @@ void Game::Draw()
 	boxObj.modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
 	part->Draw(spriteTex);
 	sprite.Draw();
+	debugText->DrawAll();
+
 }
 
 void Game::PostDraw()

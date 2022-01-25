@@ -13,10 +13,15 @@ DebugText::DebugText()
 	}
 }
 
-void DebugText::Initialize(ID3D12Device *dev)
+DebugText *DebugText::Create()
 {
-
+	DebugText *debugText = new DebugText();
+	if (debugText == nullptr) {
+		return nullptr;
+	}
+	return debugText;
 }
+
 void DebugText::Print( const std::string &text, float x, float y, float scale)
 {
 	//‘S‚Ä‚Ì•¶Žš‚É‚Â‚¢‚Ä
