@@ -2,6 +2,13 @@
 #include "WinAPI.h"
 #include "MyDirectX.h"
 #include "Sound.h"
+#include "Model.h"
+#include "3D/Object3D.h"
+#include "Camera.h"
+#include "particleManager.h"
+#include "2D/Sprite.h"
+#include "TextureMgr.h"
+
 class Game
 {
 public:
@@ -18,5 +25,14 @@ private:
 		MyDirectX *myDirectX;
 
 		Sound alarm;
+		Camera cam;
+		float angle;	//ƒJƒƒ‰‚Ì‰ñ“]Šp
+		Object3D domeObj;
+		Object3D boxObj;
 
+		Model triangle;
+		Model dome;
+		ParticleManager *part;
+		int spriteTex;
+		Sprite sprite;
 };
