@@ -15,18 +15,7 @@ Camera::Camera()
 	matBillBoard = XMMatrixIdentity();
 	matBillBoardY = XMMatrixIdentity();
 
-	MyDirectX *myD = MyDirectX::GetInstance();
 
-
-	projectionData.height = myD->winHeight;
-	projectionData.width = myD->winWidth;
-
-	//視錐台行列の生成
-	matProjection = DirectX::XMMatrixPerspectiveFovLH(
-		DirectX::XMConvertToRadians(projectionData.angle),				//上下画角60度
-		(float)projectionData.width / (float)projectionData.height,	//アスペクト比(画面横幅/画面縦幅)
-		projectionData.screenNear, projectionData.screenFar							//前端、奥端
-	);
 }
 
 void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &up, Projection::ProjectionData &projectionData)
@@ -43,6 +32,15 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 	{
 		this->projectionData = projectionData;
 	}
+	else
+	{
+		MyDirectX *myD = MyDirectX::GetInstance();
+
+		this->projectionData.height = myD->winHeight;
+		this->projectionData.width = myD->winWidth;
+	}
+
+
 	//視錐台行列の生成
 	matProjection = DirectX::XMMatrixPerspectiveFovLH(
 		DirectX::XMConvertToRadians(this->projectionData.angle),				//上下画角60度
