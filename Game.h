@@ -1,19 +1,14 @@
 #pragma once
-#include "WinAPI.h"
-#include "MyDirectX.h"
-#include "Sound.h"
-#include "Model.h"
-#include "3D/Object3D.h"
-#include "Camera.h"
-#include "particleManager.h"
-#include "2D/Sprite.h"
-#include "TextureMgr.h"
-#include "2D/DebugText.h"
 
-class Game
+#include "Model.h"
+#include "Object3D.h"
+#include "Camera.h"
+#include "Sprite.h"
+#include "Framework.h"
+class Game : public Framework
 {
 public:
-	void Init();
+	void Init() override;
 	void Finalize();
 	void Update();
 	void PreDraw();
@@ -22,19 +17,16 @@ public:
 public:
 bool isEnd;
 private:
-	WinAPI *Win;
-		MyDirectX *myDirectX;
 
 		Sound alarm;
 		Camera cam;
 		float angle;	//ÉJÉÅÉâÇÃâÒì]äp
-		Object3D domeObj;
-		Object3D boxObj;
+		Object3D *domeObj;
+		Object3D *boxObj;
 
 		Model triangle;
 		Model dome;
 		ParticleManager *part;
 		int spriteTex;
-		Sprite sprite;
-		DebugText *debugText;
+		Sprite *sprite;
 };

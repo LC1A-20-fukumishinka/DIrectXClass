@@ -5,45 +5,46 @@
 using namespace DirectX;
 void Game::Init()
 {	//WindowsAPI‰Šú‰»ˆ—
-	Win = WinAPI::GetInstance();
-	Win->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-
-	myDirectX = MyDirectX::GetInstance();
-	myDirectX->Init();
+	Framework::Init();
 	isEnd = false;
 	Input *input = Input::GetInstance();
+	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
 
-	Sound::StaticInitialize();
 	int alarmIndex = Sound::SoundLoadWave("Resources/Alarm01.wav");
 	alarm.Init(alarmIndex);
 
-	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
 
 	cam.Init(XMFLOAT3(0, 0, -100), XMFLOAT3(0, 0, 0));
 	angle = 0.0f;
 
-	domeObj.scale = { 0.1f, 0.1f, 0.1f };
-	domeObj.position = { -10,0,0 };
-	domeObj.Init(&cam);
+	domeObj = new Object3D();
+	domeObj->scale = { 0.1f, 0.1f, 0.1f };
+	domeObj->position = { -10,0,0 };
+	domeObj->Init(&cam);
 
-	boxObj.Init(&cam);
-	boxObj.scale = { 100.0f, 100.0f, 100.0f };
-	boxObj.position = { 10, 0,0 };
+	boxObj = new Object3D();
+	boxObj->Init(&cam);
+	boxObj->scale = { 100.0f, 100.0f, 100.0f };
+	boxObj->position = { 10, 0,0 };
 
+	
 	dome.CreateModel("skydome");
 	triangle.CreateModel("box");
-	ParticleManager::StaticInitialize(&cam);
 
 	part = ParticleManager::Create();
-	debugText = DebugText::Create();
+	part->SetCamera(&cam);
 
 	spriteTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
-	sprite.Init(spriteTex);
+	sprite = new Sprite();
+	sprite->Init(spriteTex);
 }
 
 void Game::Finalize()
 {
+	delete domeObj;
+	delete boxObj;
+	delete sprite;
 	delete part;
 	delete debugText;
 	//xAudio2‰ð•ú
@@ -74,25 +75,25 @@ void Game::Update()
 	{
 		if (Input::GetInstance()->Key(DIK_RIGHT))
 		{
-			domeObj.rotation.y++;
+			domeObj->rotation.y++;
 		}
 		if (Input::GetInstance()->Key(DIK_LEFT))
 		{
-			domeObj.rotation.y--;
+			domeObj->rotation.y--;
 		}
 		if (Input::GetInstance()->Key(DIK_UP))
 		{
-			domeObj.rotation.x++;
+			domeObj->rotation.x++;
 		}
 		if (Input::GetInstance()->Key(DIK_DOWN))
 		{
-			domeObj.rotation.x--;
+			domeObj->rotation.x--;
 		}
 	}
-	boxObj.color.x += 0.01;
-	domeObj.Update();
+	boxObj->color.x += 0.01;
+	domeObj->Update();
 
-	boxObj.Update();
+	boxObj->Update();
 
 	if (Input::GetInstance()->Key(DIK_D) || Input::GetInstance()->Key(DIK_A))
 	{
@@ -113,8 +114,8 @@ void Game::Update()
 	part->Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
 	part->Update();
 	debugText->Print("banana", 100, 100, 10);
-	sprite.position.x++;
-	sprite.Update();
+	sprite->position.x++;
+	sprite->Update();
 }
 
 void Game::PreDraw()
@@ -125,10 +126,10 @@ void Game::PreDraw()
 
 void Game::Draw()
 {
-	domeObj.modelDraw(dome.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
-	boxObj.modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
+	domeObj->modelDraw(dome.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
+	boxObj->modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
 	part->Draw(spriteTex);
-	sprite.Draw();
+	sprite->Draw();
 	debugText->DrawAll();
 
 }
