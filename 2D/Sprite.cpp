@@ -15,6 +15,43 @@ Sprite::Sprite()
 	texLeftTop = { 0, 0 };
 	texSize = { 0 , 0 };
 	isInvisible = false;
+
+	HRESULT result = S_FALSE;
+	MyDirectX *myD = MyDirectX::GetInstance();
+
+	////頂点データ
+	VertexPosUv vertices[] =
+	{
+		{},//左下
+		{},//左上
+		{},//右下
+		{},//右上
+	};
+	//頂点バッファ生成
+	result = myD->GetDevice()->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertices)),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&vertBuff)
+	);
+
+
+	//頂点バッファビューの作成
+	vBView.BufferLocation = vertBuff->GetGPUVirtualAddress();
+	vBView.SizeInBytes = sizeof(vertices);
+	vBView.StrideInBytes = sizeof(vertices[0]);
+
+	//定数バッファの生成
+	result = myD->GetDevice()->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuff)
+	);
 }
 
 void Sprite::Init(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
@@ -39,48 +76,15 @@ void Sprite::Init(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, b
 	color = { 1, 1, 1, 1 };
 	rotation = 0.0f;
 
-	////頂点データ
-	VertexPosUv vertices[] =
-	{
-		{},//左下
-		{},//左上
-		{},//右下
-		{},//右上
-	};
-
-
 	////切り取りサイズを画像のサイズに合わせて変更
 	D3D12_RESOURCE_DESC resDesc = TextureMgr::Instance()->GetTexBuff(texNumber)->GetDesc();
 	texLeftTop = { 0, 0 };
 	texSize = { (float)resDesc.Width , (float)resDesc.Height };
 
 
-	//頂点バッファ生成
-	result = myD->GetDevice()->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertices)),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&vertBuff)
-	);
 
 	SpriteTransferVertexBuffer();
 
-	//頂点バッファビューの作成
-	vBView.BufferLocation = vertBuff->GetGPUVirtualAddress();
-	vBView.SizeInBytes = sizeof(vertices);
-	vBView.StrideInBytes = sizeof(vertices[0]);
-
-	//定数バッファの生成
-	result = myD->GetDevice()->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuff)
-	);
 
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
