@@ -3,12 +3,9 @@
 #include <vector>
 #include <string>
 #include <cassert>
-
-
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
-
 MyDirectX::MyDirectX()
 {
 }
@@ -34,11 +31,44 @@ void MyDirectX::Init()
 	{
 		debugController->EnableDebugLayer();
 	}
+
+	//if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(dxgiInfoQueue.GetAddressOf()))))
+	//{
+	//	//dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
+	//	//dxgiInfoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
+
+
+	//	DXGI_INFO_QUEUE_MESSAGE_ID hide[] =
+	//	{
+	//		80 /* IDXGISwapChain::GetContainingOutput: The swapchain's adapter does not control the output on which the swapchain's window resides. */,
+	//	};
+	//	DXGI_INFO_QUEUE_FILTER filter = {};
+	//	filter.DenyList.NumIDs = _countof(hide);
+	//	filter.DenyList.pIDList = hide;
+	//	dxgiInfoQueue->AddStorageFilterEntries(DXGI_DEBUG_DXGI, &filter);
+	//}
 #endif
 
 	if (!InitializeDXGIDevice())
 	{
 		assert(0);
+	}
+
+	result = dev->QueryInterface(IID_PPV_ARGS(&infoQueue));
+	if (SUCCEEDED(result))
+	{
+		D3D12_MESSAGE_ID hide[] =
+		{
+			//D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
+			//D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE,
+			// Workarounds for debug layer issues on hybrid-graphics systems
+			//D3D12_MESSAGE_ID_EXECUTECOMMANDLISTS_WRONGSWAPCHAINBUFFERREFERENCE,
+			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
+		};
+		D3D12_INFO_QUEUE_FILTER filter = {};
+		filter.DenyList.NumIDs = static_cast<UINT>(std::size(hide));
+		filter.DenyList.pIDList = hide;
+		infoQueue->AddStorageFilterEntries(&filter);
 	}
 
 	if (!InitializeCommand())
@@ -71,7 +101,7 @@ void MyDirectX::PreDraw()
 {
 #pragma region ChangeResourceBarrier
 	//バックバッファの番号を取得(2つ必要なので0番か1番)
-	bbIndex =swapchain->GetCurrentBackBufferIndex();
+	bbIndex = swapchain->GetCurrentBackBufferIndex();
 
 	//①リソースバリアで書き込み可能に変更
 	//表示状態空描画状態に変更
@@ -126,11 +156,16 @@ void MyDirectX::PostDraw()
 	cmdList->Close();
 #pragma endregion
 
+#pragma region ExecuteCommand
 	//コマンドリストの実行
 	ID3D12CommandList *cmdLists[] = { cmdList.Get() };//コマンドリストの配列
 	cmdQueue->ExecuteCommandLists(1, cmdLists);
+#pragma endregion
 
-
+#pragma region Screenflip
+	//バッファをフリップ(裏表の入れ替え)
+	swapchain->Present(1, 0);
+#pragma endregion
 
 #pragma region ExecuteCommandWait
 	cmdQueue->Signal(fence.Get(), ++fenceVal);
@@ -148,8 +183,7 @@ void MyDirectX::PostDraw()
 	cmdList->Reset(cmdAllocator.Get(), nullptr);//再びコマンドリストをためる準備
 #pragma endregion
 
-	//バッファをフリップ(裏表の入れ替え)
-	swapchain->Present(1, 0);
+
 }
 
 void MyDirectX::ClearRenderTarget()
@@ -186,7 +220,7 @@ ID3D12GraphicsCommandList *MyDirectX::GetCommandList()
 CD3DX12_CPU_DESCRIPTOR_HANDLE MyDirectX::GetDsvH()
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE
-		(dsvHeap->GetCPUDescriptorHandleForHeapStart(),
+	(dsvHeap->GetCPUDescriptorHandleForHeapStart(),
 		0,
 		dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
 }
@@ -340,7 +374,7 @@ bool MyDirectX::CreateSwapChain()
 	swapchain1.As(&swapchain);
 #pragma endregion
 
-	
+
 	return true;
 }
 
@@ -365,6 +399,9 @@ bool MyDirectX::CreateFinalRenderTargets()
 			assert(0);
 			return false;
 		}
+
+		backBuffers[i]->SetName(L"BackBuffer");
+
 		//デスクリプタヒープのハンドルを取得
 		CD3DX12_CPU_DESCRIPTOR_HANDLE handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeaps->GetCPUDescriptorHandleForHeapStart(),
 			i,
@@ -460,15 +497,4 @@ bool MyDirectX::CreateFence()
 		return false;
 	}
 	return true;
-}
-
-void MyDirectX::CheckAliveObject()
-{
-	ID3D12DebugDevice *debugInterface;
-
-	if (SUCCEEDED(dev.Get()->QueryInterface(&debugInterface)))
-	{
-		debugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
-		debugInterface->Release();
-	}
 }

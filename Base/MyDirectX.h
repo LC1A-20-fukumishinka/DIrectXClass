@@ -3,7 +3,10 @@
 #include <d3dx12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
+#include <dxgidebug.h>
 
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
 class MyDirectX
 {
 private:
@@ -44,6 +47,9 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> backBuffers;
 	UINT bbIndex;
 	UINT64 fenceVal;
+
+	Microsoft::WRL::ComPtr<IDXGIInfoQueue> dxgiInfoQueue;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue;
 private://各種項目の初期化処理
 	//DXGIデバイスの初期化
 	bool InitializeDXGIDevice();
@@ -62,7 +68,4 @@ private://各種項目の初期化処理
 
 	//フェンス生成
 	bool CreateFence();
-
-	//どこでメモリリークを起こしているかを確認してくれた
-	void CheckAliveObject();
 };
