@@ -8,8 +8,6 @@ void Game::Init()
 
 	Framework::Init();
 	isEnd = false;
-	Input *input = Input::GetInstance();
-	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
 
 	int alarmIndex = Sound::SoundLoadWave("Resources/Alarm01.wav");
 	alarm.Init(alarmIndex);
@@ -52,9 +50,7 @@ void Game::Finalize()
 
 void Game::Update()
 {
-	Win->msgCheck();
-	Input::GetInstance()->Update();
-
+	Framework::Update();
 	if (Input::GetInstance()->Key(DIK_K))
 	{
 		isEnd = true;
@@ -112,25 +108,20 @@ void Game::Update()
 	debugText->Print("banana", 100, 100, 10);
 	sprite->position.x++;
 	sprite->Update();
-}
-
-void Game::PreDraw()
-{
-	myDirectX->PreDraw();
 
 }
+
 
 void Game::Draw()
 {
+	myDirectX->PreDraw();
+
 	domeObj->modelDraw(dome.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
 	boxObj->modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
 	part->Draw(spriteTex);
 	sprite->Draw();
 	debugText->DrawAll();
 
-}
-
-void Game::PostDraw()
-{
 	myDirectX->PostDraw();
 }
+

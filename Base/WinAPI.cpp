@@ -19,10 +19,10 @@ bool WinAPI::loopBreak()
 	//×ボタンで修了メッセージが来たらゲームループを抜ける
 	if (msg.message == WM_QUIT)
 	{
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void WinAPI::end()

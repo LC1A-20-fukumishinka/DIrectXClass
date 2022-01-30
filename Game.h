@@ -10,12 +10,9 @@ class Game : public Framework
 public:
 	void Init() override;
 	void Finalize() override;
-	void Update();
-	void PreDraw();
-	void Draw();
-	void PostDraw();
+	void Update() override;
+	void Draw() override;
 public:
-bool isEnd;
 private:
 
 		Sound alarm;

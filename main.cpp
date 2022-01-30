@@ -2,20 +2,10 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	Game game;
-	game.Init();
+	Framework *game = new Game;
+	
+	game->Run();
 
-
-	while (!game.isEnd) //ゲームループ
-	{
-		game.Update();
-		//描画コマンド
-		game.PreDraw();
-		game.Draw();
-		//debugText.DrawAll();
-		//描画コマンドここまで
-		game.PostDraw();
-	}
-	game.Finalize();
+	delete game;
 	return 0;
 }

@@ -27,6 +27,7 @@ public:
 
 	void ClearDepthBuffer();
 
+	void CheckAliveObject();
 public://Getter
 	ID3D12Device *GetDevice();
 	ID3D12GraphicsCommandList *GetCommandList();
@@ -68,4 +69,5 @@ private://各種項目の初期化処理
 
 	//フェンス生成
 	bool CreateFence();
+
 };
