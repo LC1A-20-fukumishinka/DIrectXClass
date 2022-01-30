@@ -11,6 +11,8 @@ class Framework
 {
 public:
 	virtual void Init();
+
+	virtual void Finalize();
 protected:
 	WinAPI *Win;
 	MyDirectX *myDirectX;

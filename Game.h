@@ -9,7 +9,7 @@ class Game : public Framework
 {
 public:
 	void Init() override;
-	void Finalize();
+	void Finalize() override;
 	void Update();
 	void PreDraw();
 	void Draw();

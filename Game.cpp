@@ -46,12 +46,8 @@ void Game::Finalize()
 	delete boxObj;
 	delete sprite;
 	delete part;
-	delete debugText;
-	//xAudio2‰ð•ú
-	Sound::xAudioDelete();
-	//‰¹ºƒf[ƒ^‰ð•ú
-	Sound::SoundUnload();
-	Win->end();
+
+	Framework::Finalize();
 }
 
 void Game::Update()

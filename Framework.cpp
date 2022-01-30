@@ -16,3 +16,13 @@ void Framework::Init()
 	debugText = DebugText::Create();
 
 }
+
+void Framework::Finalize()
+{
+	delete debugText;
+	//xAudio2‰ğ•ú
+	Sound::xAudioDelete();
+	//‰¹ºƒf[ƒ^‰ğ•ú
+	Sound::SoundUnload();
+	Win->end();
+}
