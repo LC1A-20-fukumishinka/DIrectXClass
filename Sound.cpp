@@ -151,7 +151,7 @@ void Sound::Init(const int soundIndex)
 void Sound::Play()
 {
 	HRESULT result;
-
+	Stop();
 	//再生する波形データの設定
 	XAUDIO2_BUFFER buf{};
 	buf.pAudioData = soundData[soundIndex].pBuffer;
@@ -173,6 +173,7 @@ void Sound::PlayLoop()
 	buf.pAudioData = soundData[soundIndex].pBuffer;
 	buf.AudioBytes = soundData[soundIndex].bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
+	buf.LoopCount = XAUDIO2_LOOP_INFINITE;
 
 	//波形データの再生
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
