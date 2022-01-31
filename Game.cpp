@@ -10,28 +10,30 @@ void Game::Init()
 	isEnd = false;
 
 	int alarmIndex = Sound::SoundLoadWave("Resources/Alarm01.wav");
-	alarm.Init(alarmIndex);
+	alarm = new Sound();
+	alarm->Init(alarmIndex);
 
-
-	cam.Init(XMFLOAT3(0, 0, -100), XMFLOAT3(0, 0, 0));
+	cam = new Camera();
+	cam->Init(XMFLOAT3(0, 0, -100), XMFLOAT3(0, 0, 0));
 	angle = 0.0f;
 
 	domeObj = new Object3D();
 	domeObj->scale = { 0.1f, 0.1f, 0.1f };
 	domeObj->position = { -10,0,0 };
-	domeObj->Init(&cam);
+	domeObj->Init(cam);
 
 	boxObj = new Object3D();
-	boxObj->Init(&cam);
+	boxObj->Init(cam);
 	boxObj->scale = { 100.0f, 100.0f, 100.0f };
 	boxObj->position = { 10, 0,0 };
 
-	
-	dome.CreateModel("skydome");
-	triangle.CreateModel("box");
+	dome = new Model();
+	dome->CreateModel("skydome");
+	triangle = new Model();
+	triangle->CreateModel("box");
 
 	part = ParticleManager::Create();
-	part->SetCamera(&cam);
+	part->SetCamera(cam);
 
 	spriteTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
 	sprite = new Sprite();
@@ -40,6 +42,9 @@ void Game::Init()
 
 void Game::Finalize()
 {
+	delete triangle;
+	delete dome;
+	delete alarm;
 	delete domeObj;
 	delete boxObj;
 	delete sprite;
@@ -57,11 +62,11 @@ void Game::Update()
 	}
 	if (Input::GetInstance()->KeyTrigger(DIK_SPACE))
 	{
-		alarm.Play();
+		alarm->Play();
 	}
 	if (Input::GetInstance()->KeyTrigger(DIK_8))
 	{
-		alarm.Stop();
+		alarm->Stop();
 	}
 	if (Input::GetInstance()->Key(DIK_RIGHT) || Input::GetInstance()->Key(DIK_LEFT) || Input::GetInstance()->Key(DIK_UP) || Input::GetInstance()->Key(DIK_DOWN))
 	{
@@ -97,11 +102,11 @@ void Game::Update()
 		{
 			angle -= XMConvertToRadians(1.0f);
 		}
-		cam.eye.x = -100 * sinf(angle);
-		cam.eye.z = -100 * cosf(angle);
+		cam->eye.x = -100 * sinf(angle);
+		cam->eye.z = -100 * cosf(angle);
 	}
 
-	cam.Update();
+	cam->Update();
 
 	part->Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
 	part->Update();
@@ -116,8 +121,8 @@ void Game::Draw()
 {
 	myDirectX->PreDraw();
 
-	domeObj->modelDraw(dome.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
-	boxObj->modelDraw(triangle.GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
+	domeObj->modelDraw(dome->GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
+	boxObj->modelDraw(triangle->GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
 	part->Draw(spriteTex);
 	sprite->Draw();
 	debugText->DrawAll();

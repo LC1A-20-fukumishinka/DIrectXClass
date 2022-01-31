@@ -61,6 +61,6 @@ void Framework::Finalize()
 	//‰¹ºƒf[ƒ^‰ğ•ú
 	Sound::SoundUnload();
 
-myDirectX->CheckAliveObject();
+//myDirectX->CheckAliveObject();
 Win->end();
 }

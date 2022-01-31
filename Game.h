@@ -15,14 +15,14 @@ public:
 public:
 private:
 
-		Sound alarm;
-		Camera cam;
+		Sound *alarm;
+		Camera *cam;
 		float angle;	//ƒJƒƒ‰‚Ì‰ñ“]Šp
 		Object3D *domeObj;
 		Object3D *boxObj;
 
-		Model triangle;
-		Model dome;
+		Model *triangle;
+		Model *dome;
 		ParticleManager *part;
 		int spriteTex;
 		Sprite *sprite;
