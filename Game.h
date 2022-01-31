@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include "Sprite.h"
 #include "Framework.h"
+
+class GameScene;
 class Game : public Framework
 {
 public:
@@ -18,12 +20,12 @@ private:
 		Sound *alarm;
 		Camera *cam;
 		float angle;	//ƒJƒƒ‰‚Ì‰ñ“]Šp
-		Object3D *domeObj;
 		Object3D *boxObj;
 
 		Model *triangle;
-		Model *dome;
 		ParticleManager *part;
 		int spriteTex;
 		Sprite *sprite;
+
+		GameScene *scene_ = nullptr;
 };
