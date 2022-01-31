@@ -1,7 +1,6 @@
 #include "Framework.h"
 #include "BaseData.h"
 #include "DirectInput.h"
-
 void Framework::Run()
 {
 	Init();
@@ -38,24 +37,25 @@ void Framework::Init()
 	Sound::StaticInitialize();
 	ParticleManager::StaticInitialize();
 
-	debugText = DebugText::Create();
-
+	sceneMgr = SceneMgr::Instance();
+	isEnd = false;
 }
 
 void Framework::Update()
 {
-	if (Win->loopBreak())
+	if (Win->loopBreak() || Input::GetInstance()->Key(DIK_ESCAPE))
 	{
 		isEnd = true;
 		return;
 	}
 	Win->msgCheck();
 	Input::GetInstance()->Update();
+
+	sceneMgr->Update();
 }
 
 void Framework::Finalize()
 {
-	delete debugText;
 	//xAudio2‰ð•ú
 	Sound::xAudioDelete();
 	//‰¹ºƒf[ƒ^‰ð•ú
@@ -63,4 +63,14 @@ void Framework::Finalize()
 
 //myDirectX->CheckAliveObject();
 Win->end();
+}
+
+void Framework::Draw()
+{
+	myDirectX->PreDraw();
+
+	sceneMgr->Draw();
+
+
+	myDirectX->PostDraw();
 }

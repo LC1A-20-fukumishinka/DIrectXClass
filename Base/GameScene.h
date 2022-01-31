@@ -3,13 +3,14 @@
 #include "Object3D.h"
 #include "Model.h"
 #include "../Camera.h"
-class GameScene
+#include "IScene.h"
+class GameScene : public IScene
 {
 public:
-	void Init();
-	void Update();
-	void Draw();
-	void Finalize();
+	void Init() override;
+	void Update() override;
+	void Draw() override;
+	void Finalize() override;
 private:
 	Model *dome;
 	Object3D *domeObj;

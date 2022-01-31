@@ -7,6 +7,7 @@
 #include "Sound.h"
 #include "TextureMgr.h"
 #include "particleManager.h"
+#include "SceneMgr.h"
 class Framework
 {
 public:
@@ -18,13 +19,13 @@ public:
 
 	virtual void Finalize();
 
-	virtual void Draw() = 0;
+	virtual void Draw();
 
 	bool IsEnd() { return isEnd; }
 protected:
 	WinAPI *Win;
 	MyDirectX *myDirectX;
-	DebugText *debugText;
 
 	bool isEnd = false;
+	SceneMgr *sceneMgr;
 };
