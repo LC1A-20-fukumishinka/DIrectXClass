@@ -4,6 +4,7 @@
 #include "Object3DCommon.h"
 #include "../Camera.h"
 #include "IGraphicsPipeline.h"
+#include "../Light.h"
 struct ModelObject;
 
 class Object3D
@@ -13,7 +14,10 @@ public:
 	struct ConstBufferData
 	{
 		DirectX::XMFLOAT4 color;	//色(RGBA)
-		DirectX::XMMATRIX mat;	//3D変換行列
+		//DirectX::XMMATRIX mat;	//3D変換行列
+		DirectX::XMMATRIX viewproj;
+		DirectX::XMMATRIX world;
+		DirectX::XMFLOAT3 cameraPos;
 	};
 	enum ObjectName
 	{
@@ -23,7 +27,7 @@ public:
 	};
 	Object3D();
 
-	void Init(Camera *camera, Object3D *parent = nullptr);
+	void Init(Camera *camera, Light *light, Object3D *parent = nullptr);
 
 	DirectX::XMMATRIX GetMatWorld();
 
@@ -41,6 +45,8 @@ public:
 	void SetParent(Object3D *parent);
 
 	void SetCamera(Camera *camera);
+
+	void SetLight(Light *light);
 	//色(RGBA)
 	DirectX::XMFLOAT4 color;
 	//大きさ
@@ -64,9 +70,11 @@ private:
 	//テクスチャ番号
 	UINT texNumber;
 
-	Object3D *parent;
+	Object3D *parent = nullptr;
 	//非表示
-	Camera *camera;
+	Camera *camera = nullptr;
+
+	Light *light = nullptr;
 };
 
 //深度値リセット

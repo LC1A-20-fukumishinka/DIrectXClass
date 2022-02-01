@@ -17,10 +17,14 @@ void TitleScene::Init()
 	cam->Init(Vector3(0, 0, -100), Vector3(0, 0, 0));
 	angle = 0.0f;
 
+	light = Light::Create();
 
-
+	light->Initialize();
+	light->SetLightColor({1, 1, 1});
+	light->SetLightDir({-1, 0, 1});
+	light->Update();
 	boxObj = new Object3D();
-	boxObj->Init(cam);
+	boxObj->Init(cam, light);
 	boxObj->scale = { 100.0f, 100.0f, 100.0f };
 	boxObj->position = { 10, 0,0 };
 
@@ -56,7 +60,7 @@ void TitleScene::Update()
 		SceneMgr::Instance()->SetNextScene(scene);
 	}
 	boxObj->color.x += 0.01;
-
+	boxObj->rotation.y ++;
 	boxObj->Update();
 
 	if (Input::GetInstance()->Key(DIK_D) || Input::GetInstance()->Key(DIK_A))

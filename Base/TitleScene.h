@@ -7,6 +7,7 @@
 #include "particleManager.h"
 #include "DebugText.h"
 #include "IScene.h"
+#include "../Light.h"
 class TitleScene : public IScene
 {
 public:
@@ -26,4 +27,5 @@ private:
 	Sound *alarm;
 
 	DebugText *debug;
+	Light *light;
 };

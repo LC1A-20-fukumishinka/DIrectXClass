@@ -29,7 +29,7 @@ Object3D::Object3D()
 	);
 }
 
-void Object3D::Init(Camera *camera, Object3D *parent)
+void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 {
 	this->parent = parent;
 
@@ -37,14 +37,16 @@ void Object3D::Init(Camera *camera, Object3D *parent)
 	MyDirectX *myD = MyDirectX::GetInstance();
 
 	SetCamera(camera);
-
+	SetLight(light);
 	//ワールド行列を設定する
 	matWorld = GetMatWorld();
 
 	ConstBufferData *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = color;//色指定(RGBA)
-	constMap->mat = matWorld * this->camera->matView * this->camera->matProjection;	//平行透視投影
+	constMap->viewproj = camera->matView * camera->matProjection;
+	constMap->world = matWorld;
+	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->eye);
 	constBuff->Unmap(0, nullptr);
 
 }
@@ -88,7 +90,9 @@ void Object3D::Update()
 
 	HRESULT result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = color;//色指定(RGBA)
-	constMap->mat = matWorld * camera->matView * camera->matProjection;	//透視投影
+	constMap->viewproj = camera->matView * camera->matProjection;
+	constMap->world = matWorld;
+	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->eye);
 	constBuff->Unmap(0, nullptr);
 
 }
@@ -184,6 +188,7 @@ void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipeli
 
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model.constBuffB1->GetGPUVirtualAddress());
 
+	light->Draw(3);
 	if(isSetTexture)
 	{
 		if (!TextureMgr::Instance()->CheckHandle(textureNumber))
@@ -237,6 +242,11 @@ void Object3D::SetCamera(Camera *camera)
 		assert(0);
 	}
 	this->camera = camera;
+}
+
+void Object3D::SetLight(Light *light)
+{
+	this->light = light;
 }
 
 void DepthReset()

@@ -6,10 +6,13 @@ void GameScene::Init()
 {
 	cam = new Camera();
 	cam->Init(Vector3(0, 0, -100), Vector3(0, 0, 0));
+	light = Light::Create();
+	light->SetLightColor({1, 0, 0});
+	light->Update();
 	domeObj = new Object3D();
 	domeObj->scale = { 0.1f, 0.1f, 0.1f };
 	domeObj->position = { -10,0,0 };
-	domeObj->Init(cam);
+	domeObj->Init(cam, light);
 	dome = new Model();
 	dome->CreateModel("skydome");
 }

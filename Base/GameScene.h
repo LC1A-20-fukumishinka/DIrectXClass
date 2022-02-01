@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "../Camera.h"
 #include "IScene.h"
+#include "../Light.h"
 class GameScene : public IScene
 {
 public:
@@ -16,5 +17,5 @@ private:
 	Object3D *domeObj;
 	Camera *cam;
 
-
+	Light *light;
 };
