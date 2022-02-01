@@ -60,7 +60,7 @@ void TitleScene::Update()
 		SceneMgr::Instance()->SetNextScene(scene);
 	}
 	boxObj->color.x += 0.01;
-	boxObj->rotation.y ++;
+	boxObj->rotation.y += 0.01;
 	boxObj->Update();
 
 	if (Input::GetInstance()->Key(DIK_D) || Input::GetInstance()->Key(DIK_A))
