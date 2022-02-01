@@ -25,6 +25,8 @@ cbuffer cbuff2 : register(b2)
 struct VSOutput
 {
     float4 svpos : SV_POSITION; // システム用頂点座標
-    float4 color : COLOR;
+    float3 normal : NORMAL; // 法線ベクトル
+    float4 worldpos : POSITION;
+    //float4 color : COLOR;
     float2 uv : TEXCOORD; // uv値
 };
