@@ -213,7 +213,7 @@ void Sprite::Update()
 	matWorld *= DirectX::XMMatrixScaling(size.x, size.y, 1.0f);
 
 	//Zé≤âÒì]
-	matWorld *= DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(rotation));
+	matWorld *= DirectX::XMMatrixRotationZ(rotation);
 	//ïΩçsà⁄ìÆ
 	matWorld *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 

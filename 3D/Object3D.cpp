@@ -59,9 +59,9 @@ XMMATRIX Object3D::GetMatWorld()
 	//各種アフィン変換を行列の形にする
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
-	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
-	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
+	matRot *= XMMatrixRotationZ(rotation.z);
+	matRot *= XMMatrixRotationX(rotation.x);
+	matRot *= XMMatrixRotationY(rotation.y);
 	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
 	//各種変換行列を乗算してゆく
