@@ -29,7 +29,7 @@ LoadModel(directoryPath, modelname);
 UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * model.vertices.size());
 UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * model.indices.size());
 
-ID3D12Device *device = MyDirectX::GetInstance()->GetDevice();
+ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 // 頂点バッファ生成
 HRESULT result = device->CreateCommittedResource(
 	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),

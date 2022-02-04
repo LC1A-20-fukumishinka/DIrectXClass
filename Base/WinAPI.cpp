@@ -70,7 +70,7 @@ void WinAPI::Init(const int winWidth, const int winHeight)
 	//instance->Init();
 }
 
-WinAPI *WinAPI::GetInstance()
+WinAPI *WinAPI::Instance()
 {
 	static WinAPI instance;
 	return &instance;

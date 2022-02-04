@@ -10,7 +10,7 @@ Object3DCommon::Object3DCommon()
 
 void Object3DCommon::Init()
 {
-	MyDirectX *myDirectX = MyDirectX::GetInstance();
+	MyDirectX *myDirectX = MyDirectX::Instance();
 
 	CornInit();
 
@@ -22,7 +22,7 @@ void Object3DCommon::CornInit()
 {
 
 	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 	Vertex vertices[5] = {};
 
@@ -168,7 +168,7 @@ void Object3DCommon::BoxInit()
 {
 
 	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 	Vertex vertices[24] = {};
 
@@ -324,7 +324,7 @@ void Object3DCommon::BoxTransferIndexBufferVertexBuffer()
 void Object3DCommon::PlaneInit()
 {
 	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 	Vertex vertices[4] = {};
 

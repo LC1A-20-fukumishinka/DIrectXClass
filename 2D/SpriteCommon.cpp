@@ -4,7 +4,7 @@
 #include <DirectXTex.h>
 SpriteCommon::SpriteCommon()
 {
-	myDirectX = MyDirectX::GetInstance();
+	myDirectX = MyDirectX::Instance();
 	HRESULT result = S_FALSE;
 
 

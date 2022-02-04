@@ -7,7 +7,7 @@ using namespace Microsoft::WRL;
 ModelPhongPipeline::ModelPhongPipeline()
 {
 
-	ID3D12Device *device = MyDirectX::GetInstance()->GetDevice();
+	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
@@ -173,7 +173,7 @@ const PipeClass::PipelineSet &ModelPhongPipeline::GetPipeLine()
 	return pipelineSet;
 }
 
-ModelPhongPipeline *ModelPhongPipeline::GetInstance()
+ModelPhongPipeline *ModelPhongPipeline::Instance()
 {
 	static ModelPhongPipeline instance;
 	return &instance;

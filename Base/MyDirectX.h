@@ -17,7 +17,7 @@ public:
 	MyDirectX &operator=(const MyDirectX &obj) = delete;
 	int winWidth, winHeight;
 
-	static MyDirectX *GetInstance();
+	static MyDirectX *Instance();
 	void Init();
 	void PreDraw();
 	void PostDraw();

@@ -21,7 +21,7 @@ ComPtr<ID3D12PipelineState> ParticleManager::pipelinestate;
 bool ParticleManager::StaticInitialize()
 {
 
-	ParticleManager::device = MyDirectX::GetInstance()->GetDevice();
+	ParticleManager::device = MyDirectX::Instance()->GetDevice();
 
 
 
@@ -370,7 +370,7 @@ void ParticleManager::Draw(int textureNumber)
 
 
 
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 
 

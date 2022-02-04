@@ -20,21 +20,21 @@ void GameScene::Init()
 
 void GameScene::Update()
 {
-	if (Input::GetInstance()->Key(DIK_RIGHT) || Input::GetInstance()->Key(DIK_LEFT) || Input::GetInstance()->Key(DIK_UP) || Input::GetInstance()->Key(DIK_DOWN))
+	if (Input::Instance()->Key(DIK_RIGHT) || Input::Instance()->Key(DIK_LEFT) || Input::Instance()->Key(DIK_UP) || Input::Instance()->Key(DIK_DOWN))
 	{
-		if (Input::GetInstance()->Key(DIK_RIGHT))
+		if (Input::Instance()->Key(DIK_RIGHT))
 		{
 			domeObj->rotation.y++;
 		}
-		if (Input::GetInstance()->Key(DIK_LEFT))
+		if (Input::Instance()->Key(DIK_LEFT))
 		{
 			domeObj->rotation.y--;
 		}
-		if (Input::GetInstance()->Key(DIK_UP))
+		if (Input::Instance()->Key(DIK_UP))
 		{
 			domeObj->rotation.x++;
 		}
-		if (Input::GetInstance()->Key(DIK_DOWN))
+		if (Input::Instance()->Key(DIK_DOWN))
 		{
 			domeObj->rotation.x--;
 		}
@@ -44,11 +44,13 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	domeObj->modelDraw(dome->GetModel(), ModelPhongPipeline::GetInstance()->GetPipeLine());
+	domeObj->modelDraw(dome->GetModel(), ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
 void GameScene::Finalize()
 {
 	delete dome;
 	delete domeObj;
+	delete light;
+
 }

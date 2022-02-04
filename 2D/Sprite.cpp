@@ -1,6 +1,8 @@
 #include "Sprite.h"
 #include "TextureMgr.h"
 #include "MyDirectX.h"
+#include "SpriteCommon.h"
+
 Sprite::Sprite()
 {
 	anchorpoint = { 0.5f, 0.5f };
@@ -17,7 +19,7 @@ Sprite::Sprite()
 	isInvisible = false;
 
 	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 	////頂点データ
 	VertexPosUv vertices[] =
@@ -57,9 +59,8 @@ Sprite::Sprite()
 void Sprite::Init(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
 {
 	HRESULT result = S_FALSE;
-	MyDirectX* myD = MyDirectX::GetInstance();
+	MyDirectX* myD = MyDirectX::Instance();
 
-	SpriteCommon::Instance();
 	this->texNumber = texNumber;
 
 	if (!TextureMgr::Instance()->CheckHandle(texNumber))
@@ -174,7 +175,7 @@ void Sprite::Draw()
 		return;
 	}
 
-	MyDirectX* myD = MyDirectX::GetInstance();
+	MyDirectX* myD = MyDirectX::Instance();
 	//パイプランステートの設定
 	myD->GetCommandList()->SetPipelineState(SpriteCommon::Instance()->pipelineSet.pipelineState.Get());
 	//ルートシグネチャの設定

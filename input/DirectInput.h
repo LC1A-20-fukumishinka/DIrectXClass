@@ -25,7 +25,7 @@ public:
 	DirectX::XMFLOAT2 RStick();
 	float LTrigger();
 	float RTrigger();
-	static Input *GetInstance();
+	static Input *Instance();
 private:
 	IDirectInput8 *dinput;
 	IDirectInputDevice8 *devkeyboard;

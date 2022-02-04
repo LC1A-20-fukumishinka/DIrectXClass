@@ -10,7 +10,7 @@ public:
 
 	const PipeClass::PipelineSet &GetPipeLine();
 
-	static ModelPhongPipeline *GetInstance();
+	static ModelPhongPipeline *Instance();
 private:
 	PipeClass::PipelineSet pipelineSet;
 };

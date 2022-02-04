@@ -45,16 +45,16 @@ void TitleScene::Init()
 void TitleScene::Update()
 {
 
-	if (Input::GetInstance()->KeyTrigger(DIK_SPACE))
+	if (Input::Instance()->KeyTrigger(DIK_SPACE))
 	{
 		alarm->Play();
 	}
-	if (Input::GetInstance()->KeyTrigger(DIK_8))
+	if (Input::Instance()->KeyTrigger(DIK_8))
 	{
 		alarm->Stop();
 	}
 
-	if (Input::GetInstance()->KeyTrigger(DIK_RETURN))
+	if (Input::Instance()->KeyTrigger(DIK_RETURN))
 	{
 		IScene *scene = new GameScene();
 		SceneMgr::Instance()->SetNextScene(scene);
@@ -63,13 +63,13 @@ void TitleScene::Update()
 	boxObj->rotation.y += 0.01;
 	boxObj->Update();
 
-	if (Input::GetInstance()->Key(DIK_D) || Input::GetInstance()->Key(DIK_A))
+	if (Input::Instance()->Key(DIK_D) || Input::Instance()->Key(DIK_A))
 	{
-		if (Input::GetInstance()->Key(DIK_D))
+		if (Input::Instance()->Key(DIK_D))
 		{
 			angle += XMConvertToRadians(1.0f);
 		}
-		else if (Input::GetInstance()->Key(DIK_A))
+		else if (Input::Instance()->Key(DIK_A))
 		{
 			angle -= XMConvertToRadians(1.0f);
 		}
@@ -88,7 +88,7 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	boxObj->modelDraw(triangle->GetModel(), ModelPipeline::GetInstance()->GetPipeLine());
+	boxObj->modelDraw(triangle->GetModel(), ModelPipeline::Instance()->GetPipeLine());
 	part->Draw(spriteTex);
 	sprite->Draw();
 	debug->DrawAll();
@@ -102,4 +102,6 @@ void TitleScene::Finalize()
 	delete sprite;
 	delete part;
 	delete debug;
+	delete cam;
+	delete light;
 }

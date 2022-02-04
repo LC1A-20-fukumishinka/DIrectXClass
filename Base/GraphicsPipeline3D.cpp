@@ -6,7 +6,7 @@ using namespace PipeClass;
 
 GraphicsPipeline3D::GraphicsPipeline3D()
 {
-	ID3D12Device *device = MyDirectX::GetInstance()->GetDevice();
+	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 	HRESULT result;
 	Microsoft::WRL::ComPtr<ID3DBlob>vsBlob;//頂点シェーダオブジェクト
 	Microsoft::WRL::ComPtr<ID3DBlob>psBlob;//ピクセルシェーダオブジェクト
@@ -173,7 +173,7 @@ const PipelineSet &GraphicsPipeline3D::GetPipeLine()
 	return pipelineSet;
 }
 
-GraphicsPipeline3D *GraphicsPipeline3D::GetInstance()
+GraphicsPipeline3D *GraphicsPipeline3D::Instance()
 {
 	static GraphicsPipeline3D instance;
 	return &instance;

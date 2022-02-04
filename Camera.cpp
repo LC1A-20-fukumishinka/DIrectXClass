@@ -34,7 +34,7 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 	}
 	else
 	{
-		MyDirectX *myD = MyDirectX::GetInstance();
+		MyDirectX *myD = MyDirectX::Instance();
 
 		this->projectionData.height = myD->winHeight;
 		this->projectionData.width = myD->winWidth;

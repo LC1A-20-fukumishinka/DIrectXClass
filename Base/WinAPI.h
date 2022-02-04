@@ -16,7 +16,7 @@ public:
 	int winWidth;
 	int winHeight;
 
-	static WinAPI *GetInstance();
+	static WinAPI *Instance();
 
 	void Init(const int winWidth, const int winHeight);
 

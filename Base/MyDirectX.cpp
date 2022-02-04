@@ -14,7 +14,7 @@ MyDirectX::~MyDirectX()
 {
 }
 
-MyDirectX *MyDirectX::GetInstance()
+MyDirectX *MyDirectX::Instance()
 {
 	static MyDirectX instance;
 	return &instance;
@@ -22,7 +22,7 @@ MyDirectX *MyDirectX::GetInstance()
 
 void MyDirectX::Init()
 {
-	WinAPI *Win = WinAPI::GetInstance();
+	WinAPI *Win = WinAPI::Instance();
 	this->winWidth = Win->winWidth;
 	this->winHeight = Win->winHeight;
 	HRESULT result;
@@ -341,7 +341,7 @@ bool MyDirectX::InitializeCommand()
 
 bool MyDirectX::CreateSwapChain()
 {
-	WinAPI *Win = WinAPI::GetInstance();
+	WinAPI *Win = WinAPI::Instance();
 
 	//winAPIオブジェクトが必要
 #pragma region swapChain

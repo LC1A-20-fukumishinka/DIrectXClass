@@ -24,15 +24,15 @@ void Framework::Run()
 
 void Framework::Init()
 {
-	Win = WinAPI::GetInstance();
+	Win = WinAPI::Instance();
 	Win->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
-	myDirectX = MyDirectX::GetInstance();
+	myDirectX = MyDirectX::Instance();
 	myDirectX->Init();
 
-	Input *input = Input::GetInstance();
-	input->Init(WinAPI::GetInstance()->w, WinAPI::GetInstance()->hwnd);
+	Input *input = Input::Instance();
+	input->Init(WinAPI::Instance()->w, WinAPI::Instance()->hwnd);
 
 	Sound::StaticInitialize();
 	ParticleManager::StaticInitialize();
@@ -43,13 +43,13 @@ void Framework::Init()
 
 void Framework::Update()
 {
-	if (Win->loopBreak() || Input::GetInstance()->Key(DIK_ESCAPE))
+	if (Win->loopBreak() || Input::Instance()->Key(DIK_ESCAPE))
 	{
 		isEnd = true;
 		return;
 	}
 	Win->msgCheck();
-	Input::GetInstance()->Update();
+	Input::Instance()->Update();
 
 	sceneMgr->Update();
 }

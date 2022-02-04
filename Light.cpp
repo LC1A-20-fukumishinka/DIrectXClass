@@ -25,7 +25,7 @@ Light::Light()
 {
 	HRESULT result;
 	//定数バッファの生成
-	result = MyDirectX::GetInstance()->GetDevice()->CreateCommittedResource(
+	result = MyDirectX::Instance()->GetDevice()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
@@ -58,7 +58,7 @@ void Light::Update()
 void Light::Draw( UINT rootParameterIndex)
 {
 	//定数バッファビューをセット
-	MyDirectX::GetInstance()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, 
+	MyDirectX::Instance()->GetCommandList()->SetGraphicsRootConstantBufferView(rootParameterIndex, 
 	constBuff->GetGPUVirtualAddress());
 }
 

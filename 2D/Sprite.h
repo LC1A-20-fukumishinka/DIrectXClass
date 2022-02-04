@@ -1,7 +1,6 @@
 #pragma once
 #include "../Base/MyDirectX.h"
 #include <DirectXMath.h>
-#include "SpriteCommon.h"
 
 class Sprite
 {

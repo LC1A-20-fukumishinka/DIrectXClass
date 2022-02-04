@@ -16,7 +16,7 @@ Object3D::Object3D()
 	this->type = Object3D::Corn;
 
 	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 	//定数バッファの生成
 	result = myD->GetDevice()->CreateCommittedResource(
@@ -34,7 +34,7 @@ void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 	this->parent = parent;
 
 	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 	SetCamera(camera);
 	SetLight(light);
@@ -99,7 +99,7 @@ void Object3D::Update()
 
 void Object3D::Draw(const Object3DCommon &object3DCommon, PipeClass::PipelineSet pipelineSet, int textureNumber)
 {
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 
 	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
@@ -171,7 +171,7 @@ void Object3D::Draw(const Object3DCommon &object3DCommon, PipeClass::PipelineSet
 
 void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture, int textureNumber)
 {
-	MyDirectX *myD = MyDirectX::GetInstance();
+	MyDirectX *myD = MyDirectX::Instance();
 
 
 	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
@@ -251,6 +251,6 @@ void Object3D::SetLight(Light *light)
 
 void DepthReset()
 {
-	MyDirectX *myDirectX = MyDirectX::GetInstance();
+	MyDirectX *myDirectX = MyDirectX::Instance();
 	myDirectX->GetCommandList()->ClearDepthStencilView(myDirectX->GetDsvH(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }

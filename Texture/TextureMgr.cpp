@@ -4,7 +4,7 @@
 #include "MyDirectX.h"
 TextureMgr::TextureMgr()
 {
-	MyDirectX *myDirectX = MyDirectX::GetInstance();
+	MyDirectX *myDirectX = MyDirectX::Instance();
 
 	//デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
@@ -28,7 +28,7 @@ TextureMgr *TextureMgr::Instance()
 
 int TextureMgr::SpriteLoadTexture(const wchar_t *filename)
 {
-	MyDirectX *myDirectX = MyDirectX::GetInstance();
+	MyDirectX *myDirectX = MyDirectX::Instance();
 	//異常な番号の指定を検出
 	assert(LoadTextureCount <= TextureMaxCount - 1);
 	HRESULT result;

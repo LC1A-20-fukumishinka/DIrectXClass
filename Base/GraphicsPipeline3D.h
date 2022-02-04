@@ -10,7 +10,7 @@ public:
 
 	const PipeClass::PipelineSet &GetPipeLine();
 
-	static GraphicsPipeline3D *GetInstance();
+	static GraphicsPipeline3D *Instance();
 private:
 	PipeClass::PipelineSet pipelineSet;
 };

@@ -7,7 +7,7 @@ using namespace Microsoft::WRL;
 ModelPipeline::ModelPipeline()
 {
 
-	ID3D12Device *device = MyDirectX::GetInstance()->GetDevice();
+	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
@@ -173,7 +173,7 @@ const PipeClass::PipelineSet &ModelPipeline::GetPipeLine()
 	return pipelineSet;
 }
 
-ModelPipeline *ModelPipeline::GetInstance()
+ModelPipeline *ModelPipeline::Instance()
 {
 	static ModelPipeline instance;
 	return &instance;

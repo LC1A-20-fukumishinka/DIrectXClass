@@ -139,7 +139,7 @@ float Input::RTrigger()
 
 }
 
-Input *Input::GetInstance()
+Input *Input::Instance()
 {
 	static Input instance;
 	return &instance;
