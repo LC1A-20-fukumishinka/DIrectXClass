@@ -41,6 +41,7 @@ public:
 	//ƒJƒƒ‰‚ğˆêu‚¾‚¯‚¸‚ç‚·
 	void SetShift(DirectX::XMFLOAT3 shift);
 
+	DirectX::XMFLOAT3 GetScreenPos(const DirectX::XMFLOAT3 &pos);
 	DirectX::XMMATRIX GetMatBillboard() const;
 	DirectX::XMMATRIX GetMatBillboardY() const;
 private:

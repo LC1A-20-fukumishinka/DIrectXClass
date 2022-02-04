@@ -62,6 +62,17 @@ void Camera::SetShift(XMFLOAT3 shift)
 	this->shift = shift;
 }
 
+XMFLOAT3 Camera::GetScreenPos(const DirectX::XMFLOAT3 &pos)
+{
+	XMVECTOR v = {};
+	XMFLOAT3 p = pos;
+	XMStoreFloat3(&p, v);
+	v = XMVector3Transform(v, matView);
+	v = XMVector3Transform( v, matProjection);
+
+	return XMFLOAT3(v.m128_f32[0], v.m128_f32[1], v.m128_f32[2]);
+}
+
 DirectX::XMMATRIX Camera::GetMatBillboard() const
 {
 	return matBillBoard;
