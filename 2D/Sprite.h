@@ -19,7 +19,7 @@ public:
 
 
 	//À•W
-	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT2 position;
 	//Z²‰ñ‚è‚Ì‰ñ“]²
 	float rotation;
 	//F(RGBA)

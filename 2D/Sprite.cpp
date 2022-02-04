@@ -6,7 +6,7 @@ Sprite::Sprite()
 	anchorpoint = { 0.5f, 0.5f };
 	isFlipX = false;
 	isFlipY = false;
-	position = { 0, 0, 0 };
+	position = { 0, 0 };
 	color = { 1, 1, 1, 1 };
 	rotation = 0.0f;
 
@@ -72,7 +72,7 @@ void Sprite::Init(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, b
 	this->anchorpoint = anchorpoint;
 	this->isFlipX = isFlipX;
 	this->isFlipY = isFlipY;
-	position = { 0, 0, 0 };
+	position = { 0, 0 };
 	color = { 1, 1, 1, 1 };
 	rotation = 0.0f;
 
@@ -88,7 +88,7 @@ void Sprite::Init(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, b
 
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
-	constMap->color = DirectX::XMFLOAT4(1, 1, 1, 1);//色指定(RGBA)
+	constMap->color = color;//色指定(RGBA)
 	constMap->mat = SpriteCommon::Instance()->matProjection;	//平行透視投影
 	constBuff->Unmap(0, nullptr);
 
@@ -215,7 +215,7 @@ void Sprite::Update()
 	//Z軸回転
 	matWorld *= DirectX::XMMatrixRotationZ(rotation);
 	//平行移動
-	matWorld *= DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	matWorld *= DirectX::XMMatrixTranslation(position.x, position.y, 0.0f);
 
 	//定数バッファの転送
 	ConstBufferData* constMap = nullptr;
