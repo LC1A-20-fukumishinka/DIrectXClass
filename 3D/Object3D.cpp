@@ -13,7 +13,6 @@ Object3D::Object3D()
 	isInvisible = false;
 	color = { 1, 1, 1, 1 };
 	matWorld = XMMatrixIdentity();
-	this->type = Object3D::Corn;
 
 	HRESULT result = S_FALSE;
 	MyDirectX *myD = MyDirectX::Instance();

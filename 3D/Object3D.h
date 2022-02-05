@@ -1,12 +1,14 @@
 #pragma once
-#include "../Base/MyDirectX.h"
+#include "MyDirectX.h"
 #include <DirectXMath.h>
 #include "Object3DCommon.h"
 #include "../Camera.h"
 #include "IGraphicsPipeline.h"
 #include "../Light.h"
+#include "../Collision/CollisionInfo.h"
 struct ModelObject;
 
+class BaseCollider;
 class Object3D
 {
 public:
@@ -33,7 +35,6 @@ public:
 
 	void Update();
 
-	void Draw(const Object3DCommon &object3DCommon, PipeClass::PipelineSet pipelineSet, int textureNumber);
 
 	/// <summary>
 	/// モデルの描画コマンド
@@ -57,8 +58,6 @@ public:
 	DirectX::XMFLOAT3 position;
 	//描画フラグ
 	bool isInvisible;
-	//どんな形か
-	ObjectName type;
 
 	//ワールド行列
 	DirectX::XMMATRIX matWorld;
