@@ -1,7 +1,7 @@
 #pragma once
 #include "CollisionType.h"
 #include "Object3D.h"
-
+#include "CollisionInfo.h"
 /// <summary>
 /// コライダー基底クラス
 /// </summary>
@@ -33,6 +33,10 @@ inline CollisionShapeType GetShapeType()
 	return shapeType;
 }
 
+inline void OnCollision(const CollisionInfo &info)
+{
+	object3d->OnCollision(info);
+}
 protected:
 Object3D *object3d = nullptr;
 //形状タイプ
