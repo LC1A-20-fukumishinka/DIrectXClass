@@ -1,35 +1,21 @@
 #include "Object3D.h"
 #include "TextureMgr.h"
 #include "Model.h"
+#include "../Collision/BaseCollider.h"
 using namespace DirectX;
 
-Object3D::Object3D()
+
+Object3D::~Object3D()
 {
-	scale = { 1, 1 , 1 };
-	rotation = { 0.0f ,0.0f ,0.0f };
-	position = { 0.0f ,0.0f ,0.0f };
-	parent = nullptr;
-
-	isInvisible = false;
-	color = { 1, 1, 1, 1 };
-	matWorld = XMMatrixIdentity();
-
-	HRESULT result = S_FALSE;
-	MyDirectX *myD = MyDirectX::Instance();
-
-	//定数バッファの生成
-	result = myD->GetDevice()->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuff)
-	);
+	if (collider)
+	{
+		delete collider;
+	}
 }
 
 void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 {
+
 	this->parent = parent;
 
 	HRESULT result = S_FALSE;
@@ -38,8 +24,33 @@ void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 	SetCamera(camera);
 	SetLight(light);
 	//ワールド行列を設定する
+	matWorld = XMMatrixIdentity();
+
 	matWorld = GetMatWorld();
 
+
+	//定数バッファの生成
+	if (!isMakeConstBuffer)
+	{
+		HRESULT result = S_FALSE;
+		MyDirectX *myD = MyDirectX::Instance();
+
+		result = myD->GetDevice()->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&constBuff)
+		);
+
+		if (result)
+		{
+			assert(0);
+		}
+		isMakeConstBuffer = true;
+	}
+	
 	ConstBufferData *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = color;//色指定(RGBA)
@@ -48,9 +59,11 @@ void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->eye);
 	constBuff->Unmap(0, nullptr);
 
+	//クラス名の文字列を取得
+	name = typeid(*this).name();
 }
 
-XMMATRIX Object3D::GetMatWorld()
+const XMMATRIX Object3D::GetMatWorld()
 {
 	XMMATRIX matScale, matRot, matTrans, matTmp;
 
@@ -94,79 +107,12 @@ void Object3D::Update()
 	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->eye);
 	constBuff->Unmap(0, nullptr);
 
+	if (collider)
+	{
+		collider->Update();
+	}
 }
 
-void Object3D::Draw(const Object3DCommon &object3DCommon, PipeClass::PipelineSet pipelineSet, int textureNumber)
-{
-	MyDirectX *myD = MyDirectX::Instance();
-
-
-	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
-	myD->GetCommandList()->SetGraphicsRootSignature(pipelineSet.rootSignature.Get());
-
-	myD->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//デスクリプタヒープの配列
-
-	ID3D12DescriptorHeap *descHeap = TextureMgr::Instance()->GetDescriptorHeap();
-	ID3D12DescriptorHeap *ppHeaps[] = { descHeap };
-	myD->GetCommandList()->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-	//定数バッファビュー
-	myD->GetCommandList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
-
-
-	if (!TextureMgr::Instance()->CheckHandle(textureNumber))
-	{
-		assert(0);
-		return;
-	}
-	myD->GetCommandList()->SetGraphicsRootDescriptorTable(1,
-		CD3DX12_GPU_DESCRIPTOR_HANDLE(
-			descHeap->GetGPUDescriptorHandleForHeapStart(),
-			textureNumber,
-			myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-		)
-	);
-
-#pragma region とりあえず引っ張り出した描画コマンド
-	myD->GetCommandList()->IASetVertexBuffers(0, 1, &object3DCommon.boxVBView);
-	//インデックスバッファの設定
-	myD->GetCommandList()->IASetIndexBuffer(&object3DCommon.boxIBView);
-	myD->GetCommandList()->DrawIndexedInstanced(object3DCommon.BoxNumIndices, 1, 0, 0, 0);
-#pragma endregion
-
-	switch (type)
-	{
-	case Object3D::Corn:
-		//頂点バッファの設定
-		myD->GetCommandList()->IASetVertexBuffers(0, 1, &object3DCommon.cornVBView);
-		//インデックスバッファの設定
-		myD->GetCommandList()->IASetIndexBuffer(&object3DCommon.cornIBView);
-		myD->GetCommandList()->DrawIndexedInstanced(object3DCommon.CornNumIndices, 1, 0, 0, 0);
-		break;
-	case Object3D::Box:
-		//頂点バッファの設定
-		myD->GetCommandList()->IASetVertexBuffers(0, 1, &object3DCommon.boxVBView);
-		//インデックスバッファの設定
-		myD->GetCommandList()->IASetIndexBuffer(&object3DCommon.boxIBView);
-		myD->GetCommandList()->DrawIndexedInstanced(object3DCommon.BoxNumIndices, 1, 0, 0, 0);
-		break;
-	case Object3D::Plane:
-		//頂点バッファの設定
-		myD->GetCommandList()->IASetVertexBuffers(0, 1, &object3DCommon.planeVBView);
-		//インデックスバッファの設定
-		myD->GetCommandList()->IASetIndexBuffer(&object3DCommon.planeIBView);
-		myD->GetCommandList()->DrawIndexedInstanced(object3DCommon.PlaneNumIndices, 1, 0, 0, 0);
-		break;
-	default://どれにも該当しなかった場合(コーンで描画)
-		//頂点バッファの設定
-		myD->GetCommandList()->IASetVertexBuffers(0, 1, &object3DCommon.cornVBView);
-		//インデックスバッファの設定
-		myD->GetCommandList()->IASetIndexBuffer(&object3DCommon.cornIBView);
-		myD->GetCommandList()->DrawIndexedInstanced(object3DCommon.CornNumIndices, 1, 0, 0, 0);
-		break;
-	}
-
-}
 
 void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture, int textureNumber)
 {
@@ -246,6 +192,12 @@ void Object3D::SetCamera(Camera *camera)
 void Object3D::SetLight(Light *light)
 {
 	this->light = light;
+}
+
+void Object3D::SetCollider(BaseCollider *collider)
+{
+	collider->SetObject(this);
+	this->collider = collider;
 }
 
 void DepthReset()

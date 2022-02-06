@@ -27,13 +27,14 @@ public:
 		Box,
 		Plane
 	};
-	Object3D();
+	Object3D() = default;
 
-	void Init(Camera *camera, Light *light, Object3D *parent = nullptr);
+	virtual ~Object3D();
+	virtual void Init(Camera *camera, Light *light, Object3D *parent = nullptr);
 
-	DirectX::XMMATRIX GetMatWorld();
+	const DirectX::XMMATRIX GetMatWorld();
 
-	void Update();
+	virtual void Update();
 
 
 	/// <summary>
@@ -41,30 +42,42 @@ public:
 	/// </summary>
 	/// <param name="isSetTexture">別のテクスチャを使用する</param>
 	/// <param name="textureNumber">使用するテクスチャのハンドル</param>
-	void modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture = false, int textureNumber = -1);
+	virtual void modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture = false, int textureNumber = -1);
 
 	void SetParent(Object3D *parent);
 
 	void SetCamera(Camera *camera);
 
 	void SetLight(Light *light);
+
+	void SetCollider(BaseCollider *collider);
+
+	virtual void OnCollision(const CollisionInfo &info) {};
+
+protected:
+//クラス名(デバッグ用)
+const char *name = nullptr;
+
+//コライダー
+BaseCollider * collider = nullptr;
+
 	//色(RGBA)
-	DirectX::XMFLOAT4 color;
+	DirectX::XMFLOAT4 color = { 1.0f,1.0f ,1.0f ,1.0f };
 	//大きさ
-	DirectX::XMFLOAT3 scale;
+	DirectX::XMFLOAT3 scale = { 1.0f ,1.0f ,1.0f };
 	//回転
-	DirectX::XMFLOAT3 rotation;
+	DirectX::XMFLOAT3 rotation = { 0.0f,0.0f ,0.0f };
 	//座標
-	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT3 position = { 0.0f,0.0f ,0.0f };
 	//描画フラグ
-	bool isInvisible;
+	bool isInvisible = false;
 
 	//ワールド行列
 	DirectX::XMMATRIX matWorld;
-	//定数バッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff;
 
 private:
+	//定数バッファ
+	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff;
 
 	//テクスチャ番号
 	UINT texNumber;
@@ -74,6 +87,8 @@ private:
 	Camera *camera = nullptr;
 
 	Light *light = nullptr;
+
+	bool isMakeConstBuffer = false;
 };
 
 //深度値リセット
