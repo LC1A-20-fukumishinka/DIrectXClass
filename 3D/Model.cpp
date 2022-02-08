@@ -17,6 +17,9 @@ Model::Model()
 
 Model::~Model()
 {
+	model.vertBuff.Reset();
+	model.indexBuff.Reset();
+	model.constBuffB1.Reset();
 }
 
 
@@ -39,6 +42,7 @@ HRESULT result = device->CreateCommittedResource(
 	D3D12_RESOURCE_STATE_GENERIC_READ,
 	nullptr,
 	IID_PPV_ARGS(&model.vertBuff));
+	model.vertBuff->SetName(L"modelVert");
 if (FAILED(result)) {
 	assert(0);
 	return;
@@ -63,6 +67,7 @@ result = device->CreateCommittedResource(
 	D3D12_RESOURCE_STATE_GENERIC_READ,
 	nullptr,
 	IID_PPV_ARGS(&model.indexBuff));
+	model.indexBuff->SetName(L"modelIndex");
 if (FAILED(result)) {
 	assert(0);
 	return;
@@ -92,7 +97,7 @@ result = device->CreateCommittedResource(
 	D3D12_RESOURCE_STATE_GENERIC_READ,
 	nullptr,
 	IID_PPV_ARGS(&model.constBuffB1));
-
+	model.constBuffB1->SetName(L"modelMaterial");
 //定数バッファへデータ転送
 ConstBufferDataB1 *constMap = nullptr;
 result = model.constBuffB1->Map(0, nullptr, (void**) &constMap);

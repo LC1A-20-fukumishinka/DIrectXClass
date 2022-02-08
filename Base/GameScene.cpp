@@ -76,6 +76,8 @@ void GameScene::Draw()
 void GameScene::Finalize()
 {
 	delete dome;
+	delete sphereModel;
+	delete fighterModel;
 	delete objFighter;
 	delete objectSphere;
 	delete domeObj;

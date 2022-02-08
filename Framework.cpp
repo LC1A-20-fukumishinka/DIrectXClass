@@ -56,13 +56,15 @@ void Framework::Update()
 
 void Framework::Finalize()
 {
+	sceneMgr->Finalize();
 	//xAudio2‰ð•ú
 	Sound::xAudioDelete();
 	//‰¹ºƒf[ƒ^‰ð•ú
 	Sound::SoundUnload();
 
-//myDirectX->CheckAliveObject();
-Win->end();
+	myDirectX->Finalize();
+	myDirectX->CheckAliveObject();
+	Win->end();
 }
 
 void Framework::Draw()

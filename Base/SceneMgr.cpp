@@ -1,5 +1,6 @@
 #include "SceneMgr.h"
 
+SceneMgr *SceneMgr::instance = nullptr;
 SceneMgr::SceneMgr()
 {
 }
@@ -12,9 +13,19 @@ SceneMgr::~SceneMgr()
 
 SceneMgr *SceneMgr::Instance()
 {
-	static SceneMgr instance;
+	//static SceneMgr instance;
+	if (instance == nullptr)
+	{
+		instance = new SceneMgr();
+	}
 
-	return &instance;
+	return instance;
+}
+
+void SceneMgr::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 void SceneMgr::Update()

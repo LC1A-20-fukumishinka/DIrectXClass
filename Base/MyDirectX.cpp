@@ -186,6 +186,25 @@ void MyDirectX::PostDraw()
 
 }
 
+void MyDirectX::Finalize()
+{
+	debugController.Reset();
+	dxgiFactory.Reset();
+	swapchain.Reset();
+	swapchain1.Reset();
+	cmdAllocator.Reset();
+	cmdList.Reset();
+	cmdQueue.Reset();
+	rtvHeaps.Reset();
+	depthBuffer.Reset();
+	dsvHeap.Reset();
+	fence.Reset();
+	for (int i = 0; i < backBuffers.size(); i++)
+	{
+		backBuffers[i].Reset();
+	}
+}
+
 void MyDirectX::ClearRenderTarget()
 {
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvH = CD3DX12_CPU_DESCRIPTOR_HANDLE(

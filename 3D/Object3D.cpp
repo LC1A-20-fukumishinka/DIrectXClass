@@ -46,6 +46,7 @@ void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 			IID_PPV_ARGS(&constBuff)
 		);
 
+		constBuff->SetName(L"ConstBuff3D");
 		if (result)
 		{
 			assert(0);
