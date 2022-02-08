@@ -5,6 +5,9 @@
 #include "../Camera.h"
 #include "IScene.h"
 #include "../Light.h"
+#include "SphereCollider.h"
+#include "../Collision/CollisionMgr.h"
+#include "Player.h"
 class GameScene : public IScene
 {
 public:
@@ -14,7 +17,11 @@ public:
 	void Finalize() override;
 private:
 	Model *dome;
+	Model *sphereModel;
+	Model *fighterModel;
 	Object3D *domeObj;
+	Object3D *objFighter;
+	Object3D *objectSphere;
 	Camera *cam;
 
 	Light *light;

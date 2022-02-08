@@ -23,14 +23,15 @@ void TitleScene::Init()
 	light->SetLightColor({1, 1, 1});
 	light->SetLightDir({-1, 0, 1});
 	light->Update();
-	boxObj = new Object3D();
+	boxObj = new Object3D;
 	boxObj->Init(cam, light);
-	boxObj->scale = { 100.0f, 100.0f, 100.0f };
-	boxObj->position = { 10, 0,0 };
+	boxObj->SetScale({ 100.0f, 100.0f, 100.0f });
+	boxObj->SetPosition({ 10, 0,0 });
 
 
 	triangle = new Model();
 	triangle->CreateModel("box");
+	boxObj->SetModel(triangle->GetModel());
 
 	part = ParticleManager::Create();
 	part->SetCamera(cam);
@@ -59,8 +60,6 @@ void TitleScene::Update()
 		IScene *scene = new GameScene();
 		SceneMgr::Instance()->SetNextScene(scene);
 	}
-	boxObj->color.x += 0.01;
-	boxObj->rotation.y += 0.01;
 	boxObj->Update();
 
 	if (Input::Instance()->Key(DIK_D) || Input::Instance()->Key(DIK_A))
@@ -88,7 +87,7 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	boxObj->modelDraw(triangle->GetModel(), ModelPipeline::Instance()->GetPipeLine());
+	boxObj->modelDraw( ModelPipeline::Instance()->GetPipeLine());
 	part->Draw(spriteTex);
 	sprite->Draw();
 	debug->DrawAll();

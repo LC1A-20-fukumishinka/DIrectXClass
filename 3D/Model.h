@@ -76,7 +76,7 @@ public:
 	void LoadMaterial(const std::string &directoryPath, const std::string &filename);
 	void LoadTexture(const std::string &directoryPath, const std::string &filename);
 
-	ModelObject GetModel();
+	ModelObject *GetModel();
 	void SetModel(ModelObject model);
 private:
 	ModelObject model;

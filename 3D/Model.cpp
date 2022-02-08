@@ -324,9 +324,9 @@ void Model::LoadTexture(const std::string &directoryPath, const std::string &fil
 		model.textureHandle = TextureMgr::Instance()->SpriteLoadTexture(wfilepath);
 }
 
-ModelObject Model::GetModel()
+ModelObject *Model::GetModel()
 {
-	return model;
+	return &model;
 }
 
 void Model::SetModel(ModelObject model)

@@ -42,7 +42,11 @@ public:
 	/// </summary>
 	/// <param name="isSetTexture">別のテクスチャを使用する</param>
 	/// <param name="textureNumber">使用するテクスチャのハンドル</param>
-	virtual void modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture = false, int textureNumber = -1);
+	virtual void modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture = false, int textureNumber = -1);
+
+	virtual void OnCollision(const CollisionInfo &info) {};
+
+public://セッタ
 
 	void SetParent(Object3D *parent);
 
@@ -52,14 +56,23 @@ public:
 
 	void SetCollider(BaseCollider *collider);
 
-	virtual void OnCollision(const CollisionInfo &info) {};
+	void SetModel(ModelObject *model);
 
+	void SetPosition(DirectX::XMFLOAT3 pos);
+	void SetColor(DirectX::XMFLOAT4 color);
+	void SetScale(DirectX::XMFLOAT3 scale);
+	void SetRotation(DirectX::XMFLOAT3 rot);
+public:
+	const DirectX::XMFLOAT4 &GetColor();
+	const DirectX::XMFLOAT3 &GetPosition();
+	const DirectX::XMFLOAT3 &GetScale();
+	const DirectX::XMFLOAT3 &GetRotation();
 protected:
-//クラス名(デバッグ用)
-const char *name = nullptr;
+	//クラス名(デバッグ用)
+	const char *name = nullptr;
 
-//コライダー
-BaseCollider * collider = nullptr;
+	//コライダー
+	BaseCollider *collider = nullptr;
 
 	//色(RGBA)
 	DirectX::XMFLOAT4 color = { 1.0f,1.0f ,1.0f ,1.0f };
@@ -89,6 +102,8 @@ private:
 	Light *light = nullptr;
 
 	bool isMakeConstBuffer = false;
+
+	ModelObject *model = nullptr;
 };
 
 //深度値リセット

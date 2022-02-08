@@ -2,6 +2,7 @@
 #include "TextureMgr.h"
 #include "Model.h"
 #include "../Collision/BaseCollider.h"
+#include "../Collision/CollisionMgr.h"
 using namespace DirectX;
 
 
@@ -9,6 +10,7 @@ Object3D::~Object3D()
 {
 	if (collider)
 	{
+		CollisionManager::GetInstance()->RemoveCollider(collider);
 		delete collider;
 	}
 }
@@ -50,7 +52,7 @@ void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 		}
 		isMakeConstBuffer = true;
 	}
-	
+
 	ConstBufferData *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = color;//色指定(RGBA)
@@ -114,10 +116,13 @@ void Object3D::Update()
 }
 
 
-void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipelineSet, bool isSetTexture, int textureNumber)
+void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, int textureNumber)
 {
+	if (model == nullptr)
+	{
+		assert(0);
+	}
 	MyDirectX *myD = MyDirectX::Instance();
-
 
 	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
 	myD->GetCommandList()->SetGraphicsRootSignature(pipelineSet.rootSignature.Get());
@@ -131,10 +136,10 @@ void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipeli
 	//定数バッファビュー
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
 
-	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model.constBuffB1->GetGPUVirtualAddress());
+	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model->constBuffB1->GetGPUVirtualAddress());
 
 	light->Draw(3);
-	if(isSetTexture)
+	if (isSetTexture)
 	{
 		if (!TextureMgr::Instance()->CheckHandle(textureNumber))
 		{
@@ -151,7 +156,7 @@ void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipeli
 	}
 	else
 	{
-		if (!TextureMgr::Instance()->CheckHandle(model.textureHandle))
+		if (!TextureMgr::Instance()->CheckHandle(model->textureHandle))
 		{
 			assert(0);
 			return;
@@ -159,17 +164,17 @@ void Object3D::modelDraw(const ModelObject &model, PipeClass::PipelineSet pipeli
 		myD->GetCommandList()->SetGraphicsRootDescriptorTable(2,
 			CD3DX12_GPU_DESCRIPTOR_HANDLE(
 				descHeap->GetGPUDescriptorHandleForHeapStart(),
-				model.textureHandle,
+				model->textureHandle,
 				myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 			)
 		);
 	}
 
 #pragma region とりあえず引っ張り出した描画コマンド
-	myD->GetCommandList()->IASetVertexBuffers(0, 1, &model.vbView);
+	myD->GetCommandList()->IASetVertexBuffers(0, 1, &model->vbView);
 	//インデックスバッファの設定
-	myD->GetCommandList()->IASetIndexBuffer(&model.ibView);
-	myD->GetCommandList()->DrawIndexedInstanced(model.indices.size(), 1, 0, 0, 0);
+	myD->GetCommandList()->IASetIndexBuffer(&model->ibView);
+	myD->GetCommandList()->DrawIndexedInstanced(model->indices.size(), 1, 0, 0, 0);
 #pragma endregion
 
 }
@@ -198,6 +203,55 @@ void Object3D::SetCollider(BaseCollider *collider)
 {
 	collider->SetObject(this);
 	this->collider = collider;
+	//コリジョンマネージャーに登録
+	CollisionManager::GetInstance()->AddCollider(collider);
+	//コライダーを更新しておく
+	collider->Update();
+}
+
+void Object3D::SetModel(ModelObject *model)
+{
+	this->model = model;
+}
+
+void Object3D::SetPosition(XMFLOAT3 pos)
+{
+	position = pos;
+}
+
+void Object3D::SetColor(XMFLOAT4 color)
+{
+	this->color = color;
+}
+
+void Object3D::SetScale(XMFLOAT3 scale)
+{
+	this->scale = scale;
+}
+
+void Object3D::SetRotation(XMFLOAT3 rot)
+{
+	rotation = rot;
+}
+
+const XMFLOAT4 &Object3D::GetColor()
+{
+	return color;
+}
+
+const XMFLOAT3 &Object3D::GetPosition()
+{
+	return position;
+}
+
+const XMFLOAT3 &Object3D::GetScale()
+{
+	return scale;
+}
+
+const XMFLOAT3 &Object3D::GetRotation()
+{
+	return rotation;
 }
 
 void DepthReset()
