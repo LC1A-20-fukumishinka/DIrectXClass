@@ -8,6 +8,7 @@
 #include "SphereCollider.h"
 #include "../Collision/CollisionMgr.h"
 #include "Player.h"
+#include "particleManager.h"
 
 class GameScene : public IScene
 {
@@ -26,4 +27,6 @@ private:
 	Camera *cam;
 
 	Light *light;
+	int partTex;
+	ParticleManager *rayPart;
 };
