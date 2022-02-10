@@ -106,5 +106,6 @@ void GameScene::Finalize()
 	delete objectSphere;
 	delete domeObj;
 	delete light;
+	delete rayPart;
 
 }
