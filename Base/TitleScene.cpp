@@ -24,14 +24,16 @@ void TitleScene::Init()
 	light->SetLightDir({-1, 0, 1});
 	light->Update();
 	boxObj = new Object3D;
-	boxObj->Init(cam, light);
+	boxObj->Init();
+	boxObj->SetCamera(cam);
+	boxObj->SetLight(light);
 	boxObj->SetScale({ 100.0f, 100.0f, 100.0f });
 	boxObj->SetPosition({ 10, 0,0 });
 
 
 	triangle = new Model();
 	triangle->CreateModel("box");
-	boxObj->SetModel(triangle->GetModel());
+	boxObj->SetModel(triangle);
 
 	part = ParticleManager::Create();
 	part->SetCamera(cam);

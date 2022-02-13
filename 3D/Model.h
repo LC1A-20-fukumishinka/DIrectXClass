@@ -78,6 +78,9 @@ public:
 
 	ModelObject *GetModel();
 	void SetModel(ModelObject model);
+
+	inline const std::vector<VertexPosNormalUv> & GetVertices(){return model.vertices;}
+	inline const std::vector<unsigned short> &GetIndices(){return model.indices;}
 private:
 	ModelObject model;
 };

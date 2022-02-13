@@ -29,4 +29,5 @@ private:
 	Light *light;
 	int partTex;
 	ParticleManager *rayPart;
+
 };

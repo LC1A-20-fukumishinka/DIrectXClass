@@ -15,16 +15,10 @@ Object3D::~Object3D()
 	}
 }
 
-void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
+void Object3D::Init()
 {
-
-	this->parent = parent;
-
 	HRESULT result = S_FALSE;
 	MyDirectX *myD = MyDirectX::Instance();
-
-	SetCamera(camera);
-	SetLight(light);
 	//ワールド行列を設定する
 	matWorld = XMMatrixIdentity();
 
@@ -53,14 +47,6 @@ void Object3D::Init(Camera *camera, Light *light, Object3D *parent)
 		}
 		isMakeConstBuffer = true;
 	}
-
-	ConstBufferData *constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void **)&constMap);
-	constMap->color = color;//色指定(RGBA)
-	constMap->viewproj = camera->matView * camera->matProjection;
-	constMap->world = matWorld;
-	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->eye);
-	constBuff->Unmap(0, nullptr);
 
 	//クラス名の文字列を取得
 	name = typeid(*this).name();
@@ -101,6 +87,10 @@ void Object3D::Update()
 	//ワールド行列を設定する
 	matWorld = GetMatWorld();
 
+	if (camera == nullptr)
+	{
+		assert(0);
+	}
 	ConstBufferData *constMap = nullptr;
 
 	HRESULT result = constBuff->Map(0, nullptr, (void **)&constMap);
@@ -137,7 +127,7 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 	//定数バッファビュー
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
 
-	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model->constBuffB1->GetGPUVirtualAddress());
+	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model->GetModel()->constBuffB1->GetGPUVirtualAddress());
 
 	light->Draw(3);
 	if (isSetTexture)
@@ -157,7 +147,7 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 	}
 	else
 	{
-		if (!TextureMgr::Instance()->CheckHandle(model->textureHandle))
+		if (!TextureMgr::Instance()->CheckHandle(model->GetModel()->textureHandle))
 		{
 			assert(0);
 			return;
@@ -165,17 +155,17 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 		myD->GetCommandList()->SetGraphicsRootDescriptorTable(2,
 			CD3DX12_GPU_DESCRIPTOR_HANDLE(
 				descHeap->GetGPUDescriptorHandleForHeapStart(),
-				model->textureHandle,
+				model->GetModel()->textureHandle,
 				myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 			)
 		);
 	}
 
 #pragma region とりあえず引っ張り出した描画コマンド
-	myD->GetCommandList()->IASetVertexBuffers(0, 1, &model->vbView);
+	myD->GetCommandList()->IASetVertexBuffers(0, 1, &model->GetModel()->vbView);
 	//インデックスバッファの設定
-	myD->GetCommandList()->IASetIndexBuffer(&model->ibView);
-	myD->GetCommandList()->DrawIndexedInstanced(model->indices.size(), 1, 0, 0, 0);
+	myD->GetCommandList()->IASetIndexBuffer(&model->GetModel()->ibView);
+	myD->GetCommandList()->DrawIndexedInstanced(model->GetModel()->indices.size(), 1, 0, 0, 0);
 #pragma endregion
 
 }
@@ -210,7 +200,7 @@ void Object3D::SetCollider(BaseCollider *collider)
 	collider->Update();
 }
 
-void Object3D::SetModel(ModelObject *model)
+void Object3D::SetModel(Model *model)
 {
 	this->model = model;
 }
@@ -253,6 +243,11 @@ const XMFLOAT3 &Object3D::GetScale()
 const XMFLOAT3 &Object3D::GetRotation()
 {
 	return rotation;
+}
+
+const Model *Object3D::GetModel()
+{
+	return model;
 }
 
 void DepthReset()

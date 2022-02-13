@@ -6,7 +6,7 @@
 #include "IGraphicsPipeline.h"
 #include "../Light.h"
 #include "../Collision/CollisionInfo.h"
-struct ModelObject;
+class Model;
 
 class BaseCollider;
 class Object3D
@@ -30,7 +30,7 @@ public:
 	Object3D() = default;
 
 	virtual ~Object3D();
-	virtual void Init(Camera *camera, Light *light, Object3D *parent = nullptr);
+	virtual void Init();
 
 	const DirectX::XMMATRIX GetMatWorld();
 
@@ -48,25 +48,21 @@ public:
 
 public://セッタ
 
-	void SetParent(Object3D *parent);
-
-	void SetCamera(Camera *camera);
-
-	void SetLight(Light *light);
-
-	void SetCollider(BaseCollider *collider);
-
-	void SetModel(ModelObject *model);
-
-	void SetPosition(DirectX::XMFLOAT3 pos);
-	void SetColor(DirectX::XMFLOAT4 color);
-	void SetScale(DirectX::XMFLOAT3 scale);
-	void SetRotation(DirectX::XMFLOAT3 rot);
+	virtual void SetParent(Object3D *parent);
+	virtual void SetCamera(Camera *camera);
+	virtual void SetLight(Light *light);
+	virtual void SetCollider(BaseCollider *collider);
+	virtual void SetModel(Model *model);
+	virtual void SetPosition(DirectX::XMFLOAT3 pos);
+	virtual void SetColor(DirectX::XMFLOAT4 color);
+	virtual void SetScale(DirectX::XMFLOAT3 scale);
+	virtual void SetRotation(DirectX::XMFLOAT3 rot);
 public:
 	const DirectX::XMFLOAT4 &GetColor();
 	const DirectX::XMFLOAT3 &GetPosition();
 	const DirectX::XMFLOAT3 &GetScale();
 	const DirectX::XMFLOAT3 &GetRotation();
+	const Model *GetModel();
 protected:
 	//クラス名(デバッグ用)
 	const char *name = nullptr;
@@ -103,7 +99,7 @@ private:
 
 	bool isMakeConstBuffer = false;
 
-	ModelObject *model = nullptr;
+	Model *model = nullptr;
 };
 
 //深度値リセット

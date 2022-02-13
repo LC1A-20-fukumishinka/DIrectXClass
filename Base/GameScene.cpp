@@ -15,24 +15,29 @@ void GameScene::Init()
 	domeObj = new Object3D;/*
 	domeObj->SetScale( XMFLOAT3(1f, 0.1f, 0.1f) );*/
 	domeObj->SetPosition(XMFLOAT3(0, 0, 0));
-	domeObj->Init(cam, light);
+	domeObj->Init();
+	domeObj->SetCamera(cam);
+	domeObj->SetLight(light);
 	objFighter = Player::Create(cam, light);
+	objFighter->SetCamera(cam);
+	objFighter->SetLight(light);
 	objFighter->SetScale(XMFLOAT3(1.0f, 1.0f, 1.0f));
 	objFighter->SetPosition(XMFLOAT3(-1, 0, 0));
 	objectSphere = new Object3D;
 	objectSphere->SetScale(XMFLOAT3(1.0f, 1.0f, 1.0f));
 	objectSphere->SetPosition(XMFLOAT3(-3, 0, 0));
-	objectSphere->Init(cam, light);
-
+	objectSphere->Init();
+	objectSphere->SetCamera(cam);
+	objectSphere->SetLight(light);
 	dome = new Model();
 	sphereModel = new Model();
 	fighterModel = new Model();
 	dome->CreateModel("skydome");
 	sphereModel->CreateModel("sphere");
 	fighterModel->CreateModel("chr_sword");
-	domeObj->SetModel(dome->GetModel());
-	objFighter->SetModel(fighterModel->GetModel());
-	objectSphere->SetModel(sphereModel->GetModel());
+	domeObj->SetModel(dome);
+	objFighter->SetModel(fighterModel);
+	objectSphere->SetModel(sphereModel);
 	objectSphere->SetCollider(new SphereCollider);
 	rayPart = ParticleManager::Create();
 	partTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
