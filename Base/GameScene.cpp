@@ -4,6 +4,8 @@
 #include "ModelPipeline.h"
 #include "ModelPhongPipeline.h"
 #include "TextureMgr.h"
+#include "MeshCollider.h"
+#include "TouchableObject.h"
 using namespace DirectX;
 void GameScene::Init()
 {
@@ -42,6 +44,11 @@ void GameScene::Init()
 	rayPart = ParticleManager::Create();
 	partTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
 	rayPart->SetCamera(cam);
+	groundModel = new Model();
+	groundModel->CreateModel("ground");
+	objGround = TouchableObject::create(groundModel);
+	objGround->SetCamera(cam);
+	objGround->SetLight(light);
 }
 
 void GameScene::Update()
@@ -71,7 +78,7 @@ void GameScene::Update()
 
 	Ray ray;
 	ray.start = { 10.0f, 0.5f, 0.0f, 1 };
-	ray.dir = { -1, 0, 0, 0 };
+	ray.dir = { 0, -1, 0, 0 };
 	RaycastHit raycastHit;
 	if (CollisionManager::GetInstance()->Raycast(ray, &raycastHit))
 	{
@@ -91,11 +98,13 @@ void GameScene::Update()
 	domeObj->Update();
 	objFighter->Update();
 	objectSphere->Update();
+	objGround->Update();
 	CollisionManager::GetInstance()->CheckAllCollision();
 }
 
 void GameScene::Draw()
 {
+	objGround->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	domeObj->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	objFighter->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	objectSphere->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
@@ -112,5 +121,6 @@ void GameScene::Finalize()
 	delete domeObj;
 	delete light;
 	delete rayPart;
-
+	delete groundModel;
+	delete objGround;
 }

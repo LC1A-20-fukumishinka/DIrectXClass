@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "particleManager.h"
 
+class TouchableObject;
 class GameScene : public IScene
 {
 public:
@@ -21,6 +22,7 @@ private:
 	Model *dome;
 	Model *sphereModel;
 	Model *fighterModel;
+	Model *groundModel;
 	Object3D *domeObj;
 	Object3D *objFighter;
 	Object3D *objectSphere;
@@ -30,4 +32,5 @@ private:
 	int partTex;
 	ParticleManager *rayPart;
 
+	TouchableObject *objGround = nullptr;
 };
