@@ -32,7 +32,7 @@ Light::Light()
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
-		constBuff->SetName(L"lightConst");
+		constBuff->SetName(L"lightBuff");
 	if (FAILED(result)) assert(0);
 }
 
@@ -73,6 +73,7 @@ void Light::TransferConstBuffer()
 	{
 		constMap->lightv = -lightdir;
 		constMap-> lightcolor = lightcolor;
+		constMap->active = isActive;
 		constBuff->Unmap(0, nullptr);
 	}
 }

@@ -8,6 +8,7 @@
 #include "DebugText.h"
 #include "IScene.h"
 #include "../Light.h"
+#include "../LightGroup.h"
 class TitleScene : public IScene
 {
 public:
@@ -28,4 +29,5 @@ private:
 
 	DebugText *debug;
 	Light *light;
+	LightGroup *lightGroup = nullptr;
 };

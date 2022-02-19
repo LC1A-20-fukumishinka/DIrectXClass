@@ -8,7 +8,7 @@
 class Light
 {
 private://エイリアス
-template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	using XMFLOAT2 = DirectX::XMFLOAT2;
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
@@ -20,6 +20,7 @@ public://サブクラス
 	{
 		XMVECTOR lightv;
 		XMFLOAT3 lightcolor;
+		unsigned int active;
 	};
 public:
 	/// <summary>
@@ -44,16 +45,25 @@ public:
 
 	void TransferConstBuffer();
 
+public:
 	void SetLightDir(const XMVECTOR &lightdir);
-
 	void SetLightColor(const XMFLOAT3 &lightcolor);
+	void SetLightActive(bool active) { this->isActive = active; }
+	void SetDirty(bool dirty){this->dirty = dirty;}
+
+	XMVECTOR &GetLightDir(){ return lightdir ;}
+	XMFLOAT3 &GetLightColor(){return lightcolor;}
+	bool GetLightActive() { return isActive; }
+	bool GetDirty() { return dirty; }
 private:
 	//定数バッファ
 	ComPtr<ID3D12Resource> constBuff;
 	//ライトの光線方向（単位ベクトル）
-	XMVECTOR lightdir = {1, 0, 0, 0};
+	XMVECTOR lightdir = { 1, 0, 0, 0 };
 	//ライト色
-	XMFLOAT3 lightcolor = {1, 1, 1};
+	XMFLOAT3 lightcolor = { 1, 1, 1 };
 	//ダーティフラグ
 	bool dirty = false;
+
+	bool isActive = false;
 };

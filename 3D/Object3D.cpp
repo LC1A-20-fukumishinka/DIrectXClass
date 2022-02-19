@@ -113,6 +113,15 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 	{
 		assert(0);
 	}
+
+	if (lightGroup == nullptr)
+	{
+		assert(0);
+	}
+	if (lightGroup->GetLight() == nullptr)
+	{
+		assert(0);
+	}
 	MyDirectX *myD = MyDirectX::Instance();
 
 	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
@@ -129,7 +138,7 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model->GetModel()->constBuffB1->GetGPUVirtualAddress());
 
-	light->Draw(3);
+	lightGroup->Draw(3);
 	if (isSetTexture)
 	{
 		if (!TextureMgr::Instance()->CheckHandle(textureNumber))
@@ -188,6 +197,11 @@ void Object3D::SetCamera(Camera *camera)
 void Object3D::SetLight(Light *light)
 {
 	this->light = light;
+}
+
+void Object3D::SetLightGroup(LightGroup *lightGroup)
+{
+	this->lightGroup = lightGroup;
 }
 
 void Object3D::SetCollider(BaseCollider *collider)

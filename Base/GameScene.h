@@ -9,7 +9,7 @@
 #include "../Collision/CollisionMgr.h"
 #include "Player.h"
 #include "particleManager.h"
-
+#include "../LightGroup.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -28,9 +28,10 @@ private:
 	Object3D *objectSphere;
 	Camera *cam;
 
-	Light *light;
+	Light *light = nullptr;
+	LightGroup *lightGroup = nullptr;
 	int partTex;
-	ParticleManager *rayPart;
+	ParticleManager *rayPart = nullptr;
 
 	TouchableObject *objGround = nullptr;
 };

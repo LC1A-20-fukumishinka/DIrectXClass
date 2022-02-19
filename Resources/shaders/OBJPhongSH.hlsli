@@ -14,12 +14,25 @@ cbuffer cbuff1 : register(b1)
     float3 m_specular : packoffset(c2); //スペキュラー係数
     float m_alpha : packoffset(c2.w); //アルファ
 }
-
-cbuffer cbuff2 : register(b2)
+struct dirLight
 {
     float3 lightv;
     float3 lightcolor;
+    uint active;
+};
+
+cbuffer cbuff2 : register(b2)
+{
+    float3 ambientColor;
+    dirLight dirlight;
 }
+
+//cbuffer cbuff2 : register(b2)
+//{
+//    float3 lightv;
+//    float3 lightcolor;
+//    uint active;
+//}
 
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体
 struct VSOutput

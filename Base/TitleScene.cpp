@@ -23,10 +23,13 @@ void TitleScene::Init()
 	light->SetLightColor({1, 1, 1});
 	light->SetLightDir({-1, 0, 1});
 	light->Update();
+	lightGroup = LightGroup::Create();
+	lightGroup->SetLight(light);
 	boxObj = new Object3D;
 	boxObj->Init();
 	boxObj->SetCamera(cam);
 	boxObj->SetLight(light);
+	boxObj->SetLightGroup(lightGroup);
 	boxObj->SetScale({ 100.0f, 100.0f, 100.0f });
 	boxObj->SetPosition({ 10, 0,0 });
 
@@ -79,7 +82,7 @@ void TitleScene::Update()
 	}
 
 	cam->Update();
-
+	lightGroup->Update();
 	part->Add(60, Vector3(), Vector3(((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10, ((float)rand() / RAND_MAX) * 10), Vector3(), 1, 10);
 	part->Update();
 	debug->Print("banana", 100, 100, 10);
@@ -105,4 +108,5 @@ void TitleScene::Finalize()
 	delete debug;
 	delete cam;
 	delete light;
+	delete lightGroup;
 }

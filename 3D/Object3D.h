@@ -6,6 +6,7 @@
 #include "IGraphicsPipeline.h"
 #include "../Light.h"
 #include "../Collision/CollisionInfo.h"
+#include "../LightGroup.h"
 class Model;
 
 class BaseCollider;
@@ -51,6 +52,7 @@ public://ƒZƒbƒ^
 	virtual void SetParent(Object3D *parent);
 	virtual void SetCamera(Camera *camera);
 	virtual void SetLight(Light *light);
+	virtual void SetLightGroup(LightGroup * lightGroup);
 	virtual void SetCollider(BaseCollider *collider);
 	virtual void SetModel(Model *model);
 	virtual void SetPosition(DirectX::XMFLOAT3 pos);
@@ -97,6 +99,7 @@ private:
 
 	Light *light = nullptr;
 
+	LightGroup *lightGroup = nullptr;
 	bool isMakeConstBuffer = false;
 
 	Model *model = nullptr;

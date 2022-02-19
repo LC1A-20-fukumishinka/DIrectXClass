@@ -13,24 +13,33 @@ void GameScene::Init()
 	cam->Init(Vector3(0, 1, -10), Vector3(0, 0, 0));
 	light = Light::Create();
 	light->SetLightColor({ 1, 1, 1 });
+	light->SetLightActive(true);
 	light->Update();
-	domeObj = new Object3D;/*
-	domeObj->SetScale( XMFLOAT3(1f, 0.1f, 0.1f) );*/
+	lightGroup = LightGroup::Create();
+	lightGroup->SetLight(light);
+	domeObj = new Object3D;
+	/*domeObj->SetScale( XMFLOAT3(1f, 0.1f, 0.1f) );*/
 	domeObj->SetPosition(XMFLOAT3(0, 0, 0));
 	domeObj->Init();
 	domeObj->SetCamera(cam);
 	domeObj->SetLight(light);
+	domeObj->SetLightGroup(lightGroup);
+
 	objFighter = Player::Create(cam, light);
 	objFighter->SetCamera(cam);
 	objFighter->SetLight(light);
+	objFighter->SetLightGroup(lightGroup);
 	objFighter->SetScale(XMFLOAT3(1.0f, 1.0f, 1.0f));
 	objFighter->SetPosition(XMFLOAT3(-1, 0, 0));
+
 	objectSphere = new Object3D;
 	objectSphere->SetScale(XMFLOAT3(1.0f, 1.0f, 1.0f));
 	objectSphere->SetPosition(XMFLOAT3(-3, 0, 0));
 	objectSphere->Init();
 	objectSphere->SetCamera(cam);
 	objectSphere->SetLight(light);
+	objectSphere->SetLightGroup(lightGroup);
+
 	dome = new Model();
 	sphereModel = new Model();
 	fighterModel = new Model();
@@ -49,6 +58,8 @@ void GameScene::Init()
 	objGround = TouchableObject::create(groundModel);
 	objGround->SetCamera(cam);
 	objGround->SetLight(light);
+	objGround->SetLightGroup(lightGroup);
+
 }
 
 void GameScene::Update()
@@ -93,6 +104,7 @@ void GameScene::Update()
 			rayPart->Add(10, XMFLOAT3(raycastHit.inter.m128_f32), vel, XMFLOAT3(), 0.0f, 1.0f);
 		}
 	}
+	lightGroup->Update();
 	rayPart->Update();
 	cam->Update();
 	domeObj->Update();
@@ -123,4 +135,6 @@ void GameScene::Finalize()
 	delete rayPart;
 	delete groundModel;
 	delete objGround;
+	delete lightGroup;
+
 }
