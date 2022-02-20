@@ -118,10 +118,6 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 	{
 		assert(0);
 	}
-	if (lightGroup->GetLight() == nullptr)
-	{
-		assert(0);
-	}
 	MyDirectX *myD = MyDirectX::Instance();
 
 	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());

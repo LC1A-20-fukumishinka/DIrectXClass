@@ -13,7 +13,7 @@ public:
 		XMFLOAT3 ambientColor;
 		float pad1;
 		Light::ConstBufferData dirLight;
-		/*PointLight::ConstBufferData pointLight;*/
+		PointLight::ConstBufferData pointLight;
 	};
 public:
 	static LightGroup *Create();

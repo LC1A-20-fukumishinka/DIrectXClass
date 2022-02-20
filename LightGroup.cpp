@@ -24,11 +24,28 @@ void LightGroup::Init()
 
 void LightGroup::Update()
 {
-	if (dirty || light->GetDirty())
+	bool isLight = false;
+	bool isPointLight = false;
+	if (light)
+	{
+		isLight = light->GetDirty();
+	}
+	if (pointLight)
+	{
+		isPointLight = pointLight->GetDirty();
+	}
+	if (dirty || isLight || isPointLight)
 	{
 		TransferConstBuffer();
 		dirty = false;
-		light->SetDirty(false);
+		if(isLight)
+		{
+			light->SetDirty(false);
+		}
+		if (isPointLight)
+		{
+			pointLight->SetDirty(false);
+		}
 	}
 }
 
@@ -48,6 +65,8 @@ void LightGroup::TransferConstBuffer()
 	if (SUCCEEDED(result))
 	{
 		constMap->ambientColor = ambientColor;
+
+		//•½s‚Œ´‚ªÝ’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
 		if (light == nullptr)
 		{
 			constMap->dirLight.lightv = -XMVECTOR{ 1, 1, 1, 0 };
@@ -66,6 +85,30 @@ void LightGroup::TransferConstBuffer()
 			{
 				constMap->dirLight.active = 0;
 			}
+		}
+
+
+		if (pointLight == nullptr)
+		{
+			constMap->pointLight.lightcolor = {1, 1, 1};
+			constMap->pointLight.lightpos = { 0, 0, 0 };
+			constMap->pointLight.lightatten = {1.0f,1.0f ,1.0f };
+			constMap->pointLight.active = 0;
+		}
+		else
+		{
+			if (pointLight->IsActive())
+			{
+				constMap->pointLight.lightcolor = pointLight->GetLightColor();
+				constMap->pointLight.lightpos = pointLight->GetlightPos();
+				constMap->pointLight.lightatten = pointLight->GetLightAtten();
+				constMap->pointLight.active = 1;
+			}
+			else
+			{
+				constMap->pointLight.active = 0;
+			}
+
 		}
 		constBuff->Unmap(0, nullptr);
 	}

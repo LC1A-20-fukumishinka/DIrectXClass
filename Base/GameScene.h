@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "particleManager.h"
 #include "../LightGroup.h"
+#include "../PointLight.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -29,6 +30,7 @@ private:
 	Camera *cam;
 
 	Light *light = nullptr;
+	PointLight *pointLight = nullptr;
 	LightGroup *lightGroup = nullptr;
 	int partTex;
 	ParticleManager *rayPart = nullptr;

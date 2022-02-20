@@ -12,11 +12,17 @@ void GameScene::Init()
 	cam = new Camera();
 	cam->Init(Vector3(0, 1, -10), Vector3(0, 0, 0));
 	light = Light::Create();
-	light->SetLightColor({ 1, 1, 1 });
+	light->SetLightColor({ 0, 0, 0 });
 	light->SetLightActive(true);
 	light->Update();
+
+	pointLight = PointLight::Create();
+	pointLight->SetActive(true);
+	pointLight->SetLightPos(XMFLOAT3{0, 1, 0});
+
 	lightGroup = LightGroup::Create();
 	lightGroup->SetLight(light);
+	lightGroup->SetPoinntLight(pointLight);
 	domeObj = new Object3D;
 	/*domeObj->SetScale( XMFLOAT3(1f, 0.1f, 0.1f) );*/
 	domeObj->SetPosition(XMFLOAT3(0, 0, 0));
@@ -135,6 +141,6 @@ void GameScene::Finalize()
 	delete rayPart;
 	delete groundModel;
 	delete objGround;
+	delete pointLight;
 	delete lightGroup;
-
 }

@@ -22,10 +22,19 @@ struct dirLight
     uint active;
 };
 
+struct PointLight
+{
+    float3 lightpos;
+    float3 lightcolor;
+    float3 lightatten;
+    uint active;
+};
+
 cbuffer cbuff2 : register(b2)
 {
     float3 ambientColor;
     dirLight dirlight;
+    PointLight pointlight;
 }
 
 //cbuffer cbuff2 : register(b2)

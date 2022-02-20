@@ -14,6 +14,23 @@ VSOutput main(float4 pos : POSITION, float3 normal : NORMAL, float2 uv : TEXCOOR
         float3 diffuse = saturate(dot(dirlight.lightv, wnormal.xyz)) * m_diffuse;
         output.color.rgb = (((output.color.rgb + (diffuse * m_diffuse))) * dirlight.lightcolor);
     }
+    if (pointlight.active)
+    {
+        //ライトへのベクトル
+        float3 lightv = pointlight.lightpos - wpos.xyz;
+        //ベクトルの長さ
+        float d = length(lightv);
+        //正規化し。単位ベクトルにする
+        lightv = normalize(lightv);
+        //距離減衰係数
+        float atten = 1.0f / ((pointlight.lightatten.x) + (pointlight.lightatten.y * d) + (pointlight.lightatten.z * d * d));
+        //ライトに向かうベクトルと法線の内積
+        float3 dotlightnormal = dot(lightv, wnormal.xyz);
+        //拡散反射光
+        float3 diffuse = dotlightnormal * m_diffuse;
+        //全て加算する
+        output.color.rgb += atten * (diffuse) * pointlight.lightcolor;
+    }
     output.color.a = m_alpha;
     output.uv = uv;
     return output;
