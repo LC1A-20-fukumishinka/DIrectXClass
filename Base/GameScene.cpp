@@ -18,13 +18,12 @@ void GameScene::Init()
 
 	pointLight = PointLight::Create();
 	pointLight->SetActive(true);
-	pointLight->SetLightPos(XMFLOAT3{0, 1, 0});
-
+	pointLight->SetLightPos(XMFLOAT3{0, 1.5, 0});
+	pointLight->SetLightAtten(XMFLOAT3(0.2f, 0.2f, 0.2f));
 	lightGroup = LightGroup::Create();
 	lightGroup->SetLight(light);
 	lightGroup->SetPoinntLight(pointLight);
 	domeObj = new Object3D;
-	/*domeObj->SetScale( XMFLOAT3(1f, 0.1f, 0.1f) );*/
 	domeObj->SetPosition(XMFLOAT3(0, 0, 0));
 	domeObj->Init();
 	domeObj->SetCamera(cam);

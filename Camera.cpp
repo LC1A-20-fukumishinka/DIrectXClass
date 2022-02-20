@@ -118,6 +118,7 @@ void Camera::MakeMatCamera()
 	//ベクトルの正規化
 	cameraAxisY = XMVector3Normalize(cameraAxisY);
 
+	up = { cameraAxisY.m128_f32[0], cameraAxisY.m128_f32[1],cameraAxisY.m128_f32[2] };
 	//カメラ回転行列
 	XMMATRIX matCameraRot;
 	//カメラ座標系→ワールド座標系の変換行列
