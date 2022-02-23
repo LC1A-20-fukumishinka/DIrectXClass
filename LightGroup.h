@@ -1,6 +1,7 @@
 #pragma once
 #include "Light.h"
 #include "PointLight.h"
+#include "SpotLight.h"
 #include <DirectXMath.h>
 class LightGroup
 {
@@ -14,6 +15,7 @@ public:
 		float pad1;
 		Light::ConstBufferData dirLight;
 		PointLight::ConstBufferData pointLight;
+		SpotLight::ConstBufferData spotLight;
 	};
 public:
 	static LightGroup *Create();
@@ -22,9 +24,11 @@ public:
 
 	void SetPoinntLight(PointLight *pointLight);
 
+	void SetSpotLight(SpotLight *spotLight);
 	Light *GetLight() { return light; }
 
 	PointLight *GetPoinntLight() { return pointLight; }
+	SpotLight *GetSpotLight(){return spotLight;}
 	void SetAmbientColor(XMFLOAT3 ambientColor);
 public:
 	LightGroup();
@@ -36,6 +40,7 @@ public:
 private:
 	Light *light = nullptr;
 	PointLight *pointLight = nullptr;
+	SpotLight *spotLight = nullptr;
 	ComPtr<ID3D12Resource> constBuff;
 	XMFLOAT3 ambientColor = {0.0f,0.0f ,0.0f };
 	bool dirty = false;

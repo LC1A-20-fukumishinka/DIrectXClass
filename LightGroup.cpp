@@ -26,6 +26,7 @@ void LightGroup::Update()
 {
 	bool isLight = false;
 	bool isPointLight = false;
+	bool isSpotLight = false;
 	if (light)
 	{
 		isLight = light->GetDirty();
@@ -34,7 +35,11 @@ void LightGroup::Update()
 	{
 		isPointLight = pointLight->GetDirty();
 	}
-	if (dirty || isLight || isPointLight)
+	if (spotLight)
+	{
+		isSpotLight = spotLight->IsDirty();
+	}
+	if (dirty || isLight || isPointLight || isSpotLight)
 	{
 		TransferConstBuffer();
 		dirty = false;
@@ -45,6 +50,10 @@ void LightGroup::Update()
 		if (isPointLight)
 		{
 			pointLight->SetDirty(false);
+		}
+		if (isSpotLight)
+		{
+			spotLight->SetDirty(false);
 		}
 	}
 }
@@ -110,6 +119,33 @@ void LightGroup::TransferConstBuffer()
 			}
 
 		}
+
+		if (spotLight == nullptr)
+		{
+			constMap->spotLight.active = 0;
+			constMap->spotLight.lightv = -XMVECTOR{1, 1, 0};
+			constMap->spotLight.lightpos = XMFLOAT3{0, 0, 0};
+			constMap->spotLight.lightcolor = XMFLOAT3{ 0, 0, 0 };
+			constMap->spotLight.lightatten = XMFLOAT3{ 0, 0, 0 };
+			constMap->spotLight.lightfactoranglecos = XMFLOAT2{ 0.5f, 0.2f };
+		}
+		else
+		{
+			if (spotLight->IsActive())
+			{
+				constMap->spotLight.active = 1;
+				constMap->spotLight.lightv = -spotLight->GetLightDir();
+				constMap->spotLight.lightpos = spotLight->GetLightPos();
+				constMap->spotLight.lightcolor = spotLight->GetLightColor();
+				constMap->spotLight.lightatten = spotLight->GetLightAtten();
+				constMap->spotLight.lightfactoranglecos = spotLight->GetLightFactorAngleCos();
+			}
+			else
+			{
+				constMap->spotLight.active = 0;
+			}
+		}
+
 		constBuff->Unmap(0, nullptr);
 	}
 }
@@ -135,6 +171,11 @@ void LightGroup::SetPoinntLight(PointLight *pointLight)
 {
 	this->pointLight = pointLight;
 	dirty = true;
+}
+
+void LightGroup::SetSpotLight(SpotLight *spotLight)
+{
+	this->spotLight = spotLight;
 }
 
 void LightGroup::SetAmbientColor(XMFLOAT3 ambientColor)

@@ -57,6 +57,32 @@ float4 main(VSOutput input) : SV_TARGET
         shadecolor.rgb += atten * (diffuse + specular) * pointlight.lightcolor;
 
     }
+    
+    if(spotlight.active)
+    {
+        float3 lightv = spotlight.lightpos - input.worldpos.xyz;
+        float d = length(lightv);
+        lightv = normalize(lightv);
+        //距離減衰係数
+        float atten = 1.0f / ((spotlight.lightatten.x) + (spotlight.lightatten.y * d) + (spotlight.lightatten.z * d * d));
+        //角度減衰
+        float cos = dot(lightv, spotlight.lightv);
+        //減衰開始角度から、減衰終了角度にかけて減衰
+        //減衰開始角度の内側の１倍 減衰終了角度の外側は０倍の輝度
+        float angleatten = smoothstep(spotlight.lightfactoranglecos.y, spotlight.lightfactoranglecos.x, cos);
+        //角度減衰を乗算
+        atten *= angleatten;
+        //ライトに向かうベクトルと法線の内積
+        float3 dotlightnormal = dot(lightv, input.normal);
+        //反射光ベクトル
+        float3 reflect = normalize(-lightv + (2 * dotlightnormal * input.normal));
+        //拡散反射光
+        float3 diffuse = dotlightnormal * m_diffuse;
+        //鏡面反射光
+        float3 specular = pow(saturate(dot(reflect, eyedir)), shininess) * m_specular;
+        //全て加算する
+        shadecolor.rgb += atten * (diffuse + specular) * spotlight.lightcolor;
+    }
     shadecolor.a = m_alpha;
     return float4(shadecolor * texcolor);
 }

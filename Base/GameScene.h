@@ -11,6 +11,7 @@
 #include "particleManager.h"
 #include "../LightGroup.h"
 #include "../PointLight.h"
+#include "../SpotLight.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -31,6 +32,7 @@ private:
 
 	Light *light = nullptr;
 	PointLight *pointLight = nullptr;
+	SpotLight * spotLight = nullptr;
 	LightGroup *lightGroup = nullptr;
 	int partTex;
 	ParticleManager *rayPart = nullptr;

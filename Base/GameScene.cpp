@@ -20,9 +20,17 @@ void GameScene::Init()
 	pointLight->SetActive(true);
 	pointLight->SetLightPos(XMFLOAT3{0, 1.5, 0});
 	pointLight->SetLightAtten(XMFLOAT3(0.2f, 0.2f, 0.2f));
+
+	spotLight = SpotLight::Create();
+	spotLight->SetLightDir({-0.5f, -1.0f, 0.2f});
+	spotLight->SetLightPos({0.0f, 5.0f, 0.0f });
+	spotLight->SetLightAtten({0.01f, 0.01f, 0.01f});
+	spotLight->SetActive(true);
+
 	lightGroup = LightGroup::Create();
 	lightGroup->SetLight(light);
-	lightGroup->SetPoinntLight(pointLight);
+	//lightGroup->SetPoinntLight(pointLight);
+	lightGroup->SetSpotLight(spotLight);
 	domeObj = new Object3D;
 	domeObj->SetPosition(XMFLOAT3(0, 0, 0));
 	domeObj->Init();
@@ -136,10 +144,12 @@ void GameScene::Finalize()
 	delete objFighter;
 	delete objectSphere;
 	delete domeObj;
+	delete lightGroup;
 	delete light;
+	delete pointLight;
+	delete spotLight;
 	delete rayPart;
 	delete groundModel;
 	delete objGround;
-	delete pointLight;
-	delete lightGroup;
+
 }

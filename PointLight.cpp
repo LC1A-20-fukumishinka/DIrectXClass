@@ -3,14 +3,14 @@
 using namespace DirectX;
 PointLight *PointLight::Create()
 {
-	PointLight *pointLight;
+	PointLight *pointLight = nullptr;
 	pointLight = new PointLight;
 
-	if (pointLight == nullptr)
+	if (pointLight)
 	{
-		assert(0);
+		return pointLight;
 	}
-	return pointLight;
+	return nullptr;
 }
 
 void PointLight::SetLightPos(const XMFLOAT3 &lightpos)

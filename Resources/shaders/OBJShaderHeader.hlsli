@@ -30,19 +30,25 @@ struct PointLight
     uint active;
 };
 
+struct SpotLight
+{
+    float3 lightv;
+    float3 lightpos;
+    float3 lightcolor;
+    float3 lightatten;
+    float2 lightfactoranglecos;
+    uint active;
+};
+
 cbuffer cbuff2 : register(b2)
 {
     float3 ambientColor;
     dirLight dirlight;
     PointLight pointlight;
+    SpotLight spotlight;
 }
 
-//cbuffer cbuff2 : register(b2)
-//{
-//    float3 lightv;
-//    float3 lightcolor;
-//    uint active;
-//}
+
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体
 struct VSOutput
 {
