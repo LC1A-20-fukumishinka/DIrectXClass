@@ -6,6 +6,7 @@
 #include "TextureMgr.h"
 #include "MeshCollider.h"
 #include "TouchableObject.h"
+#include "FbxLoader.h"
 using namespace DirectX;
 void GameScene::Init()
 {
@@ -73,6 +74,7 @@ void GameScene::Init()
 	objGround->SetLight(light);
 	objGround->SetLightGroup(lightGroup);
 
+	FbxLoader::GetInstance()->LoadModelFromFile("cube");
 }
 
 void GameScene::Update()

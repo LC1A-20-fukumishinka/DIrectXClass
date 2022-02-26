@@ -1,6 +1,7 @@
 #include "Framework.h"
 #include "BaseData.h"
 #include "DirectInput.h"
+#include "FbxLoader.h"
 void Framework::Run()
 {
 	Init();
@@ -30,6 +31,8 @@ void Framework::Init()
 
 	myDirectX = MyDirectX::Instance();
 	myDirectX->Init();
+
+	FbxLoader::GetInstance()->Initialize();
 
 	Input *input = Input::Instance();
 	input->Init(WinAPI::Instance()->w, WinAPI::Instance()->hwnd);
@@ -62,6 +65,7 @@ void Framework::Finalize()
 	//‰¹ºƒf[ƒ^‰ğ•ú
 	Sound::SoundUnload();
 
+	FbxLoader::GetInstance()->Finalize();
 	myDirectX->Finalize();
 	//myDirectX->CheckAliveObject();
 	Win->end();

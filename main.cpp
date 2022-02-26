@@ -1,5 +1,4 @@
 #include "Game.h"
-
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	Framework *game = new Game;
