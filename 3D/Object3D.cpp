@@ -95,9 +95,9 @@ void Object3D::Update()
 
 	HRESULT result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = color;//FŽw’è(RGBA)
-	constMap->viewproj = camera->matView * camera->matProjection;
+	constMap->viewproj = camera->GetMatView() * camera->GetMatProjection();
 	constMap->world = matWorld;
-	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->eye);
+	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->GetEye());
 	constBuff->Unmap(0, nullptr);
 
 	if (collider)

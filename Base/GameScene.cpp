@@ -7,11 +7,13 @@
 #include "MeshCollider.h"
 #include "TouchableObject.h"
 #include "FbxLoader.h"
+#include "FbxObject3D.h"
+#include "SafeDelete.h"
 using namespace DirectX;
 void GameScene::Init()
 {
 	cam = new Camera();
-	cam->Init(Vector3(0, 1, -10), Vector3(0, 0, 0));
+	cam->Init(Vector3(0, 0, -40), Vector3(0,20, 0));
 	light = Light::Create();
 	light->SetLightColor({ 0, 0, 0 });
 	light->SetLightActive(true);
@@ -74,7 +76,14 @@ void GameScene::Init()
 	objGround->SetLight(light);
 	objGround->SetLightGroup(lightGroup);
 
-	FbxLoader::GetInstance()->LoadModelFromFile("cube");
+	cube = FbxLoader::GetInstance()->LoadModelFromFile("cube");
+	FbxObject3D::SetDevice();
+	FbxObject3D::SetCamera(cam);
+	FbxObject3D::CreateGraphicsPipeline();
+	fbxObj = new FbxObject3D;
+	fbxObj->Init();
+	fbxObj->SetModel(cube);
+
 }
 
 void GameScene::Update()
@@ -127,6 +136,8 @@ void GameScene::Update()
 	objectSphere->Update();
 	objGround->Update();
 	CollisionManager::GetInstance()->CheckAllCollision();
+
+	fbxObj->Update();
 }
 
 void GameScene::Draw()
@@ -135,6 +146,7 @@ void GameScene::Draw()
 	domeObj->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	objFighter->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	objectSphere->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	fbxObj->Draw();
 	rayPart->Draw(partTex);
 }
 
@@ -153,5 +165,6 @@ void GameScene::Finalize()
 	delete rayPart;
 	delete groundModel;
 	delete objGround;
-
+	SafeDelete(cube);
+	SafeDelete(fbxObj);
 }

@@ -12,6 +12,8 @@
 #include "../LightGroup.h"
 #include "../PointLight.h"
 #include "../SpotLight.h"
+#include "FbxModel.h"
+#include "FbxObject3D.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -38,4 +40,7 @@ private:
 	ParticleManager *rayPart = nullptr;
 
 	TouchableObject *objGround = nullptr;
+
+	FbxModel *cube = nullptr;
+	FbxObject3D *fbxObj = nullptr;
 };

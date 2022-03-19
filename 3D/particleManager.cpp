@@ -357,7 +357,7 @@ void ParticleManager::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
-	constMap->mat = camera->matView * camera->matProjection;	//行列の合成
+	constMap->mat = camera->GetMatView() * camera->GetMatProjection();	//行列の合成
 	constMap->matBillboard = camera->GetMatBillboard();	//行列の合成
 	constMap->color = setColor;
 	constBuff->Unmap(0, nullptr);

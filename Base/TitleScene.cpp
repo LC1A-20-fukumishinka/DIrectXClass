@@ -77,8 +77,12 @@ void TitleScene::Update()
 		{
 			angle -= XMConvertToRadians(1.0f);
 		}
-		cam->eye.x = -100 * sinf(angle);
-		cam->eye.z = -100 * cosf(angle);
+
+		XMFLOAT3 eye = cam->GetEye();
+
+		eye.x = -100 * sinf(angle);
+		eye.z = -100 * cosf(angle);
+		cam->SetEye(eye);
 	}
 
 	cam->Update();

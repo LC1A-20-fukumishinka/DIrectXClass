@@ -68,7 +68,7 @@ XMFLOAT3 Camera::GetScreenPos(const DirectX::XMFLOAT3 &pos)
 	XMFLOAT3 p = pos;
 	XMStoreFloat3(&p, v);
 	v = XMVector3Transform(v, matView);
-	v = XMVector3Transform( v, matProjection);
+	v = XMVector3Transform(v, matProjection);
 
 	return XMFLOAT3(v.m128_f32[0], v.m128_f32[1], v.m128_f32[2]);
 }
@@ -83,9 +83,10 @@ DirectX::XMMATRIX Camera::GetMatBillboardY() const
 	return matBillBoardY;
 }
 
+
 void Camera::MakeMatCamera()
 {
-	XMFLOAT3 tmpEye =eye + position + shift;
+	XMFLOAT3 tmpEye = eye + position + shift;
 	XMVECTOR eyePosition = XMLoadFloat3(&tmpEye);
 	//íçéãì_ç¿ïW
 
@@ -168,4 +169,9 @@ void Camera::MakeMatCamera()
 	matBillBoardY.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 #pragma endregion
 
+}
+
+DirectX::XMMATRIX Camera::GetMatViewProj()
+{
+	return (matView * matProjection);
 }
