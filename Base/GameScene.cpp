@@ -15,7 +15,7 @@ void GameScene::Init()
 	cam = new Camera();
 	cam->Init(Vector3(0, 0, -40), Vector3(0,20, 0));
 	light = Light::Create();
-	light->SetLightColor({ 0, 0, 0 });
+	light->SetLightColor({ 1, 1, 1 });
 	light->SetLightActive(true);
 	light->Update();
 
@@ -32,7 +32,7 @@ void GameScene::Init()
 
 	lightGroup = LightGroup::Create();
 	lightGroup->SetLight(light);
-	//lightGroup->SetPoinntLight(pointLight);
+	lightGroup->SetPoinntLight(pointLight);
 	lightGroup->SetSpotLight(spotLight);
 	domeObj = new Object3D;
 	domeObj->SetPosition(XMFLOAT3(0, 0, 0));
@@ -76,7 +76,7 @@ void GameScene::Init()
 	objGround->SetLight(light);
 	objGround->SetLightGroup(lightGroup);
 
-	cube = FbxLoader::GetInstance()->LoadModelFromFile("cube");
+	cube = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
 	FbxObject3D::SetDevice();
 	FbxObject3D::SetCamera(cam);
 	FbxObject3D::CreateGraphicsPipeline();
