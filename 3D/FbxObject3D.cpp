@@ -1,6 +1,7 @@
 #include "FbxObject3D.h"
 #include "MyDirectX.h"
 #include <d3dcompiler.h>
+#include "FbxLoader.h"
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace Microsoft::WRL;
@@ -81,6 +82,16 @@ void FbxObject3D::CreateGraphicsPipeline()
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
+		{ //影響を受けるボーン番号(4つ)
+			"BONEINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+		{ //ボーンのスキンウェイト(4つ)
+			"BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
 	};
 
 	// グラフィックスパイプラインの流れを設定
@@ -131,12 +142,13 @@ void FbxObject3D::CreateGraphicsPipeline()
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[2];
+	CD3DX12_ROOT_PARAMETER rootparams[3];
 	// CBV（座標変換行列用）
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 	// SRV（テクスチャ）
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
-
+	//CBVスキニング
+	rootparams[2].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
 
@@ -164,11 +176,11 @@ void FbxObject3D::SetDevice()
 void FbxObject3D::Init()
 {
 	HRESULT result;
-	//定数バッファの生成
 	if (device == nullptr)
 	{
 		assert(0);
 	}
+	//(頂点情報周りの)定数バッファの生成
 	result = device->CreateCommittedResource
 	(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -178,6 +190,15 @@ void FbxObject3D::Init()
 		nullptr,
 		IID_PPV_ARGS(&constBufferTransform)
 	);
+
+	//(スキニング情報周りの)定数バッファの生成
+	result = device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataSkin) + 0xff) & ~0xff),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuffSkin));
 }
 
 void FbxObject3D::Update()
@@ -194,7 +215,7 @@ void FbxObject3D::Update()
 
 	//ワールド行列の合成
 	matWorld = XMMatrixIdentity();
-	matWorld *=matScale;
+	matWorld *= matScale;
 	matWorld *= matRot;
 	matWorld *= matTrans;
 
@@ -207,7 +228,7 @@ void FbxObject3D::Update()
 	HRESULT result;
 
 	ConstBufferDataTransform *constMap = nullptr;
-	result = constBufferTransform->Map(0, nullptr, (void**)&constMap);
+	result = constBufferTransform->Map(0, nullptr, (void **)&constMap);
 	if (SUCCEEDED(result))
 	{
 		constMap->viewproj = matViewProjection;
@@ -215,6 +236,26 @@ void FbxObject3D::Update()
 		constMap->cameraPos = cameraPos;
 		constBufferTransform->Unmap(0, nullptr);
 	}
+
+	//ボーン配列
+	std::vector<FbxModel::Bone> &bones = model->GetBones();
+
+	//定数バッファへデータ転送
+	ConstBufferDataSkin *constMapSkin = nullptr;
+	result = constBuffSkin->Map(0, nullptr, (void**) &constMapSkin);
+	for (int i = 0; i < bones.size(); i++)
+	{
+		//今の姿勢行列
+		XMMATRIX matCurrentPose;
+		//今の姿勢行列を取得
+		FbxAMatrix fbxCurrentPose =
+		bones[i].fbxCluster->GetLink()->EvaluateGlobalTransform(0);
+		//XMMATRIXに変換
+		FbxLoader::ConvertMatrixFromFbx(&matCurrentPose, fbxCurrentPose);
+		//合成してスキニング行列に
+		constMapSkin->bones[i] = bones[i].invInitialPose * matCurrentPose;
+	}
+	constBuffSkin->Unmap(0, nullptr);
 }
 
 void FbxObject3D::Draw()
@@ -231,9 +272,11 @@ void FbxObject3D::Draw()
 	cmdList->SetGraphicsRootSignature(rootsignature.Get());
 	//プリミティブ形状を設定
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	//定数バッファビューをセット
+	//（アフィン変換系の）定数バッファビューをセット
 	cmdList->SetGraphicsRootConstantBufferView(0, constBufferTransform->GetGPUVirtualAddress());
 
+	//（スキニング系の）定数バッファビューのセット
+	cmdList->SetGraphicsRootConstantBufferView(2, constBuffSkin->GetGPUVirtualAddress());
 	//モデルの描画
 	model->Draw();
 }

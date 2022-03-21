@@ -7,6 +7,8 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <d3dx12.h>
+
+#include <fbxsdk.h>
 struct Node
 {
 	//名前
@@ -38,12 +40,16 @@ private:
 
 	using string = std::string;
 	template <class T> using vector = std::vector<T>;
+public://定数
+	static const int MAX_BONE_INDICES = 4;
 public:
-	struct VertexPosNormalUv
+	struct VertexPosNormalUvSkin
 	{
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT2 uv;
+		UINT boneIndex[MAX_BONE_INDICES];	//ボーン 番号
+		float boneWeight[MAX_BONE_INDICES];	//ボーン 重み
 	};
 
 	struct Material
@@ -54,11 +60,31 @@ public:
 		int textureHandle;
 	};
 
+	struct Bone
+	{
+		//名前
+		std::string name;
+		//初期姿勢の逆行列
+		DirectX::XMMATRIX invInitialPose;
+		//クラスター(FBX側のボーン情報)
+		FbxCluster *fbxCluster;
+		//コンストラクタ
+		Bone(const std::string &name)
+		{
+			this->name = name;
+		}
+	};
+public://アクセッサ
+	FbxScene *GetFbxScene(){return fbxScene;}
+
+	std::vector<Bone> &GetBones() { return bones; }
 public:
+	~FbxModel();
+
 	void CreateBuffers();
 	void Draw();
 
-	const XMMATRIX &GetModeTransform(){return meshNode->globalTransform;}
+	const XMMATRIX &GetModeTransform() { return meshNode->globalTransform; }
 private:
 	//モデル名
 	std::string name;
@@ -67,7 +93,7 @@ private:
 	//メッシュを持つノード
 	Node *meshNode = nullptr;
 	//頂点データ配列
-	std::vector<VertexPosNormalUv> vertices;
+	std::vector<VertexPosNormalUvSkin> vertices;
 	//頂点インデックス
 	std::vector<unsigned short> indices;
 	//マテリアル
@@ -79,5 +105,8 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vbView = {};
 	D3D12_INDEX_BUFFER_VIEW ibView = {};
 
-
+	//ボーン配列
+	std::vector<Bone> bones;
+	//FBXシーン
+	FbxScene *fbxScene = nullptr;
 };

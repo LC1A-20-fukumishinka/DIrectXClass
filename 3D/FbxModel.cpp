@@ -1,10 +1,15 @@
 #include "FbxModel.h"
 #include "MyDirectX.h"
 #include "TextureMgr.h"
+FbxModel::~FbxModel()
+{
+	//FBXシーンの解放
+	fbxScene->Destroy();
+}
 void FbxModel::CreateBuffers()
 {
 	HRESULT result;
-	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
+	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUvSkin) * vertices.size());
 
 	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 	//頂点バッファ生成
@@ -18,7 +23,7 @@ void FbxModel::CreateBuffers()
 	);
 
 	//頂点バッファへのデータ転送
-	VertexPosNormalUv *vertMap = nullptr;
+	VertexPosNormalUvSkin *vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void **)&vertMap);
 	if (SUCCEEDED(result))
 	{
