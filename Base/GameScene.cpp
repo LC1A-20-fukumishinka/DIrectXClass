@@ -83,6 +83,7 @@ void GameScene::Init()
 	fbxObj = new FbxObject3D;
 	fbxObj->Init();
 	fbxObj->SetModel(cube);
+	fbxObj->PlayAnimation();
 
 }
 
@@ -138,6 +139,8 @@ void GameScene::Update()
 	CollisionManager::GetInstance()->CheckAllCollision();
 
 	fbxObj->Update();
+
+
 }
 
 void GameScene::Draw()
