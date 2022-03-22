@@ -41,6 +41,11 @@ public:
 	void Update();
 	void Draw();
 	void SetModel(FbxModel *model) { this->model = model; }
+
+	/// <summary>
+	/// アニメーション開始
+	/// </summary>
+	void PlayAnimation();
 private:
 	static ID3D12Device *device;
 	static Camera *camera;
@@ -57,4 +62,15 @@ private:
 	XMMATRIX matWorld;
 
 	FbxModel *model = nullptr;
+
+	//1フレームの時間
+	FbxTime frameTime;
+	//アニメーション開始時間
+	FbxTime startTime;
+	//アニメーション終了時間
+	FbxTime endTime;
+	//現在時間（アニメーション）
+	FbxTime currentTime;
+	//アニメーション再生中
+	bool isPlay = false;
 };
