@@ -13,7 +13,7 @@ using namespace DirectX;
 void GameScene::Init()
 {
 	cam = new Camera();
-	cam->Init(Vector3(0, 0, -40), Vector3(0,20, 0));
+	cam->Init(Vector3(0, 0, -20), Vector3(0,0, 0));
 	light = Light::Create();
 	light->SetLightColor({ 1, 1, 1 });
 	light->SetLightActive(true);

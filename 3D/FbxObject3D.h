@@ -46,6 +46,16 @@ public:
 	/// アニメーション開始
 	/// </summary>
 	void PlayAnimation();
+
+public:
+	void SetPosition(const XMFLOAT3 &position) { this->position = position; }
+	void SetRotation(const XMFLOAT3 &rotation) { this->rotation = rotation; }
+	void SetScale(const XMFLOAT3 &scale) { this->scale = scale; }
+	const XMFLOAT3 &GetPosition() { return position; }
+	const XMFLOAT3 &GetRotation() { return rotation; }
+	const XMFLOAT3 &GetScale() { return scale; }
+	const XMMATRIX &GetMatWorld() { return matWorld; }
+
 private:
 	static ID3D12Device *device;
 	static Camera *camera;
