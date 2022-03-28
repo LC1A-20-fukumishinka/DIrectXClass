@@ -2,6 +2,8 @@
 #include "BaseData.h"
 #include "DirectInput.h"
 #include "FbxLoader.h"
+#include "TextureMgr.h"
+#include "SafeDelete.h"
 void Framework::Run()
 {
 	Init();
@@ -42,6 +44,12 @@ void Framework::Init()
 
 	sceneMgr = SceneMgr::Instance();
 	isEnd = false;
+
+	postEffect = new PostEffect();
+	int white = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/white1x1.png");
+	//ポストエフェクトの初期化
+	postEffect->Init(white);
+	postEffect->size = { 100, 100 };
 }
 
 void Framework::Update()
@@ -55,6 +63,8 @@ void Framework::Update()
 	Input::Instance()->Update();
 
 	sceneMgr->Update();
+
+	postEffect->Update();
 }
 
 void Framework::Finalize()
@@ -65,6 +75,7 @@ void Framework::Finalize()
 	//音声データ解放
 	Sound::SoundUnload();
 
+	SafeDelete(postEffect);
 	FbxLoader::GetInstance()->Finalize();
 	myDirectX->Finalize();
 	//myDirectX->CheckAliveObject();
@@ -75,7 +86,8 @@ void Framework::Draw()
 {
 	myDirectX->PreDraw();
 
-	sceneMgr->Draw();
+	postEffect->Draw();
+	//sceneMgr->Draw();
 
 
 	myDirectX->PostDraw();

@@ -41,7 +41,7 @@ public:
 	DirectX::XMFLOAT2 texSize;
 	//îÒï\é¶
 	bool isInvisible;
-private:
+protected:
 	struct ConstBufferData
 	{
 		DirectX::XMFLOAT4 color;	//êF(RGBA)
