@@ -4,6 +4,9 @@
 #include "FbxLoader.h"
 #include "TextureMgr.h"
 #include "SafeDelete.h"
+#include "PostEffectTestPipeline.h"
+#include "PostMosaicPipeline.h"
+#include "PostMonochromePipeline.h"
 void Framework::Run()
 {
 	Init();
@@ -46,10 +49,13 @@ void Framework::Init()
 	isEnd = false;
 
 	postEffect = new PostEffect();
-	int white = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/white1x1.png");
 	//ポストエフェクトの初期化
-	postEffect->Init(white);
-	postEffect->size = { 100, 100 };
+	postEffect->Init();
+
+
+	postEffect2 = new PostEffect();
+	postEffect2->Init();
+	//postEffect->size = { 100, 100 };
 }
 
 void Framework::Update()
@@ -64,7 +70,7 @@ void Framework::Update()
 
 	sceneMgr->Update();
 
-	postEffect->Update();
+	//postEffect->Update();
 }
 
 void Framework::Finalize()
@@ -76,6 +82,7 @@ void Framework::Finalize()
 	Sound::SoundUnload();
 
 	SafeDelete(postEffect);
+	SafeDelete(postEffect2);
 	FbxLoader::GetInstance()->Finalize();
 	myDirectX->Finalize();
 	//myDirectX->CheckAliveObject();
@@ -84,11 +91,17 @@ void Framework::Finalize()
 
 void Framework::Draw()
 {
+	postEffect->PreDrawScene();
+	sceneMgr->Draw();
+	postEffect->PostDrawScene();
+
+	postEffect2->PreDrawScene();
+	postEffect->Draw(PostMosaicPipeline::Instance()->GetPipeLine());
+	postEffect2->PostDrawScene();
+
 	myDirectX->PreDraw();
+	//postEffect->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
 
-	postEffect->Draw();
-	//sceneMgr->Draw();
-
-
+	postEffect2->Draw(PostMonochromePipeline::Instance()->GetPipeLine());
 	myDirectX->PostDraw();
 }

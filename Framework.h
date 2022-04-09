@@ -30,5 +30,5 @@ protected:
 	bool isEnd = false;
 	SceneMgr *sceneMgr;
 	PostEffect *postEffect;
-
+	PostEffect *postEffect2;
 };
