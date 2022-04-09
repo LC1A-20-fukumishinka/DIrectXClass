@@ -7,6 +7,7 @@
 #include "PostEffectTestPipeline.h"
 #include "PostMosaicPipeline.h"
 #include "PostMonochromePipeline.h"
+#include "PostGBPipeline.h"
 void Framework::Run()
 {
 	Init();
@@ -102,6 +103,6 @@ void Framework::Draw()
 	myDirectX->PreDraw();
 	//postEffect->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
 
-	postEffect2->Draw(PostMonochromePipeline::Instance()->GetPipeLine());
+	postEffect2->Draw(PostGBPipeline::Instance()->GetPipeLine());
 	myDirectX->PostDraw();
 }
