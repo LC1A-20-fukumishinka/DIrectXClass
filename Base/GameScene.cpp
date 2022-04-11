@@ -9,11 +9,14 @@
 #include "FbxLoader.h"
 #include "FbxObject3D.h"
 #include "SafeDelete.h"
+#include "FukuMath.h"
+
+using namespace FukuMath;
 using namespace DirectX;
 void GameScene::Init()
 {
 	cam = new Camera();
-	cam->Init(Vector3(0, 0, -20), Vector3(0,0, 0));
+	cam->Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
 	light = Light::Create();
 	light->SetLightColor({ 1, 1, 1 });
 	light->SetLightActive(true);
@@ -84,7 +87,7 @@ void GameScene::Init()
 	fbxObj->Init();
 	fbxObj->SetModel(cube);
 	fbxObj->PlayAnimation();
-
+	fbxObj->SetRotation({ 0, PI / 2 , 0});
 }
 
 void GameScene::Update()
