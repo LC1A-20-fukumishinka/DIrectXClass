@@ -21,11 +21,14 @@ void Game::Finalize()
 void Game::Update()
 {
 	Framework::Update();
+	sceneMgr->Update();
 }
 
 
 void Game::Draw()
 {
-	Framework::Draw();
+	myDirectX->PreDraw();
+	sceneMgr->Draw();
+	myDirectX->PostDraw();
 }
 

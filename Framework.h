@@ -6,9 +6,7 @@
 #include "MyDirectX.h"
 #include "Sound.h"
 #include "TextureMgr.h"
-#include "particleManager.h"
 #include "SceneMgr.h"
-#include "PostEffect.h"
 class Framework
 {
 public:
@@ -26,9 +24,7 @@ public:
 protected:
 	WinAPI *Win;
 	MyDirectX *myDirectX;
+	SceneMgr *sceneMgr;
 
 	bool isEnd = false;
-	SceneMgr *sceneMgr;
-	PostEffect *postEffect;
-	PostEffect *postEffect2;
 };
