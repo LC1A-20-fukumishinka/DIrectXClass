@@ -197,6 +197,7 @@ void Model::LoadModel(const std::string &directoryPath, const std::string &model
 		{
 			//半角スペース区切り出行の続きを読み込む
 			string index_string;
+			int faceIndexCount = 0;
 			while (getline(line_stream, index_string, ' '))
 			{
 				//頂点インデックス1っ個分の文字列をストリームに変換して解析しやすくする
@@ -213,19 +214,26 @@ void Model::LoadModel(const std::string &directoryPath, const std::string &model
 				vertex.normal = normals[indexNormal - 1];
 				vertex.uv = texcoords[indexTexcoord - 1];
 				model.vertices.emplace_back(vertex);
+				faceIndexCount++;
 				//頂点インデックスに追加
-				model.indices.emplace_back((unsigned short)model.indices.size());
 
-				//const int squareSurfaceVerticesCount = 4;
-				////面の頂点数が4
-				//if (vertices.size() >= squareSurfaceVerticesCount)
-				//{
-				//	const size_t squareIndexstartValue = 4;
-				//	indices.emplace_back((unsigned short)indices.size() - squareIndexstartValue);
+				const int squareSurfaceVerticesCount = 4;
 
-				//	const size_t squareIndexBackValue = 2;
-				//	indices.emplace_back((unsigned short)indices.size() - squareIndexBackValue);
-				//}
+				//面の頂点数が4
+				if (faceIndexCount >= squareSurfaceVerticesCount)
+				{
+					const size_t index2 = (unsigned short)model.indices.size() - (unsigned short)1;
+					const size_t index3 = (unsigned short)model.indices.size();
+					const size_t index0 = (unsigned short)model.indices.size() - (unsigned short)3;
+
+					model.indices.emplace_back(index2);
+					model.indices.emplace_back(index3);
+					model.indices.emplace_back(index0);
+				}
+				else
+				{
+					model.indices.emplace_back((unsigned short)model.indices.size());
+				}
 
 			}
 		}

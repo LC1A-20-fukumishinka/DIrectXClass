@@ -53,7 +53,7 @@ void GameScene::Init()
 
 	objectSphere = new Object3D;
 	objectSphere->SetScale(XMFLOAT3(1.0f, 1.0f, 1.0f));
-	objectSphere->SetPosition(XMFLOAT3(-3, 0, 0));
+	objectSphere->SetPosition(XMFLOAT3(-3, 3, 0));
 	objectSphere->Init();
 	objectSphere->SetCamera(cam);
 	objectSphere->SetLight(light);
