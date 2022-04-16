@@ -1,6 +1,7 @@
 #pragma once
 #include "Sprite.h"
 #include <IGraphicsPipeline.h>
+#include <array>
 class PostEffect
 	//public Sprite
 {
@@ -78,7 +79,7 @@ private:
 	ID3D12GraphicsCommandList *cmdList = nullptr;
 
 	//テクスチャバッファ
-	Microsoft::WRL::ComPtr<ID3D12Resource> texBuff;
+	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> texBuff;
 	//SRV用デスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descHeapSRV;
 

@@ -22,12 +22,6 @@ public:
 		DirectX::XMMATRIX world;
 		DirectX::XMFLOAT3 cameraPos;
 	};
-	enum ObjectName
-	{
-		Corn,
-		Box,
-		Plane
-	};
 	Object3D() = default;
 
 	virtual ~Object3D();
