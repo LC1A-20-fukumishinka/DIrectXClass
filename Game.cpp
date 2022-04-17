@@ -11,10 +11,13 @@ void Game::Init()
 
 	IScene *scene_ = new TitleScene();
 	SceneMgr::Instance()->SetNextScene(scene_);
+	postTest = std::make_unique<PostEffect>();
+	postTest->Init();
 }
 
 void Game::Finalize()
 {
+	postTest.reset();
 	Framework::Finalize();
 }
 
@@ -27,8 +30,11 @@ void Game::Update()
 
 void Game::Draw()
 {
-	myDirectX->PreDraw();
+	postTest->PreDrawScene();
 	sceneMgr->Draw();
+	postTest->PostDrawScene();
+	myDirectX->PreDraw();
+	postTest->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
 	myDirectX->PostDraw();
 }
 

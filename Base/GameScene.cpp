@@ -15,7 +15,8 @@ using namespace FukuMath;
 using namespace DirectX;
 void GameScene::Init()
 {
-	cam = new Camera();
+
+		cam = new Camera();
 	cam->Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
 	light = Light::Create();
 	light->SetLightColor({ 1, 1, 1 });
@@ -24,13 +25,13 @@ void GameScene::Init()
 
 	pointLight = PointLight::Create();
 	pointLight->SetActive(true);
-	pointLight->SetLightPos(XMFLOAT3{0, 1.5, 0});
+	pointLight->SetLightPos(XMFLOAT3{ 0, 1.5, 0 });
 	pointLight->SetLightAtten(XMFLOAT3(0.2f, 0.2f, 0.2f));
 
 	spotLight = SpotLight::Create();
-	spotLight->SetLightDir({-0.5f, -1.0f, 0.2f});
-	spotLight->SetLightPos({0.0f, 5.0f, 0.0f });
-	spotLight->SetLightAtten({0.01f, 0.01f, 0.01f});
+	spotLight->SetLightDir({ -0.5f, -1.0f, 0.2f });
+	spotLight->SetLightPos({ 0.0f, 5.0f, 0.0f });
+	spotLight->SetLightAtten({ 0.01f, 0.01f, 0.01f });
 	spotLight->SetActive(true);
 
 	lightGroup = LightGroup::Create();
@@ -87,7 +88,7 @@ void GameScene::Init()
 	fbxObj->Init();
 	fbxObj->SetModel(cube);
 	fbxObj->PlayAnimation();
-	fbxObj->SetRotation({ 0, PI / 2 , 0});
+	fbxObj->SetRotation({ 0, PI / 2 , 0 });
 }
 
 void GameScene::Update()

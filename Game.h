@@ -14,5 +14,5 @@ public:
 	void Draw() override;
 public:
 private:
-
+	std::unique_ptr<PostEffect> postTest;
 };
