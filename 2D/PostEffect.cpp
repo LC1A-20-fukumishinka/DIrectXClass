@@ -26,20 +26,20 @@ void PostEffect::Draw(PipeClass::PipelineSet pipelineSet)
 	MyDirectX *myD = MyDirectX::Instance();
 	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 
-	if (Input::Instance()->KeyTrigger(DIK_0))
-	{
-		static int tex = 0;
-		tex = (tex + 1) % 2;
+	//if (Input::Instance()->KeyTrigger(DIK_0))
+	//{
+	//	static int tex = 0;
+	//	tex = (tex + 1) % 2;
 
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-		srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(texBuff[tex].Get(),
-		&srvDesc, 
-		descHeapSRV->GetCPUDescriptorHandleForHeapStart());
-	}
+	//	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	//	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	//	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//	srvDesc.Texture2D.MipLevels = 1;
+	//	device->CreateShaderResourceView(texBuff[tex].Get(),
+	//		&srvDesc,
+	//		descHeapSRV->GetCPUDescriptorHandleForHeapStart());
+	//}
 
 
 	//パイプランステートの設定
@@ -60,7 +60,19 @@ void PostEffect::Draw(PipeClass::PipelineSet pipelineSet)
 	//定数バッファをセット
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
 	//シェーダーリソースビューをセット
-	myD->GetCommandList()->SetGraphicsRootDescriptorTable(1, descHeapSRV->GetGPUDescriptorHandleForHeapStart());
+	myD->GetCommandList()->SetGraphicsRootDescriptorTable(
+		1,
+		CD3DX12_GPU_DESCRIPTOR_HANDLE(
+			descHeapSRV->GetGPUDescriptorHandleForHeapStart(),
+			0,
+			myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
+
+	myD->GetCommandList()->SetGraphicsRootDescriptorTable(
+		2,
+		CD3DX12_GPU_DESCRIPTOR_HANDLE(
+			descHeapSRV->GetGPUDescriptorHandleForHeapStart(),
+			1,
+			myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
 	//描画コマンド
 	myD->GetCommandList()->DrawInstanced(4, 1, 0, 0);
 }
@@ -152,7 +164,7 @@ void PostEffect::PreDrawScene()
 	for (int i = 0; i < 2; i++)
 	{
 		rtvHs[i] = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-		descHeapRTV->GetCPUDescriptorHandleForHeapStart(),
+			descHeapRTV->GetCPUDescriptorHandleForHeapStart(),
 			i
 			, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
 		);
@@ -166,7 +178,7 @@ void PostEffect::PreDrawScene()
 
 	CD3DX12_VIEWPORT viewports[2];
 	CD3DX12_RECT scissorRects[2];
-	for(int i = 0;i < 2;i++)
+	for (int i = 0; i < 2; i++)
 	{
 		viewports[i] = CD3DX12_VIEWPORT(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT);
 		scissorRects[i] = CD3DX12_RECT(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -190,8 +202,8 @@ void PostEffect::PostDrawScene()
 	//リソースバリアを変更（描画可能->シェーダーリソース）
 	for (int i = 0; i < 2; i++)
 	{
-	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(texBuff[i].Get(),
-		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+		cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(texBuff[i].Get(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 	}
 }
 
@@ -257,7 +269,7 @@ void PostEffect::MakeDescHeap()
 	D3D12_DESCRIPTOR_HEAP_DESC srvDescHeapDesc = {};
 	srvDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvDescHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	srvDescHeapDesc.NumDescriptors = 1;
+	srvDescHeapDesc.NumDescriptors = 2;//個数
 	//SRV用デスクリプタヒープを生成
 	result = device->CreateDescriptorHeap(&srvDescHeapDesc, IID_PPV_ARGS(&descHeapSRV));
 	assert(SUCCEEDED(result));
@@ -269,11 +281,15 @@ void PostEffect::MakeDescHeap()
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	//デスクリプタヒープ
-
-	device->CreateShaderResourceView(texBuff[0].Get(),
-		&srvDesc,
-		descHeapSRV->GetCPUDescriptorHandleForHeapStart());
+	for (int i = 0; i < 2; i++)
+	{
+		//デスクリプタヒープにSRVを作成
+		device->CreateShaderResourceView(texBuff[i].Get(),
+			&srvDesc,
+			CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeapSRV->GetCPUDescriptorHandleForHeapStart(),
+				i,
+				device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
+	}
 }
 void PostEffect::MakeRTV()
 {
