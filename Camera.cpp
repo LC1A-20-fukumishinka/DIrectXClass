@@ -43,7 +43,7 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 
 	//視錐台行列の生成
 	matProjection = DirectX::XMMatrixPerspectiveFovLH(
-		DirectX::XMConvertToRadians(this->projectionData.angle),				//上下画角60度
+		DirectX::XMConvertToRadians(this->projectionData.startAngle),				//上下画角60度
 		(float)this->projectionData.width / (float)this->projectionData.height,	//アスペクト比(画面横幅/画面縦幅)
 		this->projectionData.screenNear, this->projectionData.screenFar							//前端、奥端
 	);

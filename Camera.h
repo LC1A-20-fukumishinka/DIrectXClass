@@ -5,7 +5,7 @@ namespace Projection
 {
 	struct ProjectionData
 	{
-		float angle;
+		float startAngle;
 		float width;
 		float height;
 		float screenNear;
@@ -13,7 +13,7 @@ namespace Projection
 
 		ProjectionData()
 		{
-			angle = 60.0f;
+			startAngle = 60.0f;
 			width = 0.0f;
 			height = 0.0f;
 			screenNear = 0.1f;
