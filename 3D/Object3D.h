@@ -51,7 +51,6 @@ public://ƒZƒbƒ^
 
 	virtual void SetParent(Object3D *parent);
 	virtual void SetCamera(Camera *camera);
-	virtual void SetLight(Light *light);
 	virtual void SetLightGroup(LightGroup * lightGroup);
 	virtual void SetCollider(BaseCollider *collider);
 	virtual void SetModel(Model *model);

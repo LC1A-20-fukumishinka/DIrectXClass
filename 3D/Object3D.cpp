@@ -190,10 +190,6 @@ void Object3D::SetCamera(Camera *camera)
 	this->camera = camera;
 }
 
-void Object3D::SetLight(Light *light)
-{
-	this->light = light;
-}
 
 void Object3D::SetLightGroup(LightGroup *lightGroup)
 {
