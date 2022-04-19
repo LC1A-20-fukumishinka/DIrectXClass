@@ -8,7 +8,6 @@
 #include "TextureMgr.h"
 #include "particleManager.h"
 #include "SceneMgr.h"
-#include "PostEffect.h"
 class Framework
 {
 public:
@@ -29,6 +28,4 @@ protected:
 
 	bool isEnd = false;
 	SceneMgr *sceneMgr;
-	PostEffect *postEffect;
-	PostEffect *postEffect2;
 };

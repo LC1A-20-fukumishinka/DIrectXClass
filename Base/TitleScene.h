@@ -18,7 +18,7 @@ public:
 	void Finalize() override;
 private:
 	Camera *cam;
-	float angle;	//ƒJƒƒ‰‚Ì‰ñ“]Šp
+	float startAngle;	//ƒJƒƒ‰‚Ì‰ñ“]Šp
 	Object3D *boxObj;
 
 	Model *triangle;

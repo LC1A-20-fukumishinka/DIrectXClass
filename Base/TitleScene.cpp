@@ -15,7 +15,7 @@ void TitleScene::Init()
 
 	cam = new Camera();
 	cam->Init(Vector3(0, 0, -100), Vector3(0, 0, 0));
-	angle = 0.0f;
+	startAngle = 0.0f;
 
 	light = Light::Create();
 
@@ -28,7 +28,6 @@ void TitleScene::Init()
 	boxObj = new Object3D;
 	boxObj->Init();
 	boxObj->SetCamera(cam);
-	boxObj->SetLight(light);
 	boxObj->SetLightGroup(lightGroup);
 	boxObj->SetScale({ 100.0f, 100.0f, 100.0f });
 	boxObj->SetPosition({ 10, 0,0 });
@@ -71,17 +70,17 @@ void TitleScene::Update()
 	{
 		if (Input::Instance()->Key(DIK_D))
 		{
-			angle += XMConvertToRadians(1.0f);
+			startAngle += XMConvertToRadians(1.0f);
 		}
 		else if (Input::Instance()->Key(DIK_A))
 		{
-			angle -= XMConvertToRadians(1.0f);
+			startAngle -= XMConvertToRadians(1.0f);
 		}
 
 		XMFLOAT3 eye = cam->GetEye();
 
-		eye.x = -100 * sinf(angle);
-		eye.z = -100 * cosf(angle);
+		eye.x = -100 * sinf(startAngle);
+		eye.z = -100 * cosf(startAngle);
 		cam->SetEye(eye);
 	}
 

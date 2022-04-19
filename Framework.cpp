@@ -49,14 +49,6 @@ void Framework::Init()
 	sceneMgr = SceneMgr::Instance();
 	isEnd = false;
 
-	postEffect = new PostEffect();
-	//ポストエフェクトの初期化
-	postEffect->Init();
-
-
-	postEffect2 = new PostEffect();
-	postEffect2->Init();
-	//postEffect->size = { 100, 100 };
 }
 
 void Framework::Update()
@@ -82,8 +74,6 @@ void Framework::Finalize()
 	//音声データ解放
 	Sound::SoundUnload();
 
-	SafeDelete(postEffect);
-	SafeDelete(postEffect2);
 	FbxLoader::GetInstance()->Finalize();
 	myDirectX->Finalize();
 	//myDirectX->CheckAliveObject();
@@ -92,17 +82,9 @@ void Framework::Finalize()
 
 void Framework::Draw()
 {
-	postEffect->PreDrawScene();
-	sceneMgr->Draw();
-	postEffect->PostDrawScene();
-
-	postEffect2->PreDrawScene();
-	postEffect->Draw(PostMosaicPipeline::Instance()->GetPipeLine());
-	postEffect2->PostDrawScene();
 
 	myDirectX->PreDraw();
 	//postEffect->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
-
-	postEffect2->Draw(PostGBPipeline::Instance()->GetPipeLine());
+	sceneMgr->Draw();
 	myDirectX->PostDraw();
 }
