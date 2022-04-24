@@ -1,11 +1,12 @@
-#include "GraphicsPipeline3D.h"
+#include "BaseGraphicsPipeline.h"
 #include <d3dcompiler.h>
 #include "MyDirectX.h"
 using namespace PipeClass;
-
-
-GraphicsPipeline3D::GraphicsPipeline3D()
+using namespace std;
+std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, int renderTargetCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount)
 {
+
+	unique_ptr<PipelineSet> pipeSet = make_unique<PipelineSet>();
 	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 	HRESULT result;
 	Microsoft::WRL::ComPtr<ID3DBlob>vsBlob;//頂点シェーダオブジェクト
@@ -14,7 +15,7 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 	//頂点シェーダの読み込みとコンパイル
 #pragma region VShader
 	result = D3DCompileFromFile(
-		L"Resources/shaders/BasicVS.hlsl",//シェーダファイル名
+		VSname,//シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,//インクルード可能にする
 		"main", "vs_5_0",//エントリーポイント名、シェーダーモデル指定
@@ -25,7 +26,7 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 	//ピクセルシェーダー読み込み
 #pragma region PShader
 	result = D3DCompileFromFile(
-		L"Resources/shaders/BasicPS.hlsl",//シェーダファイル名
+		PSname,//シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,//インクルード可能にする
 		"main", "ps_5_0",//エントリーポイント名、シェーダモデル指定
@@ -50,39 +51,50 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 #pragma endregion
 	//頂点レイアウトの宣言と設定
 #pragma region inputLayOut
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-	{
-		{
-			"POSITION",									//セマンティック
-			0,											//同じセマンティック名が複数あるときに使うインデックス(0で良い)
-			DXGI_FORMAT_R32G32B32_FLOAT,				//要素数とビット数を表す(XYZの3つでfloat型なので"R32G32B32_FLOAT")
-			0,											//入力スロットインデックス(0でよい)
-			D3D12_APPEND_ALIGNED_ELEMENT,				//データのオフセット値(D3D12_APPEND_ALIGNED_ELEMENTだと自動設定)
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,	//入力データ種別(標準はD3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA)
-			0											//一度に描画するインスタンス数(0でよい)
-		},//(1行で書いた方が見やすいらしい)
-		//法線ベクトル
-		{
-			"NORMAL",
-			0,
-			DXGI_FORMAT_R32G32B32_FLOAT,
-			0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-			0
-		},
-		//座標以外に、色、テクスチャなどを渡す場合はさらに続ける
-		{
-			"TEXCOORD",
-			0,
-			DXGI_FORMAT_R32G32_FLOAT,
-			0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-			0
-		},
-	};
+	//D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+	//{
+	//	{
+	//		"POSITION",									//セマンティック
+	//		0,											//同じセマンティック名が複数あるときに使うインデックス(0で良い)
+	//		DXGI_FORMAT_R32G32B32_FLOAT,				//要素数とビット数を表す(XYZの3つでfloat型なので"R32G32B32_FLOAT")
+	//		0,											//入力スロットインデックス(0でよい)
+	//		D3D12_APPEND_ALIGNED_ELEMENT,				//データのオフセット値(D3D12_APPEND_ALIGNED_ELEMENTだと自動設定)
+	//		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,	//入力データ種別(標準はD3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA)
+	//		0											//一度に描画するインスタンス数(0でよい)
+	//	},//(1行で書いた方が見やすいらしい)
+	//	//法線ベクトル
+	//	{
+	//		"NORMAL",
+	//		0,
+	//		DXGI_FORMAT_R32G32B32_FLOAT,
+	//		0,
+	//		D3D12_APPEND_ALIGNED_ELEMENT,
+	//		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+	//		0
+	//	},
+	//	//座標以外に、色、テクスチャなどを渡す場合はさらに続ける
+	//	{
+	//		"TEXCOORD",
+	//		0,
+	//		DXGI_FORMAT_R32G32_FLOAT,
+	//		0,
+	//		D3D12_APPEND_ALIGNED_ELEMENT,
+	//		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+	//		0
+	//	},
+	//};
 #pragma endregion
+
+	int count = renderTargetCount;
+
+	if (count > 8)
+	{
+		count = 8;
+	}
+	if (count <= 0)
+	{
+		count = 1;
+	}
 	//パイプラインステート設定変数の宣言と、各種項目の設定
 #pragma region pipelineState
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
@@ -93,10 +105,9 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 
 	//標準的な設定(背面カリング、塗りつぶし、深度クリッピング有効)
 	gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	gpipeline.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;//RGBA全てのチャンネルを描画
 
-	D3D12_RENDER_TARGET_BLEND_DESC &blenddesc = gpipeline.BlendState.RenderTarget[0];
-
+	D3D12_RENDER_TARGET_BLEND_DESC blenddesc = {};
+	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;//RGBA全てのチャンネルを描画
 	blenddesc.BlendEnable = true;					//ブレンドを有効にする
 	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソース(描画する図形のピクセル)の値を100%使う
@@ -106,7 +117,10 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			//ソースのアルファ値
 	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//1.0f - ソースのアルファ値
 
-
+	for (int i = 0; i < count; i++)
+	{
+		gpipeline.BlendState.RenderTarget[i] = blenddesc;
+	}
 	//デプスステンシルステートの設定
 #pragma region DepthStencilState
 
@@ -117,12 +131,15 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 #pragma endregion
 
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
-	gpipeline.InputLayout.NumElements = _countof(inputLayout);
+	gpipeline.InputLayout.NumElements = inputLayoutCount;
 
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-	gpipeline.NumRenderTargets = 1;//描画対象は1つ
-	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;//0^255指定のRGBA
+	gpipeline.NumRenderTargets = count;//描画対象はNつ
+	for (int i = 0; i < count; i++)
+	{
+		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;//0^255指定のRGBA
+	}
 	gpipeline.SampleDesc.Count = 1;//ピクセルにつき1回サンプリング
 
 
@@ -130,14 +147,14 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 	//ルートシグネチャの生成
 #pragma region RootSignature
 #pragma region rootParameter
-//デスクリプタテーブルの設定
-	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
-
-	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);	//t0 レジスタ
-	//ルートパラメータの設定
-	CD3DX12_ROOT_PARAMETER rootparams[2] = {};
-	rootparams[0].InitAsConstantBufferView(0);
-	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
+////デスクリプタテーブルの設定
+//	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
+//
+//	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);	//t0 レジスタ
+//	//ルートパラメータの設定
+//	CD3DX12_ROOT_PARAMETER rootparams[2] = {};
+//	rootparams[0].InitAsConstantBufferView(0);
+//	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 #pragma endregion
 
 #pragma region textureSampler
@@ -145,7 +162,7 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 
 #pragma endregion
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init_1_0(_countof(rootparams), rootparams, 1, &samplerDesc,
+	rootSignatureDesc.Init_1_0(rootparamsCount, rootparams, 1, &samplerDesc,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	Microsoft::WRL::ComPtr<ID3DBlob>rootSigBlob;
@@ -156,34 +173,13 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 	//ルートシグネチャの生成
 	result =
 		device->CreateRootSignature(0, rootSigBlob->GetBufferPointer(),
-			rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&pipelineSet.rootSignature));
-	gpipeline.pRootSignature = pipelineSet.rootSignature.Get();
+			rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&pipeSet->rootSignature));
+	gpipeline.pRootSignature = pipeSet->rootSignature.Get();
 
-	result = device->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelineSet.pipelineState));
+	result = device->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipeSet->pipelineState));
 
 #pragma endregion
 
-	BaseGraphicsPipeline::CreatePipeLine(
-		L"Resources/shaders/BasicVS.hlsl",
-		L"Resources/shaders/BasicPS.hlsl",
-		inputLayout,
-		_countof(inputLayout),
-		1,
-		rootparams,
-		_countof(rootparams));
-}
-GraphicsPipeline3D::~GraphicsPipeline3D()
-{
-}
 
-const PipelineSet &GraphicsPipeline3D::GetPipeLine()
-{
-	return pipelineSet;
+	return std::move(pipeSet);
 }
-
-GraphicsPipeline3D *GraphicsPipeline3D::Instance()
-{
-	static GraphicsPipeline3D instance;
-	return &instance;
-}
-

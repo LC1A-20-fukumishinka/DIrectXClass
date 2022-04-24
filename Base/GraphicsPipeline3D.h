@@ -1,6 +1,6 @@
 #pragma once
 #include "IGraphicsPipeline.h"
-
+#include <memory>
 class GraphicsPipeline3D : public IGraphicsPipeline
 {
 private:
