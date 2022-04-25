@@ -13,9 +13,18 @@ namespace PipeClass
 	};
 }
 
+namespace GraphicsPipelineTypeName
+{
+	enum BlendName
+	{
+		ALPHA,
+		ADD,
+		Sub
+	};
+}
 class BaseGraphicsPipeline
 {
 public:
-	static std::unique_ptr<PipeClass::PipelineSet> CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, int renderTargetCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount);
+	static std::unique_ptr<PipeClass::PipelineSet> CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount,GraphicsPipelineTypeName::BlendName blendName = GraphicsPipelineTypeName::ALPHA,  int renderTargetCount = 1);
 };
 

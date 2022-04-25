@@ -8,9 +8,9 @@ private:
 	~GraphicsPipeline3D();
 public:
 
-	const PipeClass::PipelineSet &GetPipeLine();
+	PipeClass::PipelineSet *GetPipeLine();
 
 	static GraphicsPipeline3D *Instance();
 private:
-	PipeClass::PipelineSet pipelineSet;
+	std::unique_ptr<PipeClass::PipelineSet> pipelineSet;
 };

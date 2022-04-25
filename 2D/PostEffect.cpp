@@ -13,7 +13,7 @@ PostEffect::PostEffect()
 	cmdList = MyDirectX::Instance()->GetCommandList();
 }
 
-void PostEffect::Draw(PipeClass::PipelineSet pipelineSet)
+void PostEffect::Draw(PipeClass::PipelineSet *pipelineSet)
 {
 	//描画フラグがtrueじゃなかったら早期リターン
 	if (isInvisible) return;
@@ -43,9 +43,9 @@ void PostEffect::Draw(PipeClass::PipelineSet pipelineSet)
 
 
 	//パイプランステートの設定
-	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
+	myD->GetCommandList()->SetPipelineState(pipelineSet->pipelineState.Get());
 	//ルートシグネチャの設定
-	myD->GetCommandList()->SetGraphicsRootSignature(pipelineSet.rootSignature.Get());
+	myD->GetCommandList()->SetGraphicsRootSignature(pipelineSet->rootSignature.Get());
 	//プリミティブ形状を設定
 	myD->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 

@@ -107,7 +107,7 @@ void Object3D::Update()
 }
 
 
-void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, int textureNumber)
+void Object3D::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetTexture, int textureNumber)
 {
 	if (model == nullptr)
 	{
@@ -120,8 +120,8 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 	}
 	MyDirectX *myD = MyDirectX::Instance();
 
-	myD->GetCommandList()->SetPipelineState(pipelineSet.pipelineState.Get());
-	myD->GetCommandList()->SetGraphicsRootSignature(pipelineSet.rootSignature.Get());
+	myD->GetCommandList()->SetPipelineState(pipelineSet->pipelineState.Get());
+	myD->GetCommandList()->SetGraphicsRootSignature(pipelineSet->rootSignature.Get());
 
 	myD->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//デスクリプタヒープの配列
@@ -170,7 +170,7 @@ void Object3D::modelDraw(PipeClass::PipelineSet pipelineSet, bool isSetTexture, 
 	myD->GetCommandList()->IASetVertexBuffers(0, 1, &model->GetModel()->vbView);
 	//インデックスバッファの設定
 	myD->GetCommandList()->IASetIndexBuffer(&model->GetModel()->ibView);
-	myD->GetCommandList()->DrawIndexedInstanced(model->GetModel()->indices.size(), 1, 0, 0, 0);
+	myD->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(model->GetModel()->indices.size()), 1, 0, 0, 0);
 #pragma endregion
 
 }

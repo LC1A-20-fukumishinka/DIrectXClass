@@ -8,10 +8,10 @@ private:
 	~PostMonochromePipeline();
 public:
 
-	const PipeClass::PipelineSet &GetPipeLine();
+	PipeClass::PipelineSet *GetPipeLine();
 
 	static PostMonochromePipeline *Instance();
 private:
-	PipeClass::PipelineSet pipelineSet;
+	std::unique_ptr<PipeClass::PipelineSet> pipelineSet;
 };
 

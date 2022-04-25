@@ -8,9 +8,9 @@ private:
 	~ModelPhongPipeline();
 public:
 
-	const PipeClass::PipelineSet &GetPipeLine();
+	PipeClass::PipelineSet *GetPipeLine();
 
 	static ModelPhongPipeline *Instance();
 private:
-	PipeClass::PipelineSet pipelineSet;
+	std::unique_ptr<PipeClass::PipelineSet> pipelineSet;
 };

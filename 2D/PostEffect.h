@@ -14,7 +14,7 @@ public:
 	/// <summary>
 	/// •`‰æƒRƒ}ƒ“ƒh
 	/// </summary>
-	void Draw(PipeClass::PipelineSet pipelineSet);
+	void Draw(PipeClass::PipelineSet *pipelineSet);
 
 	/// <summary>
 	/// ‰Šú‰»

@@ -23,6 +23,6 @@ public:
 	IGraphicsPipeline(IGraphicsPipeline &obj) = delete;
 	IGraphicsPipeline &operator=(const IGraphicsPipeline &obj) = delete;
 
-	virtual const PipeClass::PipelineSet &GetPipeLine() = 0;
+	virtual PipeClass::PipelineSet *GetPipeLine() = 0;
 
 };

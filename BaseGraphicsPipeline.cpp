@@ -3,7 +3,8 @@
 #include "MyDirectX.h"
 using namespace PipeClass;
 using namespace std;
-std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, int renderTargetCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount)
+using namespace GraphicsPipelineTypeName;
+std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount, BlendName blendName, int renderTargetCount)
 {
 
 	unique_ptr<PipelineSet> pipeSet = make_unique<PipelineSet>();
@@ -109,13 +110,39 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	D3D12_RENDER_TARGET_BLEND_DESC blenddesc = {};
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;//RGBA全てのチャンネルを描画
 	blenddesc.BlendEnable = true;					//ブレンドを有効にする
-	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
-	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソース(描画する図形のピクセル)の値を100%使う
-	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デスト(描画対象ピクセル　　　)の値を  0%使う
+	switch (blendName)
+	{
+	case GraphicsPipelineTypeName::ALPHA:
+		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
+		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソース(描画する図形のピクセル)の値を100%使う
+		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デスト(描画対象ピクセル　　　)の値を  0%使う
 
-	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				//加算
-	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			//ソースのアルファ値
-	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//1.0f - ソースのアルファ値
+		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				//加算
+		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			//ソースのアルファ値
+		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//1.0f - ソースのアルファ値
+		break;
+	case GraphicsPipelineTypeName::ADD:
+		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;	//加算
+		blenddesc.SrcBlend = D3D12_BLEND_ONE;	//ソースの値を100%使う
+		blenddesc.DestBlend = D3D12_BLEND_ONE;	//デストの値を100%使う
+
+		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+		break;
+	case GraphicsPipelineTypeName::Sub:
+		blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	//減算
+		blenddesc.SrcBlend = D3D12_BLEND_ONE;				//ソースの値を100%使う
+		blenddesc.DestBlend = D3D12_BLEND_ONE;				//デストの値を100%使う
+
+		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+		break;
+	default:
+		break;
+	}
+
 
 	for (int i = 0; i < count; i++)
 	{
@@ -131,7 +158,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 #pragma endregion
 
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
-	gpipeline.InputLayout.NumElements = inputLayoutCount;
+	gpipeline.InputLayout.NumElements = static_cast<UINT>(inputLayoutCount);
 
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
@@ -162,7 +189,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 
 #pragma endregion
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init_1_0(rootparamsCount, rootparams, 1, &samplerDesc,
+	rootSignatureDesc.Init_1_0(static_cast<UINT>(rootparamsCount), rootparams, 1, &samplerDesc,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	Microsoft::WRL::ComPtr<ID3DBlob>rootSigBlob;
@@ -181,5 +208,5 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 #pragma endregion
 
 
-	return std::move(pipeSet);
+	return pipeSet;
 }
