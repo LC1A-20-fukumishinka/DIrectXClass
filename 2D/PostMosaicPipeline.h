@@ -8,10 +8,10 @@ private:
 	~PostMosaicPipeline();
 public:
 
-	const PipeClass::PipelineSet &GetPipeLine();
+	PipeClass::PipelineSet *GetPipeLine();
 
 	static PostMosaicPipeline *Instance();
 private:
-	PipeClass::PipelineSet pipelineSet;
+	std::unique_ptr<PipeClass::PipelineSet> pipelineSet;
 };
 

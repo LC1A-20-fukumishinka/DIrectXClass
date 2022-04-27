@@ -4,10 +4,8 @@
 #include "FbxLoader.h"
 #include "TextureMgr.h"
 #include "SafeDelete.h"
-#include "PostEffectTestPipeline.h"
-#include "PostMosaicPipeline.h"
-#include "PostMonochromePipeline.h"
-#include "PostGBPipeline.h"
+#include "particleManager.h"
+
 void Framework::Run()
 {
 	Init();
@@ -61,14 +59,12 @@ void Framework::Update()
 	Win->msgCheck();
 	Input::Instance()->Update();
 
-	sceneMgr->Update();
 
-	//postEffect->Update();
 }
 
 void Framework::Finalize()
 {
-	sceneMgr->Finalize();
+	SceneMgr::Instance()->Finalize();
 	//xAudio2‰ð•ú
 	Sound::xAudioDelete();
 	//‰¹ºƒf[ƒ^‰ð•ú
@@ -83,8 +79,4 @@ void Framework::Finalize()
 void Framework::Draw()
 {
 
-	myDirectX->PreDraw();
-	//postEffect->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
-	sceneMgr->Draw();
-	myDirectX->PostDraw();
 }

@@ -8,10 +8,10 @@ private:
 	~PostGBPipeline();
 public:
 
-	const PipeClass::PipelineSet &GetPipeLine();
+	PipeClass::PipelineSet *GetPipeLine();
 
 	static PostGBPipeline *Instance();
 private:
-	PipeClass::PipelineSet pipelineSet;
+	std::unique_ptr<PipeClass::PipelineSet> pipelineSet;
 };
 

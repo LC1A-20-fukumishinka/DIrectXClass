@@ -6,7 +6,6 @@
 #include "MyDirectX.h"
 #include "Sound.h"
 #include "TextureMgr.h"
-#include "particleManager.h"
 #include "SceneMgr.h"
 class Framework
 {
@@ -25,7 +24,7 @@ public:
 protected:
 	WinAPI *Win;
 	MyDirectX *myDirectX;
+	SceneMgr *sceneMgr;
 
 	bool isEnd = false;
-	SceneMgr *sceneMgr;
 };
