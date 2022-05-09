@@ -79,7 +79,7 @@ private:
 	ID3D12GraphicsCommandList *cmdList = nullptr;
 
 	//テクスチャバッファ
-	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> texBuff;
+	Microsoft::WRL::ComPtr<ID3D12Resource> texBuff;
 	//SRV用デスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descHeapSRV;
 

@@ -66,13 +66,6 @@ void PostEffect::Draw(PipeClass::PipelineSet *pipelineSet)
 			descHeapSRV->GetGPUDescriptorHandleForHeapStart(),
 			0,
 			myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
-
-	myD->GetCommandList()->SetGraphicsRootDescriptorTable(
-		2,
-		CD3DX12_GPU_DESCRIPTOR_HANDLE(
-			descHeapSRV->GetGPUDescriptorHandleForHeapStart(),
-			1,
-			myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
 	//描画コマンド
 	myD->GetCommandList()->DrawInstanced(4, 1, 0, 0);
 }
@@ -151,48 +144,39 @@ void PostEffect::Init()
 void PostEffect::PreDrawScene()
 {
 	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
-	//リソースバリアを変更(シェーダーリソース→描画可能)
-	for (int i = 0; i < texBuff.size(); i++)
-	{
+
 		cmdList->ResourceBarrier(1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(texBuff[i].Get(),
+			&CD3DX12_RESOURCE_BARRIER::Transition(texBuff.Get(),
 				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 				D3D12_RESOURCE_STATE_RENDER_TARGET));
-	}
 	//レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHs[2];
-	for (int i = 0; i < 2; i++)
-	{
-		rtvHs[i] = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-			descHeapRTV->GetCPUDescriptorHandleForHeapStart(),
-			i
-			, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-		);
-	}
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHs;
+
+	rtvHs = CD3DX12_CPU_DESCRIPTOR_HANDLE(
+		descHeapRTV->GetCPUDescriptorHandleForHeapStart(),
+		0
+		, device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
+	);
 	//深度ステンシルビュー用デスクリプタヒープのハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvH =
 		descHeapDSV->GetCPUDescriptorHandleForHeapStart();
 	//レンダーターゲットをセット
-	cmdList->OMSetRenderTargets(2, rtvHs, false, &dsvH);
+	cmdList->OMSetRenderTargets(1, &rtvHs, false, &dsvH);
 
 
-	CD3DX12_VIEWPORT viewports[2];
-	CD3DX12_RECT scissorRects[2];
-	for (int i = 0; i < 2; i++)
-	{
-		viewports[i] = CD3DX12_VIEWPORT(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT);
-		scissorRects[i] = CD3DX12_RECT(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	}
+	CD3DX12_VIEWPORT viewports;
+	CD3DX12_RECT scissorRects;
+
+	viewports = CD3DX12_VIEWPORT(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT);
+	scissorRects = CD3DX12_RECT(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	//ビューポートの設定
-	cmdList->RSSetViewports(2, viewports);
+	cmdList->RSSetViewports(1, &viewports);
 	//シザリング矩形の設定
-	cmdList->RSSetScissorRects(2, scissorRects);
+	cmdList->RSSetScissorRects(1, &scissorRects);
 
 	//全画面クリア
-	for (int i = 0; i < 2; i++)
-	{
-		cmdList->ClearRenderTargetView(rtvHs[i], clearColor, 0, nullptr);
-	}
+
+	cmdList->ClearRenderTargetView(rtvHs, clearColor, 0, nullptr);
 	//深度バッファのクリア
 	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
@@ -200,11 +184,9 @@ void PostEffect::PreDrawScene()
 void PostEffect::PostDrawScene()
 {
 	//リソースバリアを変更（描画可能->シェーダーリソース）
-	for (int i = 0; i < 2; i++)
-	{
-		cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(texBuff[i].Get(),
+
+		cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(texBuff.Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
-	}
 }
 
 void PostEffect::MakeTextureBuffer()
@@ -219,8 +201,6 @@ void PostEffect::MakeTextureBuffer()
 		1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
 	);
 
-	for (int i = 0; i < texBuff.size(); i++)
-	{
 		//テクスチャバッファの生成
 		result = MyDirectX::Instance()->GetDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK,
@@ -229,10 +209,9 @@ void PostEffect::MakeTextureBuffer()
 			&texresDesc,
 			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 			&CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, clearColor),
-			IID_PPV_ARGS(&texBuff[i])
+			IID_PPV_ARGS(&texBuff)
 		);
 		assert(SUCCEEDED(result));
-	}
 }
 
 void PostEffect::SendImage()
@@ -251,12 +230,10 @@ void PostEffect::SendImage()
 	for (int i = 0; i < pixelCount; i++) { img[i] = 0xff0000ff; };
 
 	//テクスチャバッファにデータ転送
-	for (int i = 0; i < texBuff.size(); i++)
-	{
-		result = texBuff[i]->WriteToSubresource(0, nullptr,
+
+		result = texBuff->WriteToSubresource(0, nullptr,
 			img, rowPitch, depthPitch);
 		assert(SUCCEEDED(result));
-	}
 	delete[] img;
 }
 
@@ -269,7 +246,7 @@ void PostEffect::MakeDescHeap()
 	D3D12_DESCRIPTOR_HEAP_DESC srvDescHeapDesc = {};
 	srvDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvDescHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	srvDescHeapDesc.NumDescriptors = 2;//個数
+	srvDescHeapDesc.NumDescriptors = 1;//個数
 	//SRV用デスクリプタヒープを生成
 	result = device->CreateDescriptorHeap(&srvDescHeapDesc, IID_PPV_ARGS(&descHeapSRV));
 	assert(SUCCEEDED(result));
@@ -281,15 +258,10 @@ void PostEffect::MakeDescHeap()
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	for (int i = 0; i < 2; i++)
-	{
-		//デスクリプタヒープにSRVを作成
-		device->CreateShaderResourceView(texBuff[i].Get(),
-			&srvDesc,
-			CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeapSRV->GetCPUDescriptorHandleForHeapStart(),
-				i,
-				device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
-	}
+	//デスクリプタヒープにSRVを作成
+	device->CreateShaderResourceView(texBuff.Get(),
+		&srvDesc,
+		descHeapSRV->GetCPUDescriptorHandleForHeapStart());
 }
 void PostEffect::MakeRTV()
 {
@@ -299,21 +271,18 @@ void PostEffect::MakeRTV()
 	//RTV用デスクリプタヒープ設定
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescHeapDesc{};
 	rtvDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	rtvDescHeapDesc.NumDescriptors = 2;
+	rtvDescHeapDesc.NumDescriptors = 1;
 	//RTV用デスクリプタヒープを生成
 	result = device->CreateDescriptorHeap(&rtvDescHeapDesc, IID_PPV_ARGS(&descHeapRTV));
 	assert(SUCCEEDED(result));
 	//デスクリプタヒープにRTV作成
-	for (int i = 0; i < texBuff.size(); i++)
-	{
-		device->CreateRenderTargetView(texBuff[i].Get(),
+		device->CreateRenderTargetView(texBuff.Get(),
 			nullptr,
 			CD3DX12_CPU_DESCRIPTOR_HANDLE(
 				descHeapRTV->GetCPUDescriptorHandleForHeapStart(),
-				i,
+				0,
 				device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
 			));
-	}
 }
 
 void PostEffect::MakeDepthBuffer()
