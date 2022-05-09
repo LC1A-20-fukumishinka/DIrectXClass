@@ -37,6 +37,8 @@ private:
 
 	float power;
 	float gravity;
+	float airResistance;
+	float friction;
 	Vector3 startAngle;
 	Vector3 jumpVector;
 

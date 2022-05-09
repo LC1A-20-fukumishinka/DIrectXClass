@@ -58,7 +58,8 @@ void GameScene::Init()
 
 	power = 2.0f;
 	gravity = 9.8f / 60.0f;
-
+	airResistance = 0.0f;
+	friction = 0.0f;
 	XMVECTOR angleV{ 1, 10, 0, 0 };
 	angleV = XMVector3Normalize(angleV);
 	XMStoreFloat3(&startAngle, angleV);

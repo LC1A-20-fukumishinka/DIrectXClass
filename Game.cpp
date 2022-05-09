@@ -31,11 +31,8 @@ void Game::Update()
 
 void Game::Draw()
 {
-	postTest->PreDrawScene();
-	sceneMgr->Draw();
-	postTest->PostDrawScene();
 	myDirectX->PreDraw();
-	postTest->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
+	sceneMgr->Draw();
 	myDirectX->PostDraw();
 }
 
