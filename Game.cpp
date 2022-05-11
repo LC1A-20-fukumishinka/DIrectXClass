@@ -25,16 +25,40 @@ void Game::Update()
 {
 	Framework::Update();
 	sceneMgr->Update();
+	if (Input::Instance()->KeyTrigger(DIK_Q))
+	{
+		isPostDraw = !isPostDraw;
+	}
 }
 
 
 void Game::Draw()
 {
+	if (isPostDraw)
+	{
+		PostDraw();
+	}
+	else
+	{
+		BaseDraw();
+	}
+}
+
+void Game::BaseDraw()
+{
+	myDirectX->PreDraw();
+	sceneMgr->Draw();
+	myDirectX->PostDraw();
+}
+
+void Game::PostDraw()
+{
 	postTest->PreDrawScene();
 	sceneMgr->Draw();
 	postTest->PostDrawScene();
 	myDirectX->PreDraw();
-	postTest->Draw(PostEffectTestPipeline::Instance()->GetPipeLine());
+	postTest->Draw(PostGBPipeline::Instance()->GetPipeLine());
 	myDirectX->PostDraw();
+
 }
 
