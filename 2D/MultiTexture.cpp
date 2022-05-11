@@ -1,4 +1,4 @@
-#include "PostEffect.h"
+#include "MultiTexture.h"
 #include <d3dx12.h>
 #include "MyDirectX.h"
 #include "TextureMgr.h"
@@ -6,14 +6,14 @@
 #include "BaseData.h"
 #include "DirectInput.h"
 using namespace DirectX;
-const float PostEffect::clearColor[4] = { 0.2f,0.2f ,0.2f ,0.0f };
+const float MultiTexture::clearColor[4] = { 0.2f,0.2f ,0.2f ,0.0f };
 
-PostEffect::PostEffect()
+MultiTexture::MultiTexture()
 {
 	cmdList = MyDirectX::Instance()->GetCommandList();
 }
 
-void PostEffect::Draw(PipeClass::PipelineSet *pipelineSet)
+void MultiTexture::Draw(PipeClass::PipelineSet *pipelineSet)
 {
 	//描画フラグがtrueじゃなかったら早期リターン
 	if (isInvisible) return;
@@ -77,7 +77,7 @@ void PostEffect::Draw(PipeClass::PipelineSet *pipelineSet)
 	myD->GetCommandList()->DrawInstanced(4, 1, 0, 0);
 }
 
-void PostEffect::Init()
+void MultiTexture::Init()
 {
 
 	//基底クラスとしての初期化
@@ -148,7 +148,7 @@ void PostEffect::Init()
 	MakeDSV();
 }
 
-void PostEffect::PreDrawScene()
+void MultiTexture::PreDrawScene()
 {
 	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 	//リソースバリアを変更(シェーダーリソース→描画可能)
@@ -197,7 +197,7 @@ void PostEffect::PreDrawScene()
 	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void PostEffect::PostDrawScene()
+void MultiTexture::PostDrawScene()
 {
 	//リソースバリアを変更（描画可能->シェーダーリソース）
 	for (int i = 0; i < 2; i++)
@@ -207,7 +207,7 @@ void PostEffect::PostDrawScene()
 	}
 }
 
-void PostEffect::MakeTextureBuffer()
+void MultiTexture::MakeTextureBuffer()
 {
 	HRESULT result;
 
@@ -235,7 +235,7 @@ void PostEffect::MakeTextureBuffer()
 	}
 }
 
-void PostEffect::SendImage()
+void MultiTexture::SendImage()
 {	//テクスチャを赤クリア
 
 	HRESULT result;
@@ -260,7 +260,7 @@ void PostEffect::SendImage()
 	delete[] img;
 }
 
-void PostEffect::MakeDescHeap()
+void MultiTexture::MakeDescHeap()
 {
 	HRESULT result;
 
@@ -291,7 +291,7 @@ void PostEffect::MakeDescHeap()
 				device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
 	}
 }
-void PostEffect::MakeRTV()
+void MultiTexture::MakeRTV()
 {
 	HRESULT result S_FALSE;
 
@@ -316,7 +316,7 @@ void PostEffect::MakeRTV()
 	}
 }
 
-void PostEffect::MakeDepthBuffer()
+void MultiTexture::MakeDepthBuffer()
 {
 	HRESULT result S_FALSE;
 
@@ -341,7 +341,7 @@ void PostEffect::MakeDepthBuffer()
 	assert(SUCCEEDED(result));
 }
 
-void PostEffect::MakeDSV()
+void MultiTexture::MakeDSV()
 {
 	HRESULT result S_FALSE;
 

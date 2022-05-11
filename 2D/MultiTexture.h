@@ -2,14 +2,14 @@
 #include "Sprite.h"
 #include <IGraphicsPipeline.h>
 #include <array>
-class PostEffect
+class MultiTexture
 	//public Sprite
 {
 public:
 	/// <summary>
 	///コンストラクタ
 	/// </summary>
-	PostEffect();
+	MultiTexture();
 
 	/// <summary>
 	/// 描画コマンド
