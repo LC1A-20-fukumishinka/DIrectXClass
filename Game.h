@@ -13,6 +13,10 @@ public:
 	void Update() override;
 	void Draw() override;
 public:
+	void BaseDraw();
+	void PostDraw();
+public:
 private:
+	bool isPostDraw = false;
 	std::unique_ptr<PostEffect> postTest;
 };

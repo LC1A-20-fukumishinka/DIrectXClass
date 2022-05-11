@@ -17,17 +17,8 @@ public:
 	void Draw() override;
 	void Finalize() override;
 private:
-	Camera *cam;
-	float angle;	//ƒJƒƒ‰‚Ì‰ñ“]Šp
-	Object3D *boxObj;
 
-	Model *triangle;
-	ParticleManager *part;
-	int spriteTex;
-	Sprite *sprite;
-	Sound *alarm;
 
 	DebugText *debug;
-	Light *light;
-	LightGroup *lightGroup = nullptr;
+
 };

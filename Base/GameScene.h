@@ -23,24 +23,5 @@ public:
 	void Draw() override;
 	void Finalize() override;
 private:
-	Model *dome;
-	Model *sphereModel;
-	Model *fighterModel;
-	Model *groundModel;
-	Object3D *domeObj;
-	Object3D *objFighter;
-	Object3D *objectSphere;
-	Camera *cam;
-
-	Light *light = nullptr;
-	PointLight *pointLight = nullptr;
-	SpotLight * spotLight = nullptr;
-	LightGroup *lightGroup = nullptr;
-	int partTex;
-	ParticleManager *rayPart = nullptr;
-
-	TouchableObject *objGround = nullptr;
-
-	FbxModel *cube = nullptr;
-	FbxObject3D *fbxObj = nullptr;
+	
 };
