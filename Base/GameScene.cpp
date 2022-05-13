@@ -17,7 +17,7 @@ using namespace std;
 void GameScene::Init()
 {
 	cam = make_unique<Camera>();
-	cam->Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
+	cam->Init(Vector3(0, 3, -30), Vector3(0, 3, 0));
 	light = unique_ptr<Light>(Light::Create());
 	light->SetLightColor({ 1, 1, 1 });
 	light->SetLightDir({ 0, 1, 10 });
@@ -45,7 +45,7 @@ void GameScene::Init()
 	objFighter->SetCamera(cam.get());
 	objFighter->SetLightGroup(lightGroup.get());
 	objFighter->SetRotation(XMFLOAT3{ 0, PI / 2, 0 });
-	Vector3 startPos(-3, 0, 0);
+	Vector3 startPos(-10, 0, 0);
 	objFighter->SetPosition(startPos);
 	partTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
 	groundModel = make_unique<Model>();
@@ -58,9 +58,9 @@ void GameScene::Init()
 
 	power = 2.0f;
 	gravity = 9.8f / 60.0f;
-	airResistance = 0.0f;
+	airResistance = 0.05f;
 	friction = 0.0f;
-	XMVECTOR angleV{ 1, 10, 0, 0 };
+	XMVECTOR angleV{ 3, 3, 0, 0 };
 	angleV = XMVector3Normalize(angleV);
 	XMStoreFloat3(&startAngle, angleV);
 	jumpVector = {};
@@ -77,22 +77,23 @@ void GameScene::Update()
 	if (isStart)
 	{
 		jumpVector.y += -gravity;
+
+		Vector3 force = AirResistance(jumpVector, airResistance);
+		jumpVector += force;
 		pos = Vector3(pos) + jumpVector;
 	}
 
 	if (pos.y <= 0.0f)
 	{
-		if (jumpVector.length() <= 0.3f)
-		{
-			jumpVector = {};
-			pos.y = 0.0f;
-		}
-		else
-		{
 			pos.y = -pos.y;
 			jumpVector.y = -jumpVector.y;
-			jumpVector *= 0.3;
-		}
+
+			if (fabs(jumpVector.y) <= 0.5f)
+			{
+				jumpVector.y = 0;
+				pos.y = 0.0f;
+			}
+
 	}
 
 	objFighter->SetPosition(pos);
@@ -114,4 +115,10 @@ void GameScene::Draw()
 
 void GameScene::Finalize()
 {
+}
+
+Vector3 GameScene::AirResistance(const Vector3 &velocity, const float k)
+{
+	Vector3 resistanceForce = k * -velocity;
+	return resistanceForce;
 }
