@@ -212,7 +212,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	return pipeSet;
 }
 
-std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, LPCWSTR GSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount, GraphicsPipelineTypeName::BlendName blendName, bool isDepthWrite = true, int renderTargetCount)
+std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, LPCWSTR GSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount, GraphicsPipelineTypeName::BlendName blendName, bool isDepthWrite, int renderTargetCount)
 {
 
 	HRESULT result = S_FALSE;
@@ -292,26 +292,6 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 		OutputDebugStringA(errstr.c_str());
 		exit(1);
 	}
-
-	// 頂点レイアウト
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-		{ // xy座標(1行で書いたほうが見やすい)
-			"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		},
-		//{ // 法線ベクトル(1行で書いたほうが見やすい)
-		//	"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-		//	D3D12_APPEND_ALIGNED_ELEMENT,
-		//	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		//},
-		{ // スケール
-			"TEXCOORD", 0, DXGI_FORMAT_R32_FLOAT, 0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		},
-	};
-
 
 	int count = renderTargetCount;
 
@@ -408,11 +388,6 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 	// デスクリプタレンジ
 	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
-
-	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[2];
-	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
