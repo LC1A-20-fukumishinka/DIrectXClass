@@ -6,11 +6,11 @@ using namespace DirectX;
 using namespace Projection;
 Camera::Camera()
 {
-	this->eye = { 0.0f, 0.0f, -100.0f };
-	this->target = { 0.0f, 0.0f, 0.0f };
-	this->up = { 0.0f, 1.0f, 0.0f };
-	this->shift = { 0.0f, 0.0f, 0.0f };
-	position = { 0.0f, 0.0f, 0.0f };
+	this->eye = Vector3(0.0f, 0.0f, -100.0f);
+	this->target = Vector3(0.0f, 0.0f, 0.0f);
+	this->up = Vector3(0.0f, 1.0f, 0.0f);
+	this->shift = Vector3(0.0f, 0.0f, 0.0f);
+	position = Vector3(0.0f, 0.0f, 0.0f);
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 	matBillBoard = XMMatrixIdentity();
 	matBillBoardY = XMMatrixIdentity();
@@ -119,7 +119,7 @@ void Camera::MakeMatCamera()
 	//ベクトルの正規化
 	cameraAxisY = XMVector3Normalize(cameraAxisY);
 
-	up = { cameraAxisY.m128_f32[0], cameraAxisY.m128_f32[1],cameraAxisY.m128_f32[2] };
+	up = Vector3(cameraAxisY.m128_f32[0], cameraAxisY.m128_f32[1], cameraAxisY.m128_f32[2]);
 	//カメラ回転行列
 	XMMATRIX matCameraRot;
 	//カメラ座標系→ワールド座標系の変換行列
