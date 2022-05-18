@@ -27,7 +27,8 @@ private:
 	unique_ptr<Model> fighterModel;
 	unique_ptr<Model> groundModel;
 	unique_ptr<Object3D> domeObj;
-	unique_ptr<Object3D> objFighter;
+	unique_ptr<Object3D> SphereA;
+	unique_ptr<Object3D> SphereB;
 	unique_ptr<Object3D> objectSphere;
 	unique_ptr<Camera> cam;
 	unique_ptr<Light> light;
@@ -36,7 +37,7 @@ private:
 	unique_ptr<LightGroup> lightGroup;
 	int partTex;
 
-	unique_ptr < Object3D> objGround;
+	unique_ptr <Object3D> objGround;
 
 	float power;
 	float gravity;

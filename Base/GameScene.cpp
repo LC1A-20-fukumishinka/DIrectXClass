@@ -17,7 +17,7 @@ using namespace std;
 void GameScene::Init()
 {
 	cam = make_unique<Camera>();
-	cam->Init(Vector3(0, 3, -30), Vector3(0, 3, 0));
+	cam->Init(Vector3(0, 10, -30), Vector3(0, 1, 0));
 	light = unique_ptr<Light>(Light::Create());
 	light->SetLightColor({ 1, 1, 1 });
 	light->SetLightDir({ 0, 1, 10 });
@@ -32,26 +32,35 @@ void GameScene::Init()
 	domeObj->Init();
 	domeObj->SetCamera(cam.get());
 	domeObj->SetLightGroup(lightGroup.get());
-
 	dome = make_unique<Model>();
 	fighterModel = make_unique<Model>();
 
 	dome->CreateModel("skydome");
-	fighterModel->CreateModel("chr_sword");
+	fighterModel->CreateModel("sphere");
 	domeObj->SetModel(dome.get());
-	objFighter = make_unique<Object3D>();
-	objFighter->Init();
-	objFighter->SetModel(fighterModel.get());
-	objFighter->SetCamera(cam.get());
-	objFighter->SetLightGroup(lightGroup.get());
-	objFighter->SetRotation(XMFLOAT3{ 0, PI / 2, 0 });
+	SphereA = make_unique<Object3D>();
+	SphereA->Init();
+	SphereA->SetModel(fighterModel.get());
+	SphereA->SetCamera(cam.get());
+	SphereA->SetLightGroup(lightGroup.get());
+
+	SphereB = make_unique<Object3D>();
+	SphereB->Init();
+	SphereB->SetModel(fighterModel.get());
+	SphereB->SetCamera(cam.get());
+	SphereB->SetLightGroup(lightGroup.get());
+
+
 	Vector3 startPos(-10, 0, 0);
-	objFighter->SetPosition(startPos);
+	SphereB->SetPosition(startPos);
 	partTex = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/texture.png");
 	groundModel = make_unique<Model>();
 	groundModel->CreateModel("ground");
 	objGround = make_unique<Object3D>();
 	objGround->Init();
+	Vector3 tmp;
+	tmp = objGround->GetPosition();
+	objGround->SetPosition(tmp + Vector3(0, -1, 0));
 	objGround->SetModel(groundModel.get());
 	objGround->SetCamera(cam.get());
 	objGround->SetLightGroup(lightGroup.get());
@@ -63,12 +72,12 @@ void GameScene::Init()
 	XMVECTOR angleV{ 3, 3, 0, 0 };
 	angleV = XMVector3Normalize(angleV);
 	XMStoreFloat3(&startAngle, angleV);
-	jumpVector = {};
+	jumpVector = Vector3();
 }
 
 void GameScene::Update()
 {
-	XMFLOAT3 pos = objFighter->GetPosition();
+	XMFLOAT3 pos = SphereB->GetPosition();
 	if (Input::Instance()->KeyTrigger(DIK_SPACE))
 	{
 		isStart = true;
@@ -83,6 +92,7 @@ void GameScene::Update()
 		pos = Vector3(pos) + jumpVector;
 	}
 
+	//’…’n‚µ‚½‚Æ‚«‚Ì‹““®
 	if (pos.y <= 0.0f)
 	{
 			pos.y = -pos.y;
@@ -96,11 +106,11 @@ void GameScene::Update()
 
 	}
 
-	objFighter->SetPosition(pos);
+	SphereB->SetPosition(pos);
 	lightGroup->Update();
 	cam->Update();
 	domeObj->Update();
-	objFighter->Update();
+	SphereB->Update();
 	objGround->Update();
 
 
@@ -110,7 +120,7 @@ void GameScene::Draw()
 {
 	objGround->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	domeObj->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
-	objFighter->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	SphereB->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
 void GameScene::Finalize()
