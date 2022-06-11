@@ -15,6 +15,7 @@
 #include "FbxModel.h"
 #include "FbxObject3D.h"
 #include "../Planet.h"
+#include "../gameOriginal/GravityPlayer.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -24,7 +25,7 @@ public:
 	void Draw() override;
 	void Finalize() override;
 private:
-	std::unique_ptr<Planet> star;
+	std::shared_ptr<Planet> star;
 
 	std::unique_ptr<Camera> cam;
 
@@ -34,7 +35,10 @@ private:
 	std::unique_ptr<LightGroup> lightGroup;
 
 	std::unique_ptr<Model> groundModel;
+	std::unique_ptr<Model> playerModel;
+
 	std::unique_ptr<Object3D> objGround;
 	std::unique_ptr<FbxModel> templeModel;
 	std::unique_ptr<FbxObject3D> temple;
+	std::unique_ptr<GravityPlayer> player;
 };

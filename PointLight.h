@@ -1,5 +1,5 @@
 #pragma once
-
+#include <memory>
 #include <DirectXMath.h>
 
 class PointLight
@@ -20,8 +20,6 @@ public:
 		XMFLOAT3 lightatten;
 		unsigned int active;
 	};
-public:
-static PointLight *Create();
 public:
 void SetLightPos(const XMFLOAT3 &lightpos);
 inline const XMFLOAT3 &GetlightPos(){return lightPos;}

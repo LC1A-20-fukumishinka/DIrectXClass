@@ -37,8 +37,8 @@ ModelPhongPipeline::ModelPhongPipeline()
 	rootparams[3].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
 	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(
-		L"Resources/shaders/OBJVertexShader.hlsl",	// シェーダファイル名
-		L"Resources/shaders/OBJPixelShader.hlsl",	// シェーダファイル名
+		L"Resources/shaders/OBJPhongVS.hlsl",	// シェーダファイル名
+		L"Resources/shaders/OBJPhongPS.hlsl",	// シェーダファイル名
 		inputLayout,
 		_countof(inputLayout),
 		rootparams,

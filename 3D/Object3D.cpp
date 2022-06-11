@@ -20,6 +20,8 @@ void Object3D::Init()
 	HRESULT result = S_FALSE;
 	MyDirectX *myD = MyDirectX::Instance();
 	//ワールド行列を設定する
+
+	quaternion = XMQuaternionIdentity();
 	matWorld = XMMatrixIdentity();
 
 	matWorld = GetMatWorld();
@@ -60,9 +62,10 @@ const XMMATRIX Object3D::GetMatWorld()
 	//各種アフィン変換を行列の形にする
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(rotation.z);
-	matRot *= XMMatrixRotationX(rotation.x);
-	matRot *= XMMatrixRotationY(rotation.y);
+	//matRot *= XMMatrixRotationZ(rotation.z);
+	//matRot *= XMMatrixRotationX(rotation.x);
+	//matRot *= XMMatrixRotationY(rotation.y);
+	matRot = XMMatrixRotationQuaternion(quaternion);
 	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
 	//各種変換行列を乗算してゆく
@@ -233,6 +236,23 @@ void Object3D::SetScale(XMFLOAT3 scale)
 void Object3D::SetRotation(XMFLOAT3 rot)
 {
 	rotation = rot;
+
+	quaternion = XMQuaternionRotationRollPitchYaw(rot.x, rot.y, rot.z);
+}
+
+void Object3D::AddRotation(DirectX::XMFLOAT3 rot)
+{
+	rotation.x += rot.x;
+	rotation.y += rot.y;
+	rotation.z += rot.z;
+	XMVECTOR AddRot = XMQuaternionRotationRollPitchYaw(rot.x, rot.y, rot.z);
+	//乗算処理すると回転を混ぜることができるよ
+	quaternion = XMQuaternionMultiply(quaternion, AddRot);
+}
+
+void Object3D::AddRotation(DirectX::XMVECTOR rot)
+{
+	quaternion = XMQuaternionMultiply(quaternion, rot);
 }
 
 const XMFLOAT4 &Object3D::GetColor()
@@ -255,9 +275,45 @@ const XMFLOAT3 &Object3D::GetRotation()
 	return rotation;
 }
 
+const DirectX::XMVECTOR &Object3D::GetQuaternion()
+{
+	return quaternion;
+}
+
+const DirectX::XMVECTOR &Object3D::GetRotQuaternion()
+{
+	return quaternion;
+}
+
+const DirectX::XMVECTOR &Object3D::GerWorldQuaternion()
+{
+	XMVECTOR worldQ = quaternion;
+	if (parent != nullptr)
+	{
+		XMVECTOR parentQ = GerWorldQuaternion();
+		worldQ = XMQuaternionMultiply(worldQ, parentQ);
+	}
+	return worldQ;
+}
+
 const Model *Object3D::GetModel()
 {
 	return model;
+}
+
+void Object3D::Separate()
+{
+	if (parent != nullptr)
+	{
+		//親オブジェクトのワールド行列を乗算する
+		 parent->GetMatWorld();
+	}
+}
+
+void Object3D::ConnectObject(Object3D *parent)
+{
+	//位置情報をオブジェクト基準に変換する(逆行列をかけるような感じかな)
+
 }
 
 void DepthReset()

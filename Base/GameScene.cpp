@@ -10,10 +10,11 @@
 #include "FbxObject3D.h"
 #include "SafeDelete.h"
 #include "FukuMath.h"
-
+#include"../gameOriginal/GameInput.h"
 using namespace FukuMath;
 using namespace DirectX;
 using namespace std;
+using namespace GameInput;
 void GameScene::Init()
 {
 	star = make_unique<Planet>();
@@ -43,6 +44,8 @@ void GameScene::Init()
 
 	groundModel = make_unique<Model>();
 	groundModel->CreateModel("ground");
+	playerModel = make_unique<Model>();
+	playerModel->CreateModel("chr_sword");
 	objGround = make_unique<Object3D>();
 	objGround->Init();
 	objGround->SetModel(groundModel.get());
@@ -64,6 +67,10 @@ void GameScene::Init()
 	//temple->SetRotation({ -PI/2.0f, PI , 0 });
 	//temple->SetPosition(XMFLOAT3(0.0f, 3.0f, 0.0f));
 	//temple->SetScale(XMFLOAT3(0.01f, 0.01f, 0.01f));
+	player = make_unique<GravityPlayer>();
+	player->Init(playerModel.get());
+	player->SetCamera(cam.get());
+	player->SetLight(lightGroup.get());
 }
 
 void GameScene::Update()
@@ -71,6 +78,15 @@ void GameScene::Update()
 
 	cam->Update();
 	lightGroup->Update();
+	if (B())
+	{
+		player->SetGrabPlanet(star);
+	}
+	else
+	{
+		player->ReleasePlanet();
+	}
+	player->Update();
 	if (Input::Instance()->Key(DIK_W))
 	{
 		star->SetPos(Vector3(0, 1, 0) + star->GetPos());
@@ -82,12 +98,14 @@ void GameScene::Update()
 	objGround->Update();
 	star->Update();
 	//temple->Update();
+
+
 }
 
 void GameScene::Draw()
 {
 	star->Draw();
-
+	player->Draw();
 	//temple->Draw();
 	objGround->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
@@ -96,5 +114,3 @@ void GameScene::Finalize()
 {
 
 }
-
-//hoge

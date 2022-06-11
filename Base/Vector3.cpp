@@ -40,7 +40,7 @@ Vector3::Vector3(float x, float y, float z) :
 {
 }
 
-Vector3::Vector3(DirectX::XMFLOAT3 &v):
+Vector3::Vector3(const DirectX::XMFLOAT3 &v):
 Vector3(v.x, v.y, v.z)
 {
 }

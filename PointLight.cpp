@@ -1,17 +1,7 @@
 #include "PointLight.h"
 
 using namespace DirectX;
-PointLight *PointLight::Create()
-{
-	PointLight *pointLight = nullptr;
-	pointLight = new PointLight;
 
-	if (pointLight)
-	{
-		return pointLight;
-	}
-	return nullptr;
-}
 
 void PointLight::SetLightPos(const XMFLOAT3 &lightpos)
 {

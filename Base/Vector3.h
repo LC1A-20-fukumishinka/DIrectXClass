@@ -12,7 +12,7 @@ public:
 	//コンストラクタ
 	Vector3();
 	Vector3(float x, float y, float z);
-	Vector3(DirectX::XMFLOAT3 &v);
+	Vector3(const DirectX::XMFLOAT3 &v);
 	Vector3(const Vector3 &obj);
 	//メンバ関数
 	float length() const;

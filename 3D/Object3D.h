@@ -46,18 +46,23 @@ public://セッタ
 	virtual void SetParent(Object3D *parent);
 	virtual void SetCamera(Camera *camera);
 	virtual void SetLight(Light *light);
-	virtual void SetLightGroup(LightGroup * lightGroup);
+	virtual void SetLightGroup(LightGroup *lightGroup);
 	virtual void SetCollider(BaseCollider *collider);
 	virtual void SetModel(Model *model);
 	virtual void SetPosition(DirectX::XMFLOAT3 pos);
 	virtual void SetColor(DirectX::XMFLOAT4 color);
 	virtual void SetScale(DirectX::XMFLOAT3 scale);
 	virtual void SetRotation(DirectX::XMFLOAT3 rot);
+	virtual void AddRotation(DirectX::XMFLOAT3 rot);
+	virtual void AddRotation(DirectX::XMVECTOR rot);
 public:
 	const DirectX::XMFLOAT4 &GetColor();
 	const DirectX::XMFLOAT3 &GetPosition();
 	const DirectX::XMFLOAT3 &GetScale();
 	const DirectX::XMFLOAT3 &GetRotation();
+	const DirectX::XMVECTOR &GetQuaternion();
+	const DirectX::XMVECTOR &GetRotQuaternion();
+	const DirectX::XMVECTOR &GerWorldQuaternion();
 	const Model *GetModel();
 protected:
 	//クラス名(デバッグ用)
@@ -72,6 +77,8 @@ protected:
 	DirectX::XMFLOAT3 scale = { 1.0f ,1.0f ,1.0f };
 	//回転
 	DirectX::XMFLOAT3 rotation = { 0.0f,0.0f ,0.0f };
+	//任意軸回転
+	DirectX::XMVECTOR quaternion = {};
 	//座標
 	DirectX::XMFLOAT3 position = { 0.0f,0.0f ,0.0f };
 	//描画フラグ
@@ -79,7 +86,13 @@ protected:
 
 	//ワールド行列
 	DirectX::XMMATRIX matWorld;
+public://あったほうがいいかもね関数
+	/// <summary>
+	/// 親子関係を分離する
+	/// </summary>
+	void Separate();
 
+	void ConnectObject(Object3D *parent);
 private:
 	//定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff;

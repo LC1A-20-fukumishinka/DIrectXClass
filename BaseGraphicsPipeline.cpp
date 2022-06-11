@@ -226,7 +226,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shaders/particleVS.hlsl",	// シェーダファイル名
+		/*L"Resources/shaders/particleVS.hlsl"*/VSname,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -249,7 +249,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shaders/particlePS.hlsl",	// シェーダファイル名
+		/*L"Resources/shaders/particlePS.hlsl"*/PSname,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -272,7 +272,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	//ジオメトリシェーダの代みっこみとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shaders/particleGS.hlsl",//シェーダファイル名
+		/*L"Resources/shaders/particleGS.hlsl"*/GSname,//シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, //インクルード可能にする
 		"main", "gs_5_0", //エントリーポイント名、シェーダーモデル指定
