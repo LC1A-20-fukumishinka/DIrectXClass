@@ -16,44 +16,16 @@ void GravityPlayer::Init(Model *model)
 {
 	drawObject.Init();
 	drawObject.SetModel(model);
-	drawObject.SetRotation(XMFLOAT3(45 * degree, 0, 0));
-	RotX.Init(60);
-	RotY.Init(120);
 }
 
 void GravityPlayer::Update()
 {
-	float x = static_cast<float>(RotX.Do(Easing::InOut, Easing::Sine)) - 0.5f;
-	float y = static_cast<float>(RotY.Do(Easing::InOut, Easing::Sine)) - 0.5f;
-
-	if (isX)
-	{
-		x = -x;
-	}
-	if (isY)
-	{
-		y = -y;
-	}
-
-	x = 45 * degree;
-
-	y = y * 90 * degree;
-	if (RotX.IsEnd())
-	{
-		RotX.Init(120);
-		isX = !isX;
-	}
-	if (RotY.IsEnd())
-	{
-		RotY.Reset();
-		isY = !isY;
-	}
 	XMFLOAT2 stick = LStick();
 	Vector3 move = { stick.x,0, stick.y };
 	Vector3 nowPos(drawObject.GetPosition());
 	drawObject.SetPosition(nowPos + move);
 
-	drawObject.AddRotation(XMFLOAT3{ 0, degree,0 });
+	GrabUpdate();
 }
 
 void GravityPlayer::Finalize()
@@ -99,7 +71,12 @@ const DirectX::XMFLOAT3 GravityPlayer::GetPos()
 void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 {
 	this->grabPlanet = planet;
-	grabPlanet.lock()->Grab();
+	grabPlanet.lock()->GrabInput();
+	XMFLOAT3 dist = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
+	XMVECTOR vec = XMLoadFloat3(&dist);
+	//惑星に向き直る
+	drawObject.SetRotationVector(vec);
+	grabPlanet.lock()->SetGrabRotateAngle(drawObject.GetUpVec());
 }
 
 void GravityPlayer::ReleasePlanet()
@@ -114,5 +91,34 @@ void GravityPlayer::GrabUpdate()
 {
 	bool isNotGrab = grabPlanet.expired();
 	if (isNotGrab)return;
+
+	//星とプレイヤーの二点間の距離を計算
+	Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
+
+	//二点間の長さを計算
+	float length = planetPlayerDistance.length();
+
+	//プレイヤーのローカルのX軸に対して回転
+	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetRightVec(), RStick().y * degree));
+	//ToDo///////////////
+	//世界のY軸でなく自分の立っている垂直方向に最終的に変更したいね
+	////////////////////
+	//世界のY軸に対して回転
+	drawObject.AddRotation(XMFLOAT3{ 0.0f, RStick().x * degree, 0.0});
+
+	//プレイヤーの正面方向に
+	XMVECTOR vec = drawObject.GetFrontVec();
+
+	//移動量を乗算する
+	vec *= length;
+
+	//それをプレイヤーの位置に加算して
+	XMVECTOR playerPos = XMLoadFloat3(&drawObject.GetPosition());
+	vec += playerPos;
+
+	//惑星の位置完成
+	XMFLOAT3 planetPos = {};
+	XMStoreFloat3(&planetPos, vec);
+	grabPlanet.lock()->SetPos(planetPos);
 
 }

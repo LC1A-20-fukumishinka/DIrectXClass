@@ -14,7 +14,7 @@ void TitleScene::Init()
 
 void TitleScene::Update()
 {
-	if (Input::Instance()->KeyTrigger(DIK_RETURN))
+	if (Input::Instance()->KeyTrigger(DIK_RETURN) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_START))
 	{
 		IScene *scene = new GameScene();
 		SceneMgr::Instance()->SetNextScene(scene);

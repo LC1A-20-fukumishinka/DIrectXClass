@@ -55,6 +55,11 @@ public://セッタ
 	virtual void SetRotation(DirectX::XMFLOAT3 rot);
 	virtual void AddRotation(DirectX::XMFLOAT3 rot);
 	virtual void AddRotation(DirectX::XMVECTOR rot);
+	/// <summary>
+	/// 向きたい方向をベクトルで指定する
+	/// </summary>
+	/// <param name="rot">向く方向</param>
+	virtual void SetRotationVector(DirectX::XMVECTOR rot);
 public:
 	const DirectX::XMFLOAT4 &GetColor();
 	const DirectX::XMFLOAT3 &GetPosition();
@@ -63,6 +68,9 @@ public:
 	const DirectX::XMVECTOR &GetQuaternion();
 	const DirectX::XMVECTOR &GetRotQuaternion();
 	const DirectX::XMVECTOR &GerWorldQuaternion();
+	const DirectX::XMVECTOR &GetUpVec();
+	const DirectX::XMVECTOR &GetRightVec();
+	const DirectX::XMVECTOR &GetFrontVec();
 	const Model *GetModel();
 protected:
 	//クラス名(デバッグ用)
@@ -81,11 +89,18 @@ protected:
 	DirectX::XMVECTOR quaternion = {};
 	//座標
 	DirectX::XMFLOAT3 position = { 0.0f,0.0f ,0.0f };
+	DirectX::XMVECTOR front = { 0.0f,0.0f ,1.0f , 0.0f };
+	DirectX::XMVECTOR up = {0.0f,1.0f ,0.0f , 0.0f};
+	DirectX::XMVECTOR right = {1.0f, 0.0f, 0.0f, 0.0f};
+
 	//描画フラグ
 	bool isInvisible = false;
 
 	//ワールド行列
 	DirectX::XMMATRIX matWorld;
+
+	void UpdateVector
+	();
 public://あったほうがいいかもね関数
 	/// <summary>
 	/// 親子関係を分離する

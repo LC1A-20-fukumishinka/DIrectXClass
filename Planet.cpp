@@ -51,20 +51,20 @@ void Planet::NormalUpdate()
 	object->SetRotation(tmp);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
-	object->Update();
 }
 
 void Planet::GrabUpdate()
 {
-	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxis, RStick().x);
+	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxis, RStick().x * degree);
 	object->AddRotation(Rot);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
-	object->Update();
+	object->SetPosition(pos);
 }
 
 void Planet::Draw()
 {
+	object->Update();
 	object->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
@@ -82,7 +82,7 @@ void Planet::SetCamera(Camera *cam)
 	Planet::cam = cam;
 }
 
-void Planet::Grab()
+void Planet::GrabInput()
 {
 	isGrab = true;
 }
@@ -92,7 +92,7 @@ void Planet::ReleaseGrab()
 	isGrab = false;
 }
 
-void Planet::SetGrabRotateAngle(XMVECTOR Axis)
+void Planet::SetGrabRotateAngle(const XMVECTOR Axis)
 {
 	GrabRotateAxis = Axis;
 }

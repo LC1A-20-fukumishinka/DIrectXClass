@@ -24,9 +24,9 @@ public:
 public:
 	static void SetLight(LightGroup *lights);
 	static void SetCamera(Camera *cam);
-	void Grab();
+	void GrabInput();
 	void ReleaseGrab();
-	void SetGrabRotateAngle(DirectX::XMVECTOR Axis);
+	void SetGrabRotateAngle(const DirectX::XMVECTOR Axis);
 private://Ã“Iƒƒ“ƒo•Ï”
 	static Camera *cam;
 	static LightGroup *lights;

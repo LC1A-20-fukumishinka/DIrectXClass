@@ -78,7 +78,7 @@ void GameScene::Update()
 
 	cam->Update();
 	lightGroup->Update();
-	if (B())
+	if (GrabInput())
 	{
 		player->SetGrabPlanet(star);
 	}

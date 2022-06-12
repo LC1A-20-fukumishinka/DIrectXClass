@@ -12,7 +12,7 @@ namespace GameInput
 
 	bool BTrigger();
 
-	bool B();
+	bool GrabInput();
 
 	bool Pause();
 }

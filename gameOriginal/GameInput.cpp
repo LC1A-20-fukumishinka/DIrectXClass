@@ -12,6 +12,7 @@ bool GameInput::A()
 
 DirectX::XMFLOAT2 GameInput::LStick()
 {
+	
 	return Input::Instance()->LStick();
 }
 
@@ -25,9 +26,9 @@ bool GameInput::BTrigger()
 	return Input::Instance()->KeyTrigger(DIK_X) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_B);
 }
 
-bool GameInput::B()
+bool GameInput::GrabInput()
 {
-	return Input::Instance()->Key(DIK_X) || Input::Instance()->Button(XINPUT_GAMEPAD_B);
+	return Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
 }
 
 bool GameInput::Pause()

@@ -3,8 +3,9 @@
 #include "Model.h"
 #include "../Collision/BaseCollider.h"
 #include "../Collision/CollisionMgr.h"
+#include "FukuMath.h"
 using namespace DirectX;
-
+using namespace FukuMath;
 
 Object3D::~Object3D()
 {
@@ -67,6 +68,10 @@ const XMMATRIX Object3D::GetMatWorld()
 	//matRot *= XMMatrixRotationY(rotation.y);
 	matRot = XMMatrixRotationQuaternion(quaternion);
 	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
+	//オブジェクトの軸のベクトルを更新
+
+	//正面ベクトルを再計算
+	UpdateVector();
 
 	//各種変換行列を乗算してゆく
 	matTmp = XMMatrixIdentity();
@@ -238,6 +243,7 @@ void Object3D::SetRotation(XMFLOAT3 rot)
 	rotation = rot;
 
 	quaternion = XMQuaternionRotationRollPitchYaw(rot.x, rot.y, rot.z);
+	UpdateVector();
 }
 
 void Object3D::AddRotation(DirectX::XMFLOAT3 rot)
@@ -248,11 +254,25 @@ void Object3D::AddRotation(DirectX::XMFLOAT3 rot)
 	XMVECTOR AddRot = XMQuaternionRotationRollPitchYaw(rot.x, rot.y, rot.z);
 	//乗算処理すると回転を混ぜることができるよ
 	quaternion = XMQuaternionMultiply(quaternion, AddRot);
+	UpdateVector();
 }
 
 void Object3D::AddRotation(DirectX::XMVECTOR rot)
 {
 	quaternion = XMQuaternionMultiply(quaternion, rot);
+	UpdateVector();
+}
+
+void Object3D::SetRotationVector(DirectX::XMVECTOR rot)
+{
+	//正面ベクトルから回転行列を計算
+	XMMATRIX matRot = FukuMath::GetMatRot(rot);
+
+	//行列をクオータニオンに変換
+	quaternion = XMQuaternionRotationMatrix(matRot);
+
+	//更新したクオータニオンを用いて各ベクトルを再計算
+	UpdateVector();
 }
 
 const XMFLOAT4 &Object3D::GetColor()
@@ -296,9 +316,31 @@ const DirectX::XMVECTOR &Object3D::GerWorldQuaternion()
 	return worldQ;
 }
 
+const DirectX::XMVECTOR &Object3D::GetUpVec()
+{
+	return up;
+}
+
+const DirectX::XMVECTOR &Object3D::GetRightVec()
+{
+	return right;
+}
+
+const DirectX::XMVECTOR &Object3D::GetFrontVec()
+{
+	return front;
+}
+
 const Model *Object3D::GetModel()
 {
 	return model;
+}
+
+void Object3D::UpdateVector()
+{
+	front = XMVector3Rotate(ZVec, quaternion);
+	up = XMVector3Rotate(YVec, quaternion);
+	right = XMVector3Rotate(XVec, quaternion);
 }
 
 void Object3D::Separate()
@@ -306,7 +348,7 @@ void Object3D::Separate()
 	if (parent != nullptr)
 	{
 		//親オブジェクトのワールド行列を乗算する
-		 parent->GetMatWorld();
+		parent->GetMatWorld();
 	}
 }
 
