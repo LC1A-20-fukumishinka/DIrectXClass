@@ -30,7 +30,7 @@ virtual void Update() = 0;
 //形状タイプの取得
 inline CollisionShapeType GetShapeType() 
 {
-	return shapeType;
+	return this->shapeType;
 }
 
 inline void OnCollision(const CollisionInfo &info)
