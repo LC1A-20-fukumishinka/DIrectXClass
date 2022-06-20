@@ -1,8 +1,8 @@
 #include "Camera.h"
 #include "MyDirectX.h"
-
+#include "FukuMath.h"
 using namespace DirectX;
-
+using namespace FukuMath;
 using namespace Projection;
 Camera::Camera()
 {
@@ -10,7 +10,6 @@ Camera::Camera()
 	this->target = Vector3(0.0f, 0.0f, 0.0f);
 	this->up = Vector3(0.0f, 1.0f, 0.0f);
 	this->shift = Vector3(0.0f, 0.0f, 0.0f);
-	position = Vector3(0.0f, 0.0f, 0.0f);
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 	matBillBoard = XMMatrixIdentity();
 	matBillBoardY = XMMatrixIdentity();
@@ -18,14 +17,12 @@ Camera::Camera()
 
 }
 
-void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &up, Projection::ProjectionData &projectionData)
+void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up, Projection::ProjectionData &projectionData)
 {
 	this->eye = eye;
 	this->target = target;
 	this->up = up;
-	this->position = position;
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
-	matView *= XMMatrixTranslation(position.x, position.y, position.z);
 
 	bool isDefault = (projectionData.height <= 0.0f || projectionData.width <= 0.0f);
 	if (!isDefault)
@@ -86,11 +83,11 @@ DirectX::XMMATRIX Camera::GetMatBillboardY() const
 
 void Camera::MakeMatCamera()
 {
-	XMFLOAT3 tmpEye = eye + position + shift;
+	XMFLOAT3 tmpEye = eye + shift;
 	XMVECTOR eyePosition = XMLoadFloat3(&tmpEye);
 	//注視点座標
 
-	XMFLOAT3 tmpTarget = target + position + shift;
+	XMFLOAT3 tmpTarget = target + shift;
 	XMVECTOR targetPosition = XMLoadFloat3(&tmpTarget);
 	//(仮の) 上方向
 	XMVECTOR upVector = XMLoadFloat3(&up);
@@ -174,4 +171,48 @@ void Camera::MakeMatCamera()
 DirectX::XMMATRIX Camera::GetMatViewProj()
 {
 	return (matView * matProjection);
+}
+
+DirectX::XMFLOAT3 Camera::GetAngle()
+{
+	return Vector3(target- eye).normalaize();
+}
+
+void Camera::CameraRot(const DirectX::XMVECTOR &rotQ)
+{
+	//targetからcameraの視点座標までのベクトルを計算
+	XMVECTOR camVec = XMLoadFloat3(&(eye - target));
+	//回転させる
+	camVec = XMVector3Rotate(camVec, rotQ);
+
+	Vector3 camPos;
+	XMStoreFloat3(&camPos, camVec);
+	//targetの座標＋生成したベクトルを合わせて回転完了
+	camPos += target;
+	eye = camPos;
+}
+
+void Camera::TargetRot(const DirectX::XMVECTOR &rotQ)
+{
+	//targetからcameraの視点座標までのベクトルを計算
+	XMVECTOR camVec = XMLoadFloat3(&(target - eye));
+	//回転させる
+	camVec = XMVector3Rotate(camVec, rotQ);
+
+	Vector3 camPos;
+	XMStoreFloat3(&camPos, camVec);
+	//targetの座標＋生成したベクトルを合わせて回転完了
+	camPos += eye;
+	target = camPos;
+}
+
+void Camera::UpVecReset()
+{
+	XMStoreFloat3(&up, YVec);
+}
+
+void Camera::MoveCamera(const DirectX::XMFLOAT3 &vec)
+{
+	eye += vec;
+	target += vec;
 }

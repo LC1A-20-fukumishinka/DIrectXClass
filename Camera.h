@@ -27,11 +27,10 @@ class Camera
 public:
 	Vector3 target;
 	Vector3 up;
-	Vector3 position;
 	Vector3 shift;
 
 	Camera();
-	void Init(const DirectX::XMFLOAT3 &eye = { 0, 0, -100 }, const  DirectX::XMFLOAT3 &target = { 0, 0, 0 }, const DirectX::XMFLOAT3 &position = { 0, 0, 0 }, const  DirectX::XMFLOAT3 &up = { 0, 1, 0 }, Projection::ProjectionData &projectionData = Projection::ProjectionData());
+	void Init(const DirectX::XMFLOAT3 &eye = { 0, 0, -100 }, const  DirectX::XMFLOAT3 &target = { 0, 0, 0 }, const  DirectX::XMFLOAT3 &up = { 0, 1, 0 }, Projection::ProjectionData &projectionData = Projection::ProjectionData());
 	void Update();
 
 	//ÉJÉÅÉâÇàÍèuÇæÇØÇ∏ÇÁÇ∑
@@ -44,7 +43,13 @@ public:
 	DirectX::XMMATRIX GetMatView() { return matView; }
 	DirectX::XMMATRIX GetMatViewProj();
 	DirectX::XMFLOAT3 GetEye(){return eye;}
+	DirectX::XMFLOAT3 GetAngle();
 	void SetEye(const DirectX::XMFLOAT3 &eye){this->eye = eye;}
+	void CameraRot(const DirectX::XMVECTOR &rotQ);
+	void TargetRot(const DirectX::XMVECTOR &rotQ);
+	void UpVecReset();
+	//ïΩçsà⁄ìÆópä÷êî
+	void MoveCamera(const DirectX::XMFLOAT3 &vec);
 private:
 	DirectX::XMMATRIX matProjection;
 
