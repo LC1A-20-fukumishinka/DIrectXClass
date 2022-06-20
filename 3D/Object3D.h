@@ -67,7 +67,7 @@ public:
 	const DirectX::XMFLOAT3 &GetRotation();
 	const DirectX::XMVECTOR &GetQuaternion();
 	const DirectX::XMVECTOR &GetRotQuaternion();
-	const DirectX::XMVECTOR &GerWorldQuaternion();
+	const DirectX::XMVECTOR GerWorldQuaternion();
 	const DirectX::XMVECTOR &GetUpVec();
 	const DirectX::XMVECTOR &GetRightVec();
 	const DirectX::XMVECTOR &GetFrontVec();

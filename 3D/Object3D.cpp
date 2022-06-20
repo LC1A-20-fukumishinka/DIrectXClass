@@ -105,7 +105,7 @@ void Object3D::Update()
 	constMap->color = color;//FŽw’è(RGBA)
 	constMap->viewproj = camera->GetMatView() * camera->GetMatProjection();
 	constMap->world = matWorld;
-	constMap->cameraPos = Vector3(camera->position) + Vector3(camera->GetEye());
+	constMap->cameraPos = Vector3(camera->GetEye());
 	constBuff->Unmap(0, nullptr);
 
 	if (collider)
@@ -305,7 +305,7 @@ const DirectX::XMVECTOR &Object3D::GetRotQuaternion()
 	return quaternion;
 }
 
-const DirectX::XMVECTOR &Object3D::GerWorldQuaternion()
+const DirectX::XMVECTOR Object3D::GerWorldQuaternion()
 {
 	XMVECTOR worldQ = quaternion;
 	if (parent != nullptr)
