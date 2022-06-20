@@ -39,14 +39,14 @@ private:
 	static double easeInOutBounce(const int &timer, const int &maxTimer);
 
 public:
-	static const enum InOut
+	const enum EaseMove
 	{
 		In,
 		Out,
 		InOut
 	};
 
-	static const enum Type
+	const enum Type
 	{
 		Sine,
 		Quad,
