@@ -19,6 +19,20 @@ public://基本関数
 	void Finalize();
 	void Draw();
 
+private:
+	/// <summary>
+	/// スティックによる移動関数
+	/// </summary>
+	/// <param name="isSetAngle">入力による向きの変化をつけるか</param>
+	void Move(bool isSetAngle);
+
+	/// <summary>
+	/// playerを右スティックで回転できるようにする
+	/// </summary>
+	void PlayerRotation();
+	void NormalUpdate();
+private:
+	void LockOnUpdate();
 public://ゲッタセッタ
 	void SetPos(const DirectX::XMFLOAT3 &pos);
 
@@ -26,8 +40,8 @@ public://ゲッタセッタ
 	void SetModel(Model *model);
 	void SetCamera(Camera *cam);
 	void SetLight(LightGroup *lights);
-	const XMFLOAT3 GetPos();
-
+	const XMFLOAT3 &GetPos();
+	const XMFLOAT3 GetAngle();
 public://惑星周りの処理
 	/// <summary>
 	/// 掴む惑星のセットを行う
@@ -47,6 +61,9 @@ private:
 	Vector3 rotation;
 	Vector3 scale;
 	Object3D drawObject;
+	Camera *cam;
 	std::weak_ptr<Planet> grabPlanet;
+	//惑星と自分の距離
+	float baseLength = 0.0f;
 };
 
