@@ -2,7 +2,6 @@
 #include "Sprite.h"
 #include "Object3D.h"
 #include "Model.h"
-#include "../Camera.h"
 #include "IScene.h"
 #include "../Light.h"
 #include "SphereCollider.h"
@@ -14,8 +13,9 @@
 #include "../SpotLight.h"
 #include "FbxModel.h"
 #include "FbxObject3D.h"
-#include "../Planet.h"
+#include "../gameOriginal/Planet.h"
 #include "../gameOriginal/GravityPlayer.h"
+#include "../gameOriginal/GameCamera.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -27,7 +27,7 @@ public:
 private:
 	std::shared_ptr<Planet> star;
 
-	std::unique_ptr<Camera> cam;
+	std::unique_ptr<GameCamera> cam;
 
 	std::unique_ptr<Light> light;
 	std::unique_ptr<PointLight> pointLight;
