@@ -1,33 +1,42 @@
 #include "Planet.h"
-#include "Camera.h"
-#include "LightGroup.h"
+#include "../Camera.h"
+#include "../LightGroup.h"
 #include "ModelPhongPipeline.h"
 #include "FukuMath.h"
-#include "gameOriginal/GameInput.h"
+#include "GameInput.h"
+#include "gameConstData.h"
 using namespace std;
 using namespace FukuMath;
 using namespace DirectX;
 using namespace GameInput;
+using namespace GameDatas;
 Camera *Planet::cam = nullptr;
 LightGroup *Planet::lights = nullptr;
 Planet::Planet()
 {
 	model = make_unique<Model>();
 
-	//model->CreateModel("sphere");
-	model->CreateModel("chr_sword");//回転確認用
+	model->CreateModel("sphere");
+	//model->CreateModel("chr_sword");//回転確認用
 	object = make_unique<Object3D>();
 	object->Init();
 	object->SetModel(model.get());
-	GrabRotateAxis = {0.0f, 1.0f, 0.0f , 0.0f};
+	object->SetCamera(Planet::cam);
+	object->SetScale(XMFLOAT3(scale, scale, scale));
+
+	GrabRotateAxisY = YVec;
+	GrabRotateAxisX = XVec;
 }
 
 Planet::~Planet()
 {
 }
 
-void Planet::Init()
+void Planet::Init(const DirectX::XMFLOAT3 &pos, float size)
 {
+	SetScale(size);
+	this->pos = pos;
+	object->SetPosition(pos);
 }
 
 void Planet::Update()
@@ -45,17 +54,17 @@ void Planet::Update()
 void Planet::NormalUpdate()
 {
 	object->SetPosition(pos);
-	Vector3 tmp;
-	tmp = object->GetRotation();
+	Vector3 tmp = {};
 	tmp.y += degree;
-	object->SetRotation(tmp);
+	object->AddRotation(tmp);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
 }
 
 void Planet::GrabUpdate()
 {
-	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxis, RStick().x * degree);
+	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxisY, RStick().x * RotRate);
+	Rot = XMQuaternionMultiply( Rot, XMQuaternionRotationAxis(GrabRotateAxisX, RStick().y * RotRate));
 	object->AddRotation(Rot);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
@@ -70,6 +79,17 @@ void Planet::Draw()
 
 void Planet::Finalize()
 {
+}
+
+void Planet::SetScale(float scale)
+{
+	this->scale = scale;
+	object->SetScale(XMFLOAT3(scale, scale, scale));
+}
+
+float Planet::GetScale()
+{
+	return scale;
 }
 
 void Planet::SetLight(LightGroup *lights)
@@ -92,7 +112,8 @@ void Planet::ReleaseGrab()
 	isGrab = false;
 }
 
-void Planet::SetGrabRotateAngle(const XMVECTOR Axis)
+void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX)
 {
-	GrabRotateAxis = Axis;
+	GrabRotateAxisY = AxisY;
+	GrabRotateAxisX = AxisX;
 }
