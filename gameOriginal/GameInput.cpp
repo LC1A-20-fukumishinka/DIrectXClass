@@ -10,15 +10,32 @@ bool GameInput::A()
 	return Input::Instance()->Key(DIK_Z) || Input::Instance()->Button(XINPUT_GAMEPAD_A);
 }
 
-DirectX::XMFLOAT2 GameInput::LStick()
+DirectX::XMFLOAT2 GameInput::LStick(bool YReverse, bool XReverse)
 {
-	
-	return Input::Instance()->LStick();
+	DirectX::XMFLOAT2 output = Input::Instance()->LStick();
+	if (YReverse)
+	{
+		output.y = -output.y;
+	}
+	if (XReverse)
+	{
+		output.x = -output.x;
+	}
+	return output;
 }
 
-DirectX::XMFLOAT2 GameInput::RStick()
+DirectX::XMFLOAT2 GameInput::RStick(bool YReverse, bool XReverse)
 {
-	return Input::Instance()->RStick();
+	DirectX::XMFLOAT2 output = Input::Instance()->RStick();
+	if (YReverse)
+	{
+		output.y = -output.y;
+	}
+	if (XReverse)
+	{
+		output.x = -output.x;
+	}
+	return output;
 }
 
 bool GameInput::BTrigger()
@@ -27,6 +44,11 @@ bool GameInput::BTrigger()
 }
 
 bool GameInput::GrabInput()
+{
+	return Input::Instance()->Key(DIK_X) || Input::Instance()->RTrigger();
+}
+
+bool GameInput::LockOnInput()
 {
 	return Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
 }
