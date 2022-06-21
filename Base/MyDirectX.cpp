@@ -133,7 +133,7 @@ void MyDirectX::PreDraw()
 	ClearDepthBuffer();
 
 #pragma region Viewport
-	cmdList->RSSetViewports(1, &CD3DX12_VIEWPORT(0.0f, 0.0f, winWidth, winHeight));
+	cmdList->RSSetViewports(1, &CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<FLOAT>(winWidth), static_cast<FLOAT>(winHeight)));
 #pragma endregion
 
 #pragma region Scissor

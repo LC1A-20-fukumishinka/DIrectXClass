@@ -30,7 +30,7 @@ public:
 	Vector3 shift;
 
 	Camera();
-	void Init(const DirectX::XMFLOAT3 &eye = { 0, 0, -100 }, const  DirectX::XMFLOAT3 &target = { 0, 0, 0 }, const  DirectX::XMFLOAT3 &up = { 0, 1, 0 }, Projection::ProjectionData &projectionData = Projection::ProjectionData());
+	void Init(const DirectX::XMFLOAT3 &eye = { 0, 0, -100 }, const  DirectX::XMFLOAT3 &target = { 0, 0, 0 }, const  DirectX::XMFLOAT3 &up = { 0, 1, 0 }, const Projection::ProjectionData &projectionData = Projection::ProjectionData());
 	void Update();
 
 	//ÉJÉÅÉâÇàÍèuÇæÇØÇ∏ÇÁÇ∑

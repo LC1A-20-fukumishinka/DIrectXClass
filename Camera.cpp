@@ -17,7 +17,7 @@ Camera::Camera()
 
 }
 
-void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up, Projection::ProjectionData &projectionData)
+void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up, const Projection::ProjectionData &projectionData)
 {
 	this->eye = eye;
 	this->target = target;
@@ -33,8 +33,8 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 	{
 		MyDirectX *myD = MyDirectX::Instance();
 
-		this->projectionData.height = myD->winHeight;
-		this->projectionData.width = myD->winWidth;
+		this->projectionData.height = static_cast<float>(myD->winHeight);
+		this->projectionData.width = static_cast<float>(myD->winWidth);
 	}
 
 

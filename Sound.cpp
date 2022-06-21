@@ -22,6 +22,7 @@ bool Sound::StaticInitialize()
 		assert(0);
 		return false;
 	}
+	return true;
 }
 
 void Sound::xAudioDelete()
