@@ -136,8 +136,6 @@ StyleCopReport.xml
 *.scc
 
 # origin
-DirectXTex/
-lib/
 Resources/
 !Resources/shaders
 *.txt
