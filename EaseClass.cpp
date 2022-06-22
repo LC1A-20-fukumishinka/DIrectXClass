@@ -1,6 +1,6 @@
 #include "EaseClass.h"
-#include<math.h>
-
+#include <math.h>
+#include <algorithm>
 
 
 
@@ -11,42 +11,44 @@ Easing::Easing()
 	rate = 0.0;
 }
 
-double Easing::EaseCalc(int InOrOut, int type, const int &rate, const int &max)
+float Easing::EaseCalc(int InOrOut, int type, float t)
 {
+	t = std::clamp<float>(t,0.0f, 1.0f);
+	 
 	switch (InOrOut)
 	{
 	case In:
 		switch (type)
 		{
 		case Sine:
-			return easeInSine(rate, max);
+			return easeInSine(t);
 			break;
 		case Quad:
-			return easeInQuad(rate, max);
+			return easeInQuad(t);
 			break;
 		case Cubic:
-			return easeInCubic(rate, max);
+			return easeInCubic(t);
 			break;
 		case Quart:
-			return easeInQuart(rate, max);
+			return easeInQuart(t);
 			break;
 		case Quint:
-			return easeInQuint(rate, max);
+			return easeInQuint(t);
 			break;
 		case Expo:
-			return easeInExpo(rate, max);
+			return easeInExpo(t);
 			break;
 		case Circ:
-			return easeInCirc(rate, max);
+			return easeInCirc(t);
 			break;
 		case Back:
-			return easeInBack(rate, max);
+			return easeInBack(t);
 			break;
 		case Elastic:
-			return easeInElastic(rate, max);
+			return easeInElastic(t);
 			break;
 		case Bounce:
-			return easeInBounce(rate, max);
+			return easeInBounce(t);
 			break;
 		default:
 			break;
@@ -56,34 +58,34 @@ double Easing::EaseCalc(int InOrOut, int type, const int &rate, const int &max)
 		switch (type)
 		{
 		case Sine:
-			return easeOutSine(rate, max);
+			return easeOutSine(t);
 			break;
 		case Quad:
-			return easeOutQuad(rate, max);
+			return easeOutQuad(t);
 			break;
 		case Cubic:
-			return easeOutCubic(rate, max);
+			return easeOutCubic(t);
 			break;
 		case Quart:
-			return easeOutQuart(rate, max);
+			return easeOutQuart(t);
 			break;
 		case Quint:
-			return easeOutQuint(rate, max);
+			return easeOutQuint(t);
 			break;
 		case Expo:
-			return easeOutExpo(rate, max);
+			return easeOutExpo(t);
 			break;
 		case Circ:
-			return easeOutCirc(rate, max);
+			return easeOutCirc(t);
 			break;
 		case Back:
-			return easeOutBack(rate, max);
+			return easeOutBack(t);
 			break;
 		case Elastic:
-			return easeOutElastic(rate, max);
+			return easeOutElastic(t);
 			break;
 		case Bounce:
-			return easeOutBounce(rate, max);
+			return easeOutBounce(t);
 			break;
 		default:
 			break;
@@ -93,34 +95,34 @@ double Easing::EaseCalc(int InOrOut, int type, const int &rate, const int &max)
 		switch (type)
 		{
 		case Sine:
-			return easeinOutSine(rate, max);
+			return easeinOutSine(t);
 			break;
 		case Quad:
-			return easeInOutQuad(rate, max);
+			return easeInOutQuad(t);
 			break;
 		case Cubic:
-			return easeInOutCubic(rate, max);
+			return easeInOutCubic(t);
 			break;
 		case Quart:
-			return easeInOutQuart(rate, max);
+			return easeInOutQuart(t);
 			break;
 		case Quint:
-			return easeInOutQuint(rate, max);
+			return easeInOutQuint(t);
 			break;
 		case Expo:
-			return easeInOutExpo(rate, max);
+			return easeInOutExpo(t);
 			break;
 		case Circ:
-			return easeInOutCirc(rate, max);
+			return easeInOutCirc(t);
 			break;
 		case Back:
-			return easeInOutBack(rate, max);
+			return easeInOutBack(t);
 			break;
 		case Elastic:
-			return easeInOutElastic(rate, max);
+			return easeInOutElastic(t);
 			break;
 		case Bounce:
-			return easeInOutBounce(rate, max);
+			return easeInOutBounce(t);
 			break;
 		default:
 			break;
@@ -132,23 +134,23 @@ double Easing::EaseCalc(int InOrOut, int type, const int &rate, const int &max)
 	return 0.0;
 }
 
-double Easing::Do(int InOrOut, int type)
+float Easing::Do(int InOrOut, int type)
 {
 	if (timer >= maxTimer) return 1.0;
 
-	timer += 1;
+	float t = static_cast<float>(timer) / maxTimer;
 
-	rate = EaseCalc(InOrOut, type, timer, maxTimer);
+	rate = EaseCalc(InOrOut, type, t);
 	return rate;
 }
 
-double Easing::Linear()
+float Easing::Linear()
 {
 	if (timer >= maxTimer) return 1.0;
 
 	timer += 1;
 
-	rate = static_cast<double>(timer) / maxTimer;
+	rate = static_cast<float>(timer) / maxTimer;
 	return rate;
 }
 
@@ -164,7 +166,7 @@ bool Easing::IsEnd()
 	return true;
 }
 
-double Easing::Read()
+float Easing::Read()
 {
 	return rate;
 }
@@ -175,437 +177,428 @@ void Easing::Reset()
 	rate = 0.0;
 }
 
-double Easing::easeBasic(const int &timer, const int &maxTimer)
-{
-
-	if (timer >= maxTimer) return 1.0;
-
-	return static_cast<double>(timer) / maxTimer;
-
-}
-
 //Sine(1)
 //easeInSine(ゆっくり→速い)
-double Easing::easeInSine(const int &timer, const int &maxTimer)
+float Easing::easeInSine(const float rate)
 {
 	//変化率
-	double changeRate;
-	double PI = 3.14159265;
+	float changeRate;
+	float PI = 3.14159265f;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return 1 - cos((changeRate * PI) / 2);
+	changeRate = rate;
+	return 1 - cosf((changeRate * PI) / 2);
 }
 
 //easeOutSine(速い→ゆっくり)
-double Easing::easeOutSine(const int &timer, const int &maxTimer)
+float Easing::easeOutSine(const float rate)
 {
 	//変化率
-	double changeRate;
-	double PI = 3.14159265;
+	float changeRate;
+	float PI = 3.14159265f;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return sin((changeRate * PI) / 2);
+	changeRate = rate;
+	return sinf((changeRate * PI) / 2);
 
 }
 
 //easeInOutSine(ゆっくり→速い→ゆっくり)
-double Easing::easeinOutSine(const int &timer, const int &maxTimer)
+float Easing::easeinOutSine(const float rate)
 {
 	//変化率
-	double changeRate;
-	double PI = 3.14159265;
+	float changeRate;
+	float PI = 3.14159265f;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return -(cos(PI * changeRate) - 1) / 2;
+	changeRate = rate;
+	return -(cosf(PI * changeRate) - 1) / 2;
 
 }
 
 
 //Quad(2乗)
 //easeInQuad(ゆっくり→速い)
-double Easing::easeInQuad(const int &timer, const int &maxTimer)
+float Easing::easeInQuad(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 	//ヌルチェック済み
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate * changeRate;
 
 }
 
 //easeOutQuad(速い→ゆっくり)
-double Easing::easeOutQuad(const int &timer, const int &maxTimer)
+float Easing::easeOutQuad(const float rate)
 {
 	//変化率
-	double changeRate;
-	changeRate = easeBasic(timer, maxTimer);
+	float changeRate;
+	changeRate = rate;
 	return 1 - (1 - changeRate) * (1 - changeRate);
 
 }
 
 //easeInOutQuad(ゆっくり→速い→ゆっくり)
-double Easing::easeInOutQuad(const int &timer, const int &maxTimer)
+float Easing::easeInOutQuad(const float rate)
 {
 	//変化率
-	double changeRate;
-	changeRate = easeBasic(timer, maxTimer);
-	return				 changeRate < 0.5 ?
-		2 * changeRate * changeRate : 1 - pow(-2 * changeRate + 2, 2) / 2;
+	float changeRate;
+	changeRate = rate;
+	return				 changeRate < 0.5f ?
+		2 * changeRate * changeRate : 1 - powf(-2 * changeRate + 2, 2) / 2;
 }
 
 
 //Cubic(3乗)
 //easeInCubic(ゆっくり→速い)
-double Easing::easeInCubic(const int &timer, const int &maxTimer)
+float Easing::easeInCubic(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 	//ヌルチェック済み
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate * changeRate * changeRate;
 
 }
 
 //easeOutCubic(速い→ゆっくり)
-double Easing::easeOutCubic(const int &timer, const int &maxTimer)
+float Easing::easeOutCubic(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return 1 - pow(1 - changeRate, 3);
+	changeRate = rate;
+	return 1 - powf(1 - changeRate, 3);
 
 }
 
 //easeInOutCubic(ゆっくり→速い→ゆっくり)
-double Easing::easeInOutCubic(const int &timer, const int &maxTimer)
+float Easing::easeInOutCubic(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return							  changeRate < 0.5 ?
-		4 * changeRate * changeRate * changeRate : 1 - pow(-2 * changeRate + 2, 3) / 2;
+		4 * changeRate * changeRate * changeRate : 1 - powf(-2 * changeRate + 2, 3) / 2;
 
 }
 
 
 //Quart(4乗)
 //easeInQuart(ゆっくり→速い)
-double Easing::easeInQuart(const int &timer, const int &maxTimer)
+float Easing::easeInQuart(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate * changeRate * changeRate * changeRate;
 
 }
 
 //easeOutQuart(速い→ゆっくり)
-double Easing::easeOutQuart(const int &timer, const int &maxTimer)
+float Easing::easeOutQuart(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return 1 - pow(1 - changeRate, 4);
+	changeRate = rate;
+	return 1 - powf(1 - changeRate, 4);
 
 }
 
 //easeInOutQuart(ゆっくり→速い→ゆっくり)
-double Easing::easeInOutQuart(const int &timer, const int &maxTimer)
+float Easing::easeInOutQuart(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 	//ヌルチェック済み
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return										   changeRate < 0.5 ?
-		8 * changeRate * changeRate * changeRate * changeRate : 1 - pow(-2 * changeRate + 2, 4) / 2;
+		8 * changeRate * changeRate * changeRate * changeRate : 1 - powf(-2 * changeRate + 2, 4) / 2;
 
 }
 
 
 //Quint(5乗)
 //easeInQuint(ゆっくり→速い)
-double Easing::easeInQuint(const int &timer, const int &maxTimer)
+float Easing::easeInQuint(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate * changeRate * changeRate * changeRate * changeRate;
 
 }
 
 //easeOutQuint(速い→ゆっくり)
-double Easing::easeOutQuint(const int &timer, const int &maxTimer)
+float Easing::easeOutQuint(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return 1 - pow(1 - changeRate, 5);
+	changeRate = rate;
+	return 1 - powf(1 - changeRate, 5);
 
 }
 
 //easeInOutQuint(ゆっくり→速い→ゆっくり)
-double Easing::easeInOutQuint(const int &timer, const int &maxTimer)
+float Easing::easeInOutQuint(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 	//ヌルチェック済み
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return														 changeRate < 0.5 ?
-		16 * changeRate * changeRate * changeRate * changeRate * changeRate : 1 - pow(-2 * changeRate + 2, 5) / 2;
+		16 * changeRate * changeRate * changeRate * changeRate * changeRate : 1 - powf(-2 * changeRate + 2, 5) / 2;
 
 }
 
 
 //Expo(急カーブ)
 //easeInExpo
-double Easing::easeInExpo(const int &timer, const int &maxTimer)
+float Easing::easeInExpo(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return changeRate == 0 ? 0 : pow(2, 10 * changeRate - 10);
+	changeRate = rate;
+	return changeRate == 0 ? 0 : powf(2, 10 * changeRate - 10);
 
 }
 
 //easeOutExpo
-double Easing::easeOutExpo(const int &timer, const int &maxTimer)
+float Easing::easeOutExpo(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return changeRate == 1 ? 1 : 1 - pow(2, -10 * changeRate);
+	changeRate = rate;
+	return changeRate == 1 ? 1 : 1 - powf(2, -10 * changeRate);
 
 }
 
 //easeInOutExpo
-double Easing::easeInOutExpo(const int &timer, const int &maxTimer)
+float Easing::easeInOutExpo(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return						changeRate == 0 ?
 		0 : changeRate == 1 ?
 		1 : changeRate < 0.5 ?
-		pow(2, 20 * changeRate - 10) / 2 : (2 - pow(2, -20 * changeRate + 10)) / 2;
+		powf(2, 20 * changeRate - 10) / 2 : (2 - powf(2, -20 * changeRate + 10)) / 2;
 
 }
 
 
 //Circ
 //easeInCirc
-double Easing::easeInCirc(const int &timer, const int &maxTimer)
+float Easing::easeInCirc(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return 1 - sqrt(1 - pow(changeRate, 2));
+	changeRate = rate;
+	return 1 - sqrtf(1 - powf(changeRate, 2));
 
 }
 
 //easeOutCirc
-double Easing::easeOutCirc(const int &timer, const int &maxTimer)
+float Easing::easeOutCirc(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return sqrt(1 - pow(changeRate - 1, 2));
+	changeRate = rate;
+	return sqrtf(1 - powf(changeRate - 1, 2));
 
 }
 
 //easeInOutCirc
-double Easing::easeInOutCirc(const int &timer, const int &maxTimer)
+float Easing::easeInOutCirc(const float rate)
 {
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return changeRate < 0.5
-		? (1 - sqrt(1 - pow(2 * changeRate, 2))) / 2
-		: (sqrt(1 - pow(-2 * changeRate + 2, 2)) + 1) / 2;
+	changeRate = rate;
+	return changeRate < 0.5f
+		? (1 - sqrtf(1 - powf(2 * changeRate, 2))) / 2
+		: (sqrtf(1 - powf(-2 * changeRate + 2, 2)) + 1) / 2;
 
 }
 
 
 //Back
 //easeInBack
-double Easing::easeInBack(const int &timer, const int &maxTimer)
+float Easing::easeInBack(const float rate)
 {
-	const double c1 = 1.70158;
-	const double c3 = c1 + 1;
+	const float c1 = 1.70158f;
+	const float c3 = c1 + 1;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return c3 * changeRate * changeRate * changeRate - c1 * changeRate * changeRate;
 
 }
 
 //easeOutBack
-double Easing::easeOutBack(const int &timer, const int &maxTimer)
+float Easing::easeOutBack(const float rate)
 {
-	const double c1 = 1.70158;
-	const double c3 = c1 + 1;
+	const float c1 = 1.70158f;
+	const float c3 = c1 + 1;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	return 1 + c3 * pow(changeRate - 1, 3) + c1 * pow(changeRate - 1, 2);
+	changeRate = rate;
+	return 1 + c3 * powf(changeRate - 1, 3) + c1 * powf(changeRate - 1, 2);
 
 }
 
 //easeInOutBack
-double Easing::easeInOutBack(const int &timer, const int &maxTimer)
+float Easing::easeInOutBack(const float rate)
 {
-	const double c1 = 1.70158;
-	const double c2 = c1 * 1.525;
+	const float c1 = 1.70158f;
+	const float c2 = c1 * 1.525f;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate < 0.5
-		? (pow(2 * changeRate, 2) * ((c2 + 1) * 2 * changeRate - c2)) / 2
-		: (pow(2 * changeRate - 2, 2) * ((c2 + 1) * (changeRate * 2 - 2) + c2) + 2) / 2;
+		? (powf(2 * changeRate, 2) * ((c2 + 1) * 2 * changeRate - c2)) / 2
+		: (powf(2 * changeRate - 2, 2) * ((c2 + 1) * (changeRate * 2 - 2) + c2) + 2) / 2;
 
 }
 
 
 //Elastic
 //easeInElastic
-double Easing::easeInElastic(const int &timer, const int &maxTimer)
+float Easing::easeInElastic(const float rate)
 {
-	double PI = 3.14159265;
-	const double c4 = (2 * PI) / 3;
+	float PI = 3.14159265f;
+	const float c4 = (2 * PI) / 3;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate == 0
 		? 0
 		: changeRate == 1
 		? 1
-		: -pow(2, 10 * changeRate - 10) * sin((changeRate * 10 - 10.75) * c4);
+		: -powf(2, 10 * changeRate - 10) * sinf((changeRate * 10 - 10.75f) * c4);
 
 }
 
 //easeOutElastic
-double Easing::easeOutElastic(const int &timer, const int &maxTimer)
+float Easing::easeOutElastic(const float rate)
 {
-	double PI = 3.14159265;
-	const double c4 = (2 * PI) / 3;
+	float PI = 3.14159265f;
+	const float c4 = (2 * PI) / 3;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate == 0
 		? 0
 		: changeRate == 1
 		? 1
-		: -pow(2, -10 * changeRate) * sin((changeRate * 10 - 0.75) * c4) + 1;
+		: -powf(2, -10 * changeRate) * sinf((changeRate * 10 - 0.75f) * c4) + 1;
 
 }
 
 //easeInOutElastic
-double Easing::easeInOutElastic(const int &timer, const int &maxTimer)
+float Easing::easeInOutElastic(const float rate)
 {
-	double PI = 3.14159265;
-	const double c5 = (2 * PI) / 4.5;
+	float PI = 3.14159265f;
+	const float c5 = (2 * PI) / 4.5f;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
+	changeRate = rate;
 	return changeRate == 0
 		? 0
 		: changeRate == 1
 		? 1
 		: changeRate < 0.5
-		? -(pow(2, 20 * changeRate - 10) * sin((20 * changeRate - 11.125) * c5)) / 2
-		: (pow(2, -20 * changeRate + 10) * sin((20 * changeRate - 11.125) * c5)) / 2 + 1;
+		? -(powf(2, 20 * changeRate - 10) * sinf((20 * changeRate - 11.125f) * c5)) / 2
+		: (powf(2, -20 * changeRate + 10) * sinf((20 * changeRate - 11.125f) * c5)) / 2 + 1;
 
 }
 
 
 //Bounce
 //easeInBounce
-double Easing::easeInBounce(const int &timer, const int &maxTimer)
+float Easing::easeInBounce(const float rate)
 {
-	const double n1 = 7.5625;
-	const double d1 = 2.75;
+	const float n1 = 7.5625f;
+	const float d1 = 2.75f;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = 1 - (easeBasic(timer, maxTimer));
-	if (changeRate < 1 / d1)
+	changeRate = 1.0f - (rate);
+	if (changeRate < 1.0f / d1)
 	{
 		return 1 - (n1 * changeRate * changeRate);
 	}
-	else if (changeRate < 2 / d1)
+	else if (changeRate < 2.0f / d1)
 	{
-		return 1 - (n1 * (changeRate -= 1.5 / d1) * changeRate + 0.75);//0.11
+		return 1 - (n1 * (changeRate -= 1.5f / d1) * changeRate + 0.75f);//0.11
 	}
-	else if (changeRate < 2.5 / d1)
+	else if (changeRate < 2.5f / d1)
 	{
-		return 1 - (n1 * (changeRate -= 2.25 / d1) * changeRate + 0.9375);//0.1111
+		return 1 - (n1 * (changeRate -= 2.25f / d1) * changeRate + 0.9375f);//0.1111
 	}
 	else
 	{
-		return 1 - (n1 * (changeRate -= 2.625 / d1) * changeRate + 0.984375);//0.111111
+		return 1 - (n1 * (changeRate -= 2.625f / d1) * changeRate + 0.984375f);//0.111111
 	}
 
 }
 
 //easeOutBounce
-double Easing::easeOutBounce(const int &timer, const int &maxTimer)
+float Easing::easeOutBounce(const float rate)
 {
-	const double n1 = 7.5625;
-	const double d1 = 2.75;
+	const float n1 = 7.5625f;
+	const float d1 = 2.75f;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	if (changeRate < 1 / d1)
+	changeRate = rate;
+	if (changeRate < 1.0f / d1)
 	{
 		return n1 * changeRate * changeRate;
 	}
-	else if (changeRate < 2 / d1)
+	else if (changeRate < 2.0f / d1)
 	{
-		return n1 * (changeRate -= 1.5 / d1) * changeRate + 0.75;//0.11
+		return n1 * (changeRate -= 1.5f / d1) * changeRate + 0.75f;//0.11
 	}
-	else if (changeRate < 2.5 / d1)
+	else if (changeRate < 2.5f / d1)
 	{
-		return n1 * (changeRate -= 2.25 / d1) * changeRate + 0.9375;//0.1111
+		return n1 * (changeRate -= 2.25f / d1) * changeRate + 0.9375f;//0.1111
 	}
 	else
 	{
-		return n1 * (changeRate -= 2.625 / d1) * changeRate + 0.984375;//0.111111
+		return n1 * (changeRate -= 2.625f / d1) * changeRate + 0.984375f;//0.111111
 	}
 
 }
 
 //easeInOutBounce
-double Easing::easeInOutBounce(const int &timer, const int &maxTimer)
+float Easing::easeInOutBounce(const float rate)
 {
-	const double n1 = 7.5625;
-	const double d1 = 2.75;
+	const float n1 = 7.5625f;
+	const float d1 = 2.75f;
 	//変化率
-	double changeRate;
+	float changeRate;
 
-	changeRate = easeBasic(timer, maxTimer);
-	if (changeRate < 0.5)
+	changeRate = rate;
+	if (changeRate < 0.5f)
 	{
 		changeRate = (1 - 2 * changeRate);
 		if (changeRate < 1 / d1)
@@ -614,15 +607,15 @@ double Easing::easeInOutBounce(const int &timer, const int &maxTimer)
 		}
 		else if (changeRate < 2 / d1)
 		{
-			return (1 - (n1 * (changeRate -= 1.5 / d1) * changeRate + 0.75)) / 2;//0.11
+			return (1 - (n1 * (changeRate -= 1.5f / d1) * changeRate + 0.75f)) / 2;//0.11
 		}
-		else if (changeRate < 2.5 / d1)
+		else if (changeRate < 2.5f / d1)
 		{
-			return (1 - (n1 * (changeRate -= 2.25 / d1) * changeRate + 0.9375)) / 2;//0.1111
+			return (1 - (n1 * (changeRate -= 2.25f / d1) * changeRate + 0.9375f)) / 2;//0.1111
 		}
 		else
 		{
-			return (1 - (n1 * (changeRate -= 2.625 / d1) * changeRate + 0.984375)) / 2;//0.111111
+			return (1 - (n1 * (changeRate -= 2.625f / d1) * changeRate + 0.984375f)) / 2;//0.111111
 		}
 	}
 	else
@@ -634,15 +627,15 @@ double Easing::easeInOutBounce(const int &timer, const int &maxTimer)
 		}
 		else if (changeRate < 2 / d1)
 		{
-			return (1 + (n1 * (changeRate -= 1.5 / d1) * changeRate + 0.75)) / 2;//0.11
+			return (1 + (n1 * (changeRate -= 1.5f / d1) * changeRate + 0.75f)) / 2;//0.11
 		}
-		else if (changeRate < 2.5 / d1)
+		else if (changeRate < 2.5f / d1)
 		{
-			return (1 + (n1 * (changeRate -= 2.25 / d1) * changeRate + 0.9375)) / 2;//0.1111
+			return (1 + (n1 * (changeRate -= 2.25f / d1) * changeRate + 0.9375f)) / 2;//0.1111
 		}
 		else
 		{
-			return (1 + (n1 * (changeRate -= 2.625 / d1) * changeRate + 0.984375)) / 2;//0.111111
+			return (1 + (n1 * (changeRate -= 2.625f / d1) * changeRate + 0.984375f)) / 2;//0.111111
 		}
 	}
 

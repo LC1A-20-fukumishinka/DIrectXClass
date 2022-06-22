@@ -10,7 +10,7 @@ public:
 	void Finalize();
 public:
 	Camera *GetCamera();
-	const Vector3 &GetCameraPos();
+	Vector3 GetCameraPos();
 private:
 	void NormalUpdate(const Vector3 &playerPos);
 	void LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVec);

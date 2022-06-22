@@ -18,7 +18,7 @@ namespace FukuMath
 	/// <param name="up">上方向ベクトル</param>
 	/// <param name="right">右方向ベクトルを取得する場合入れておく</param>
 	/// <returns></returns>
-	const DirectX::XMMATRIX &GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTOR &up = DirectX::XMVECTOR {}, DirectX::XMVECTOR &right = DirectX::XMVECTOR{});
+	DirectX::XMMATRIX GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTOR &up = DirectX::XMVECTOR {}, DirectX::XMVECTOR &right = DirectX::XMVECTOR{});
 
 	const float PI = 3.14159265f;
 

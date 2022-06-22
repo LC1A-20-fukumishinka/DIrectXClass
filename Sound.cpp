@@ -50,7 +50,7 @@ int Sound::SoundLoadWave(const char *filename)
 	file.open(filename, std::ios_base::binary);
 	//ファイルオープン失敗を検出する
 
-	(file.is_open());
+	assert(file.is_open());
 #pragma endregion
 #pragma region wavRead
 	//RIFFヘッダーの読み込み
@@ -116,7 +116,7 @@ int Sound::SoundLoadWave(const char *filename)
 	newData.bufferSize = chunkData.size;
 #pragma endregion
 
-	int dataNumber = soundData.size();
+	int dataNumber = static_cast<int>(soundData.size());
 	soundData.push_back(newData);
 	return dataNumber;
 }

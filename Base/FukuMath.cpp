@@ -8,7 +8,7 @@ float FukuMath::CosineTheorem(const float a, const float b, const float c)
 	return (bunshi / bunbo);
 }
 
-const DirectX::XMMATRIX &FukuMath::GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTOR &up, DirectX::XMVECTOR &right)
+DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTOR &up, DirectX::XMVECTOR &right)
 {
 	XMVECTOR upVector = XMVECTOR{ 0, 1, 0, 0 };
 

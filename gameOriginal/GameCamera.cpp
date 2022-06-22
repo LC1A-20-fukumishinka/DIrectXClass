@@ -44,9 +44,8 @@ Camera *GameCamera::GetCamera()
 	return &cam;
 }
 
-const Vector3 &GameCamera::GetCameraPos()
+Vector3 GameCamera::GetCameraPos()
 {
-XMFLOAT3 a = cam.GetEye();
 	return cam.GetEye();
 }
 
