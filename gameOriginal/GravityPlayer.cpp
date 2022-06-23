@@ -14,10 +14,19 @@ static Easing RotX;
 static Easing RotY;
 bool isX = false;
 bool isY = false;
-void GravityPlayer::Init(Model *model)
+void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 {
 	drawObject.Init();
 	drawObject.SetModel(model);
+	SetBasePlanet(planet);
+
+	if (!basePlanet.expired())
+	{
+		Vector3 startPos;
+		startPos = basePlanet.lock()->GetPos();
+		startPos += YVec * basePlanet.lock()->GetScale();
+		drawObject.SetPosition(startPos);
+	}
 }
 
 void GravityPlayer::Update()
@@ -31,7 +40,7 @@ void GravityPlayer::Update()
 	}
 	else if (LockOnInput())
 	{//ロックオン用の移動
-	LockOnUpdate();
+		LockOnUpdate();
 	}
 	else
 	{//通常状態
@@ -53,16 +62,31 @@ void GravityPlayer::Move(bool isSetAngle)
 {
 	XMFLOAT2 stick = LStick();
 	//スティックの入力をベクターに入れる
-	Vector3 move = { stick.x,0, stick.y };
+	Vector3 move = { 0,0, stick.y };
 
 	//カメラの行列から入力を画面の向きに合わせて矯正
 	XMVECTOR moveV = XMLoadFloat3(&move);
-	XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboardY()) ;
-	moveV =XMVector3Rotate(moveV, camRot);
+	XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboardY());
+	moveV = XMVector3Rotate(moveV, camRot);
 	XMStoreFloat3(&move, moveV);
 
+	Vector3 up = {};
+
+	up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+
+	//法線方向
+	XMVECTOR upV = XMLoadFloat3(&up.normalaize());
+
+
+	XMVECTOR rightV = {};
+	//右取得
+	rightV = XMVector3Cross(upV, moveV);
+
+	XMVECTOR frontV = {};
+
+	frontV = XMVector3Cross(rightV, upV);
 	//Y軸移動を修正
-	move.y = 0;
+	//move.y = 0;
 	Vector3 nowPos(drawObject.GetPosition());
 
 	//向きの変化
@@ -71,7 +95,6 @@ void GravityPlayer::Move(bool isSetAngle)
 		XMVECTOR inputVec = XMLoadFloat3(&move);
 		drawObject.SetRotationVector(inputVec);
 	}
-	drawObject.SetPosition(nowPos + move);
 }
 
 void GravityPlayer::PlayerRotation()
@@ -81,6 +104,7 @@ void GravityPlayer::PlayerRotation()
 	//ToDo///////////////
 	//世界のY軸でなく自分の立っている垂直方向に最終的に変更したいね
 	////////////////////
+
 	//世界のY軸に対して回転
 	drawObject.AddRotation(XMFLOAT3{ 0.0f, RStick().x * RotRate, 0.0 });
 }
@@ -152,6 +176,11 @@ void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 	//惑星に向き直る
 	drawObject.SetRotationVector(vec);
 	grabPlanet.lock()->SetGrabRotateAngle(YVec, drawObject.GetRightVec());
+}
+
+void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
+{
+	this->basePlanet = planet;
 }
 
 void GravityPlayer::ReleasePlanet()

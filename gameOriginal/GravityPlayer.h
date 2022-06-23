@@ -14,7 +14,7 @@ public://Šî–{ŠÖ”
 	/// ‰Šú‰»ŠÖ”
 	/// </summary>
 	/// <param name="model"></param>
-	void Init(Model *model);
+	void Init(Model *model, std::shared_ptr<Planet> planet);
 	void Update();
 	void Finalize();
 	void Draw();
@@ -49,6 +49,8 @@ public://˜f¯ü‚è‚Ìˆ—
 	/// <param name="planet">’Í‚Ş˜f¯‚Ìƒ|ƒCƒ“ƒ^</param>
 	void SetGrabPlanet(std::shared_ptr<Planet> planet);
 
+	void SetBasePlanet(std::shared_ptr<Planet> planet);
+
 	/// <summary>
 	/// ’Í‚ñ‚Å‚¢‚é˜f¯‚ğ—£‚·
 	/// </summary>
@@ -63,6 +65,8 @@ private:
 	Object3D drawObject;
 	Camera *cam;
 	std::weak_ptr<Planet> grabPlanet;
+
+	std::weak_ptr<Planet> basePlanet;
 	//˜f¯‚Æ©•ª‚Ì‹——£
 	float baseLength = 0.0f;
 };

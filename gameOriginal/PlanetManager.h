@@ -21,6 +21,11 @@ public:
 public:
 	bool GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &angle);
 
+	/// <summary>
+	/// Šî–{‚Ì˜f¯‚ğó‚¯“n‚·
+	/// </summary>
+	/// <returns></returns>
+	std::shared_ptr<Planet> GetBasePlanet();
 	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size);
 private:
 	std::list<std::shared_ptr<Planet>> planets;

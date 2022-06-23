@@ -26,6 +26,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
+	AddPlanet(XMFLOAT3(0, 0, 0), 1);
 }
 
 void PlanetManager::Update()
@@ -73,6 +74,11 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 		}
 	}
 	return isCollision;
+}
+
+std::shared_ptr<Planet> PlanetManager::GetBasePlanet()
+{
+	return *planets.begin();
 }
 
 void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size)

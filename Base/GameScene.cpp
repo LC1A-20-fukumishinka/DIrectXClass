@@ -58,10 +58,11 @@ void GameScene::Init()
 	Planet::SetCamera(cam->GetCamera());
 	Planet::SetLight(lightGroup.get());
 
-	for (int i = 0; i < 10; i++)
-	{
-		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(2 * i), 3.0f, 0 }, 3.0f);
-	}
+	PlanetManager::Instance()->Init();
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(2 * i), 3.0f, 0 }, 3.0f);
+	//}
 	//templeModel = unique_ptr<FbxModel>(FbxLoader::GetInstance()->LoadModelFromFile("newPlayer"));
 	//FbxObject3D::SetDevice();
 	//FbxObject3D::SetCamera(cam.get());
@@ -74,7 +75,7 @@ void GameScene::Init()
 	//temple->SetPosition(XMFLOAT3(0.0f, 3.0f, 0.0f));
 	//temple->SetScale(XMFLOAT3(0.01f, 0.01f, 0.01f));
 	player = make_unique<GravityPlayer>();
-	player->Init(playerModel.get());
+	player->Init(playerModel.get(), PlanetManager::Instance()->GetBasePlanet());
 	player->SetCamera(cam->GetCamera());
 	player->SetLight(lightGroup.get());
 }
