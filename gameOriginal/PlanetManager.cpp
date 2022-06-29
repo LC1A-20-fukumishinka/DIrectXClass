@@ -26,7 +26,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
-	AddPlanet(XMFLOAT3(0, 0, 0), 1);
+	AddPlanet(XMFLOAT3(0, 0, 0), 50);
 }
 
 void PlanetManager::Update()
