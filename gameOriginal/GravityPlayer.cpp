@@ -20,6 +20,8 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 	drawObject.SetModel(model);
 	SetBasePlanet(planet);
 
+	status = STAND;
+
 	if (!basePlanet.expired())
 	{
 		Vector3 startPos;
@@ -60,41 +62,81 @@ void GravityPlayer::Draw()
 
 void GravityPlayer::Move(bool isSetAngle)
 {
+	//switch (status)
+	//{
+	//case STAND:
+	//	FloorMove(isSetAngle);
+	//	break;
+	//case JUMP:
+	//	JumpMove(isSetAngle);
+	//	break;
+	//default:
+	//	break;
+	//}
+
+	FloorMove(isSetAngle);
+
+}
+
+void GravityPlayer::FloorMove(bool isSetAngle)
+{
 	XMFLOAT2 stick = LStick();
+	Vector3 stickInputVector3(stick.x, 0, stick.y);
 	//スティックの入力をベクターに入れる
-	Vector3 move = { 0,0, stick.y };
+	Vector3 move = stickInputVector3;
 
 	//カメラの行列から入力を画面の向きに合わせて矯正
 	XMVECTOR moveV = XMLoadFloat3(&move);
-	XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboardY());
+	XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboard());
 	moveV = XMVector3Rotate(moveV, camRot);
 	XMStoreFloat3(&move, moveV);
+	move.normalize();
+
+	move *= maxMoveSpeed;
+	Vector3 nowPos(drawObject.GetPosition());
+
+	Vector3 dist = (nowPos + move) - basePlanet.lock()->GetPos();
+
+	//基本の惑星から距離を測って
+	dist = dist.normalize() * basePlanet.lock()->GetScale();
+	drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
 
 	Vector3 up = {};
 
 	up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
 
 	//法線方向
-	XMVECTOR upV = XMLoadFloat3(&up.normalaize());
+	XMVECTOR upV = XMLoadFloat3(&up.normalize());
 
 
 	XMVECTOR rightV = {};
 	//右取得
-	rightV = XMVector3Cross(upV, moveV);
+
+	if (!isSetAngle)
+	{
+		rightV = XMVector3Cross(upV, drawObject.GetFrontVec());
+	}
+	else
+	{
+		rightV = XMVector3Cross(upV, moveV);
+	}
 
 	XMVECTOR frontV = {};
 
 	frontV = XMVector3Cross(rightV, upV);
 	//Y軸移動を修正
 	//move.y = 0;
-	Vector3 nowPos(drawObject.GetPosition());
 
-	//向きの変化
-	if (isSetAngle && move.length() > 0.0f)
+	//通常移動時の向きの変化
+	if (move.length() > 0.0f)
 	{
-		XMVECTOR inputVec = XMLoadFloat3(&move);
-		drawObject.SetRotationVector(inputVec);
+		drawObject.SetRotationVector(frontV, upV);
 	}
+}
+
+void GravityPlayer::JumpMove(bool isSetAngle)
+{
+
 }
 
 void GravityPlayer::PlayerRotation()
@@ -112,9 +154,9 @@ void GravityPlayer::PlayerRotation()
 void GravityPlayer::NormalUpdate()
 {
 	//フィールドが球体になったらそれに合わせて変化
-	XMVECTOR angle = drawObject.GetFrontVec();
-	angle.m128_f32[1] = 0.0f;
-	drawObject.SetRotationVector(angle);
+	//XMVECTOR playerUp = drawObject.GetFrontVec();
+	//playerUp.m128_f32[1] = 0.0f;
+	//drawObject.SetRotationVector(playerUp);
 	Move(true);
 }
 
@@ -160,6 +202,27 @@ const XMFLOAT3 GravityPlayer::GetAngle()
 	XMFLOAT3 angle;
 	XMStoreFloat3(&angle, drawObject.GetFrontVec());
 	return angle;
+}
+
+const XMFLOAT3 GravityPlayer::GetUpVec()
+{
+	XMFLOAT3 playerUp;
+	XMStoreFloat3(&playerUp, drawObject.GetUpVec());
+	return playerUp;
+}
+
+const float GravityPlayer::GetBasePlanetScale()
+{
+	if (basePlanet.expired())
+	{
+		return 0.0f;
+	}
+	return basePlanet.lock()->GetScale();
+}
+
+const std::weak_ptr<Planet> &GravityPlayer::GetBasePlanet()
+{
+	return basePlanet;
 }
 
 void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)

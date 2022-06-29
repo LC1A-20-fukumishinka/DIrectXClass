@@ -4,6 +4,12 @@
 #include "Model.h"
 #include <memory>
 class Planet;
+
+enum PlayerStatus
+{
+	STAND,
+	JUMP,
+};
 class GravityPlayer
 {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
@@ -26,6 +32,10 @@ private:
 	/// <param name="isSetAngle">入力による向きの変化をつけるか</param>
 	void Move(bool isSetAngle);
 
+
+	void FloorMove(bool isSetAngle);
+
+	void JumpMove(bool isSetAngle);
 	/// <summary>
 	/// playerを右スティックで回転できるようにする
 	/// </summary>
@@ -42,6 +52,9 @@ public://ゲッタセッタ
 	void SetLight(LightGroup *lights);
 	const XMFLOAT3 &GetPos();
 	const XMFLOAT3 GetAngle();
+	const XMFLOAT3 GetUpVec();
+	const float GetBasePlanetScale();
+	const std::weak_ptr<Planet> &GetBasePlanet();
 public://惑星周りの処理
 	/// <summary>
 	/// 掴む惑星のセットを行う
@@ -67,7 +80,13 @@ private:
 	std::weak_ptr<Planet> grabPlanet;
 
 	std::weak_ptr<Planet> basePlanet;
+
+	PlayerStatus status;
 	//惑星と自分の距離
 	float baseLength = 0.0f;
+
+	//惑星からの高さを
+	float jumpheight = 0.0f;
+
 };
 
