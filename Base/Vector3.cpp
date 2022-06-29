@@ -40,13 +40,13 @@ Vector3::Vector3(float x, float y, float z) :
 {
 }
 
-Vector3::Vector3(const DirectX::XMFLOAT3 &v):
-Vector3(v.x, v.y, v.z)
+Vector3::Vector3(const DirectX::XMFLOAT3 &v) :
+	Vector3(v.x, v.y, v.z)
 {
 }
 
-Vector3::Vector3(const DirectX::XMVECTOR &v):
-Vector3(v.m128_f32[0], v.m128_f32[1], v.m128_f32[2])
+Vector3::Vector3(const DirectX::XMVECTOR &v) :
+	Vector3(v.m128_f32[0], v.m128_f32[1], v.m128_f32[2])
 {
 }
 
@@ -61,8 +61,12 @@ float Vector3::length() const
 	return sqrtf(x * x + y * y + z * z);
 }
 
-Vector3 &Vector3::normalaize()
+Vector3 &Vector3::normalize()
 {
+	if (length() == 0.0f)
+	{
+		return*this;
+	}
 	float l = length();
 	return *this /= l;
 }
