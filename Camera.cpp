@@ -175,7 +175,7 @@ DirectX::XMMATRIX Camera::GetMatViewProj()
 
 DirectX::XMFLOAT3 Camera::GetAngle()
 {
-	return Vector3(target- eye).normalaize();
+	return Vector3(target- eye).normalize();
 }
 
 void Camera::CameraRot(const DirectX::XMVECTOR &rotQ)
