@@ -8,9 +8,6 @@ VSOutput main(float4 pos : POSITION, float3 normal : NORMAL, float2 uv : TEXCOOR
     output.normal = wnormal.xyz;
     output.svpos = mul(mul(viewproj, world), pos);
     output.uv = uv;
-    //float3 eyedir = normalize(cameraPos - wpos.xyz);
-    //float3 diffuse = saturate(dot(lightv, wnormal.xyz)) * m_diffuse;
-    //output.color.rgb = (((m_ambient + (diffuse * m_diffuse))) * lightcolor);
-    //output.color.a = m_alpha;
+
     return output;
 }
