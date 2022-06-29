@@ -113,7 +113,8 @@ void GameScene::Update()
 	PlanetManager::Instance()->Update();
 	//star->Update();
 	//temple->Update();
-	cam->Update(player->GetPos(), player->GetAngle());
+	cam->SetBasePlanet(player->GetBasePlanet());
+	cam->Update(player->GetPos(), player->GetAngle(), player->GetUpVec());
 
 
 }
