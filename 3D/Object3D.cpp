@@ -263,10 +263,11 @@ void Object3D::AddRotation(DirectX::XMVECTOR rot)
 	UpdateVector();
 }
 
-void Object3D::SetRotationVector(DirectX::XMVECTOR rot)
+void Object3D::SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up)
 {
+	this->up = up;
 	//正面ベクトルから回転行列を計算
-	XMMATRIX matRot = FukuMath::GetMatRot(rot);
+	XMMATRIX matRot = FukuMath::GetMatRot(front, up);
 
 	//行列をクオータニオンに変換
 	quaternion = XMQuaternionRotationMatrix(matRot);

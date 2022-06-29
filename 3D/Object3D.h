@@ -59,7 +59,7 @@ public://セッタ
 	/// 向きたい方向をベクトルで指定する
 	/// </summary>
 	/// <param name="rot">向く方向</param>
-	virtual void SetRotationVector(DirectX::XMVECTOR rot);
+	virtual void SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up = DirectX::XMVECTOR {0.0f, 1.0f, 0.0f , 0.0f});
 public:
 	const DirectX::XMFLOAT4 &GetColor();
 	const DirectX::XMFLOAT3 &GetPosition();
