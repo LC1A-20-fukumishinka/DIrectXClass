@@ -53,10 +53,10 @@ void Planet::Update()
 
 void Planet::NormalUpdate()
 {
+	//Vector3 tmp = {};
+	//tmp.y += degree;
+	//object->AddRotation(tmp);
 	object->SetPosition(pos);
-	Vector3 tmp = {};
-	tmp.y += degree;
-	object->AddRotation(tmp);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
 }
@@ -112,8 +112,23 @@ void Planet::ReleaseGrab()
 	isGrab = false;
 }
 
+void Planet::OnPlayer()
+{
+	isBase = true;
+}
+
+void Planet::ReleaseBase()
+{
+	isBase = false;
+}
+
 void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX)
 {
 	GrabRotateAxisY = AxisY;
 	GrabRotateAxisX = AxisX;
+}
+
+bool Planet::GetBase()
+{
+	return isBase;
 }

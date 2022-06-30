@@ -63,7 +63,7 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 		starCol.center = XMLoadFloat3(&e->GetPos());
 		starCol.radius = e->GetScale();
 		float colDist;
-		if (Collision::CheckRay2Sphere(cameraRay, starCol, &colDist))
+		if (!e->GetBase() && Collision::CheckRay2Sphere(cameraRay, starCol, &colDist))
 		{
 			if (colDist <= minDist)
 			{

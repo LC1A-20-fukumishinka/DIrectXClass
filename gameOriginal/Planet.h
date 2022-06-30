@@ -28,7 +28,10 @@ public:
 	static void SetCamera(Camera *cam);
 	void GrabInput();
 	void ReleaseGrab();
+	void OnPlayer();
+	void ReleaseBase();
 	void SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX);
+	bool GetBase();
 private://Ã“Iƒƒ“ƒo•Ï”
 	static Camera *cam;
 	static LightGroup *lights;
@@ -37,6 +40,7 @@ private://ƒƒ“ƒo•Ï”
 	Vector3 pos;
 
 	bool isGrab = false;
+	bool isBase = false;
 	DirectX::XMVECTOR GrabRotateAxisY = {};
 	DirectX::XMVECTOR GrabRotateAxisX = {};
 	float scale = 3.0f;
