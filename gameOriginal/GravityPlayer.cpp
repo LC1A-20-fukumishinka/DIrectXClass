@@ -20,7 +20,7 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 	drawObject.SetModel(model);
 	SetBasePlanet(planet);
 
-	status = STAND;
+	status = PlayerStatus::STAND;
 
 	if (!basePlanet.expired())
 	{
@@ -81,6 +81,28 @@ void GravityPlayer::Move(bool isSetAngle)
 void GravityPlayer::FloorMove(bool isSetAngle)
 {
 	XMFLOAT2 stick = LStick();
+	
+#pragma region jump;
+	if (status == PlayerStatus::STAND && A())
+	{
+		jumpSpeed = jumpPower;
+		status = PlayerStatus::JUMP;
+	}
+
+	if (status == PlayerStatus::JUMP)
+	{
+		jumpHeight += jumpSpeed;
+		jumpSpeed += gravity;
+		if (jumpHeight <= 0)
+		{
+			jumpHeight = 0;
+			status = PlayerStatus::STAND;
+		}
+	}
+#pragma endregion
+
+
+
 	Vector3 stickInputVector3(stick.x, 0, stick.y);
 	//スティックの入力をベクターに入れる
 	Vector3 move = stickInputVector3;
@@ -97,8 +119,9 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 	Vector3 dist = (nowPos + move) - basePlanet.lock()->GetPos();
 
+	float length = basePlanet.lock()->GetScale() + jumpHeight;
 	//基本の惑星から距離を測って
-	dist = dist.normalize() * basePlanet.lock()->GetScale();
+	dist = dist.normalize() * length;
 	drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
 
 	Vector3 up = {};
@@ -146,9 +169,8 @@ void GravityPlayer::PlayerRotation()
 	//ToDo///////////////
 	//世界のY軸でなく自分の立っている垂直方向に最終的に変更したいね
 	////////////////////
+	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetUpVec(), RStick().x * RotRate));
 
-	//世界のY軸に対して回転
-	drawObject.AddRotation(XMFLOAT3{ 0.0f, RStick().x * RotRate, 0.0 });
 }
 
 void GravityPlayer::NormalUpdate()
@@ -233,17 +255,22 @@ void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 		Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
 		baseLength = planetPlayerDistance.length();
 	}
-	grabPlanet.lock()->GrabInput();
-	XMFLOAT3 dist = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
-	XMVECTOR vec = XMLoadFloat3(&dist);
-	//惑星に向き直る
-	drawObject.SetRotationVector(vec);
-	grabPlanet.lock()->SetGrabRotateAngle(YVec, drawObject.GetRightVec());
+
+	if (!grabPlanet.expired())
+	{
+		grabPlanet.lock()->GrabInput();
+		XMFLOAT3 dist = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
+		XMVECTOR vec = XMLoadFloat3(&dist);
+		//惑星に向き直る
+		drawObject.SetRotationVector(vec);
+		grabPlanet.lock()->SetGrabRotateAngle(YVec, drawObject.GetRightVec());
+	}
 }
 
 void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
 {
 	this->basePlanet = planet;
+	basePlanet.lock()->OnPlayer();
 }
 
 void GravityPlayer::ReleasePlanet()

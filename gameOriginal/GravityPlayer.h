@@ -85,8 +85,12 @@ private:
 	//惑星と自分の距離
 	float baseLength = 0.0f;
 
-	//惑星からの高さを
-	float jumpheight = 0.0f;
+	//惑星からの高さを(位置)
+	float jumpHeight = 0.0f;
+	//ジャンプ中の速度(速度)
+	float jumpSpeed = 0.0f;
 
+	//ジャンプ力
+	const float jumpPower = 1.0f;
 };
 

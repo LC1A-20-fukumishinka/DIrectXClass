@@ -59,10 +59,10 @@ void GameScene::Init()
 	Planet::SetLight(lightGroup.get());
 
 	PlanetManager::Instance()->Init();
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(2 * i), 3.0f, 0 }, 3.0f);
-	//}
+	for (int i = 0; i < 10; i++)
+	{
+		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(2 * i), 55.0f, 0 }, 3.0f);
+	}
 	//templeModel = unique_ptr<FbxModel>(FbxLoader::GetInstance()->LoadModelFromFile("newPlayer"));
 	//FbxObject3D::SetDevice();
 	//FbxObject3D::SetCamera(cam.get());

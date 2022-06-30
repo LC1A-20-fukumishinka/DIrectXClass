@@ -74,7 +74,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	//ターゲットの位置を加算してカメラの座標完成
 	camPos += cam.target;
 
-	float camUpLength = 3;
+	float camUpLength = 5;
 	Vector3 basePlanetToCameraAngle = { 0, 1, 0 };
 
 	if (!planet.expired())
@@ -92,10 +92,8 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 		camPos += basePlanetToCameraAngle;
 	}
 
-	//camPos.y = 3;
 	cam.SetEye(camPos);
 	cam.up = basePlanetToCameraAngle.normalize();
-	//DirectX::XMStoreFloat3(&cam.up, YVec);
 	camRot();
 }
 
