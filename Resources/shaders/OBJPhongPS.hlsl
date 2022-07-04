@@ -31,7 +31,7 @@ float4 main(VSOutput input) : SV_TARGET
     //‹¾–Ê”½ŽËŒõ
         float3 specular = pow(saturate(dot(reflect, eyedir)), shininess) * m_specular;
     //‘S‚Ä‰ÁŽZ‚·‚é
-        shadecolor.rgb = (ambient + diffuse + specular) * dirlight.lightcolor;
+        shadecolor.rgb += (ambient + diffuse + specular) * dirlight.lightcolor;
     }
     
     //“_ŒõŒ¹
@@ -84,5 +84,5 @@ float4 main(VSOutput input) : SV_TARGET
         shadecolor.rgb += atten * (diffuse + specular) * spotlight.lightcolor;
     }
     shadecolor.a = m_alpha;
-    return float4(shadecolor * texcolor);
+    return float4(shadecolor * texcolor * color);
 }
