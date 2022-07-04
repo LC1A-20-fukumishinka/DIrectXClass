@@ -25,7 +25,6 @@ namespace Projection
 class Camera
 {
 public:
-	Vector3 target;
 	Vector3 up;
 	Vector3 shift;
 
@@ -43,8 +42,10 @@ public:
 	DirectX::XMMATRIX GetMatView() { return matView; }
 	DirectX::XMMATRIX GetMatViewProj();
 	DirectX::XMFLOAT3 GetEye(){return eye;}
+	DirectX::XMFLOAT3 GetTarget(){return target;}
 	DirectX::XMFLOAT3 GetAngle();
 	void SetEye(const DirectX::XMFLOAT3 &eye){this->eye = eye;}
+	void SetTarget(const DirectX::XMFLOAT3 &target){this->target = target;}
 	void CameraRot(const DirectX::XMVECTOR &rotQ);
 	void TargetRot(const DirectX::XMVECTOR &rotQ);
 	void UpVecReset();
@@ -55,6 +56,7 @@ private:
 
 	DirectX::XMMATRIX matView;
 	Vector3 eye;
+	Vector3 target;
 	DirectX::XMMATRIX matBillBoard;
 	DirectX::XMMATRIX matBillBoardY;
 	Projection::ProjectionData projectionData;
