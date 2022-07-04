@@ -136,6 +136,7 @@ float Easing::EaseCalc(int InOrOut, int type, float t)
 
 float Easing::Do(int InOrOut, int type)
 {
+	timer++;
 	if (timer >= maxTimer) return 1.0;
 
 	float t = static_cast<float>(timer) / maxTimer;
