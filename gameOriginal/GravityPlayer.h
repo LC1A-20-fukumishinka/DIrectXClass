@@ -5,7 +5,7 @@
 #include <memory>
 class Planet;
 
-enum PlayerStatus
+enum class PlayerStatus
 {
 	STAND,
 	JUMP,
@@ -41,6 +41,8 @@ private:
 	/// </summary>
 	void PlayerRotation();
 	void NormalUpdate();
+
+	void PostureReset();
 private:
 	void LockOnUpdate();
 public://ゲッタセッタ
@@ -55,6 +57,7 @@ public://ゲッタセッタ
 	const XMFLOAT3 GetUpVec();
 	const float GetBasePlanetScale();
 	const std::weak_ptr<Planet> &GetBasePlanet();
+	const bool GetIsJump();
 public://惑星周りの処理
 	/// <summary>
 	/// 掴む惑星のセットを行う
@@ -82,6 +85,9 @@ private:
 	std::weak_ptr<Planet> basePlanet;
 
 	PlayerStatus status;
+
+	DirectX::XMVECTOR playerAngle;
+
 	//惑星と自分の距離
 	float baseLength = 0.0f;
 
@@ -92,5 +98,7 @@ private:
 
 	//ジャンプ力
 	const float jumpPower = 1.0f;
+
+	bool oldLockonInput = false;
 };
 

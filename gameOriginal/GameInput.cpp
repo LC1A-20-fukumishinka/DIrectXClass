@@ -1,5 +1,29 @@
 #include "GameInput.h"
 #include "DirectInput.h"
+bool GameInput::isMakeInstance = false;
+GameInput::GameInput()
+{
+}
+GameInput::~GameInput()
+{
+}
+std::unique_ptr<GameInput> &GameInput::Instance()
+{
+	static std::unique_ptr<GameInput> instance;
+	if (!isMakeInstance)
+	{
+		instance = std::make_unique<GameInput>();
+		isMakeInstance = true;
+	}
+	return instance;
+}
+void GameInput::Update()
+{
+	isOldGrab = isGrab;
+	isOldLockOn = isLockOn;
+	isGrab = Input::Instance()->Key(DIK_X) || Input::Instance()->RTrigger();
+	isLockOn = Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
+}
 bool GameInput::ATrigger()
 {
 	return Input::Instance()->KeyTrigger(DIK_Z) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_A);
@@ -45,12 +69,32 @@ bool GameInput::BTrigger()
 
 bool GameInput::GrabInput()
 {
-	return Input::Instance()->Key(DIK_X) || Input::Instance()->RTrigger();
+	return isGrab;
+}
+
+bool GameInput::GrabTrigger()
+{
+	return (isGrab && !isOldGrab);
+}
+
+bool GameInput::GrabRelease()
+{
+	return (!isGrab && isOldGrab);
 }
 
 bool GameInput::LockOnInput()
 {
-	return Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
+	return isLockOn;
+}
+
+bool GameInput::LockOnTrigger()
+{
+	return (isLockOn && !isOldLockOn);
+}
+
+bool GameInput::LockOnRelease()
+{
+	return (!isLockOn && isOldLockOn);
 }
 
 bool GameInput::Pause()
