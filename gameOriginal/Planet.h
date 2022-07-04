@@ -11,7 +11,7 @@ public:
 	Planet();
 	~Planet();
 
-	void Init(const DirectX::XMFLOAT3 &pos, float size);
+	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color);
 	void Update();
 	void NormalUpdate();
 	void GrabUpdate();

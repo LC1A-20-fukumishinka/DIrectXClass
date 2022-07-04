@@ -8,7 +8,6 @@
 using namespace std;
 using namespace FukuMath;
 using namespace DirectX;
-using namespace GameInput;
 using namespace GameDatas;
 Camera *Planet::cam = nullptr;
 LightGroup *Planet::lights = nullptr;
@@ -32,11 +31,12 @@ Planet::~Planet()
 {
 }
 
-void Planet::Init(const DirectX::XMFLOAT3 &pos, float size)
+void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color)
 {
 	SetScale(size);
 	this->pos = pos;
 	object->SetPosition(pos);
+	object->SetColor(color);
 }
 
 void Planet::Update()
@@ -63,8 +63,8 @@ void Planet::NormalUpdate()
 
 void Planet::GrabUpdate()
 {
-	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxisY, RStick().x * RotRate);
-	Rot = XMQuaternionMultiply( Rot, XMQuaternionRotationAxis(GrabRotateAxisX, RStick().y * RotRate));
+	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxisY, GameInput::Instance()->RStick().x * RotRate);
+	Rot = XMQuaternionMultiply( Rot, XMQuaternionRotationAxis(GrabRotateAxisX, GameInput::Instance()->RStick().y * RotRate));
 	object->AddRotation(Rot);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
