@@ -277,12 +277,12 @@ void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 
 	if (!grabPlanet.expired())
 	{
-		grabPlanet.lock()->GrabInput();
+		grabPlanet.lock()->GrabOn();
 		XMFLOAT3 dist = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
 		XMVECTOR vec = XMLoadFloat3(&dist);
 		//˜f¯‚ÉŒü‚«’¼‚é
-		drawObject.SetRotationVector(vec);
-		grabPlanet.lock()->SetGrabRotateAngle(YVec, drawObject.GetRightVec());
+		drawObject.SetRotationVector(vec, drawObject.GetUpVec());
+		grabPlanet.lock()->SetGrabRotateAngle(drawObject.GetUpVec(), drawObject.GetRightVec());
 	}
 }
 
@@ -360,6 +360,6 @@ void GravityPlayer::GrabUpdate()
 	XMFLOAT3 planetPos = {};
 	XMStoreFloat3(&planetPos, vec);
 	grabPlanet.lock()->SetPos(planetPos);
-	grabPlanet.lock()->SetGrabRotateAngle(YVec, drawObject.GetRightVec());
+	grabPlanet.lock()->SetGrabRotateAngle(drawObject.GetUpVec(), drawObject.GetRightVec());
 
 }
