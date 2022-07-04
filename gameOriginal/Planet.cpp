@@ -102,7 +102,7 @@ void Planet::SetCamera(Camera *cam)
 	Planet::cam = cam;
 }
 
-void Planet::GrabInput()
+void Planet::GrabOn()
 {
 	isGrab = true;
 }

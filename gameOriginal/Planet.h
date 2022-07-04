@@ -26,7 +26,7 @@ public:
 public:
 	static void SetLight(LightGroup *lights);
 	static void SetCamera(Camera *cam);
-	void GrabInput();
+	void GrabOn();
 	void ReleaseGrab();
 	void OnPlayer();
 	void ReleaseBase();
