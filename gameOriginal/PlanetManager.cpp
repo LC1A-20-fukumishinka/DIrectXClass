@@ -26,7 +26,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
-	AddPlanet(XMFLOAT3(0, 0, 0), 50);
+	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
 }
 
 void PlanetManager::Update()
@@ -76,16 +76,35 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	return isCollision;
 }
 
+bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos)
+{
+	float minDist = 10000.0f;
+
+	//‘S•”‚Ì˜f¯‚Ì‹ß‚¢˜f¯‚ð‚Æ‚é
+	for (auto &e : planets)
+	{
+		float tmpDist = (e->GetPos() - pos).length();
+
+		tmpDist -= e->GetScale();
+		if(tmpDist <= minDist)
+		{
+			planet = e;
+			minDist = tmpDist;
+		}
+	}
+	return !planet->GetBase();
+}
+
 std::shared_ptr<Planet> PlanetManager::GetBasePlanet()
 {
 	return *planets.begin();
 }
 
-void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size)
+void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color)
 {
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();
-	planet->Init(pos, size);
+	planet->Init(pos, size, color);
 	int hoge = 0;
 	planets.push_back(planet);
 }
