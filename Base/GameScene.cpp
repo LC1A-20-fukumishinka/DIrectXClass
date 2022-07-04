@@ -10,19 +10,18 @@
 #include "FbxObject3D.h"
 #include "SafeDelete.h"
 #include "FukuMath.h"
-#include"../gameOriginal/GameInput.h"
+#include "../gameOriginal/GameInput.h"
 #include "../Collision/Collision.h"
 #include "../gameOriginal/PlanetManager.h"
 using namespace FukuMath;
 using namespace DirectX;
 using namespace std;
-using namespace GameInput;
 void GameScene::Init()
 {
 	cam = make_unique<GameCamera>();
 	cam->Init();
 	light = unique_ptr<Light>(Light::Create());
-	light->SetLightColor({ 1, 1, 1 });
+	light->SetLightColor({ 0.9f, 0.9f, 0.9f });
 	light->SetLightDir({ 1.0f,-1.0f ,1.0f ,0.0f });
 	light->SetLightActive(true);
 	light->Update();
@@ -59,21 +58,14 @@ void GameScene::Init()
 	Planet::SetLight(lightGroup.get());
 
 	PlanetManager::Instance()->Init();
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(2 * i), 55.0f, 0 }, 3.0f);
+		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f,1.0f));
 	}
-	//templeModel = unique_ptr<FbxModel>(FbxLoader::GetInstance()->LoadModelFromFile("newPlayer"));
-	//FbxObject3D::SetDevice();
-	//FbxObject3D::SetCamera(cam.get());
-	//FbxObject3D::CreateGraphicsPipeline();
-	//temple = make_unique<FbxObject3D>();
-	//temple->Init();
-	//temple->SetModel(templeModel.get());
-	//temple->PlayAnimation();
-	//temple->SetRotation({ -PI/2.0f, PI , 0 });
-	//temple->SetPosition(XMFLOAT3(0.0f, 3.0f, 0.0f));
-	//temple->SetScale(XMFLOAT3(0.01f, 0.01f, 0.01f));
+
+	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+
+	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f));
 	player = make_unique<GravityPlayer>();
 	player->Init(playerModel.get(), PlanetManager::Instance()->GetBasePlanet());
 	player->SetCamera(cam->GetCamera());
@@ -82,14 +74,20 @@ void GameScene::Init()
 
 void GameScene::Update()
 {
-
+	//スクショ用停止ポーズ
+	if (Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_START))
+	{
+		isPause = !isPause;
+	}
+	if(isPause) return;
+	GameInput::Instance()->Update();
 	lightGroup->Update();
 
 	//掴む
-	if (LockOnInput())
+	if (GameInput::Instance()->LockOnInput())
 	{
 
-		if (GrabInput())
+		if (GameInput::Instance()->GrabInput())
 		{
 			XMFLOAT3 tmp = cam->GetCameraPos();
 			bool isCollision;
@@ -103,10 +101,12 @@ void GameScene::Update()
 		}
 	}
 	//離す
-	if (!GrabInput())
+	if (!GameInput::Instance()->GrabInput())
 	{
 		player->ReleasePlanet();
 	}
+
+	MovePlanet();
 	player->Update();
 
 	objGround->Update();
@@ -121,15 +121,32 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
-	//star->Draw();
-
 	PlanetManager::Instance()->Draw();
 	player->Draw();
-	//temple->Draw();
-	objGround->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	//objGround->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
 void GameScene::Finalize()
 {
 
+}
+
+void GameScene::MovePlanet()
+{
+	if (player->GetIsJump())
+	{
+		shared_ptr<Planet> basePlanet;
+		bool isMove = false;
+		isMove = PlanetManager::Instance()->MovePlanet(basePlanet, player->GetPos());
+
+		if (isMove)
+		{
+			player->SetBasePlanet(basePlanet);
+			cam->IsAnimationOn();
+		}
+	}
+	else if(cam->GetIsChangeBasePlanet())
+	{
+		cam->StartCameraAnimation(false, 60);
+	}
 }

@@ -25,6 +25,8 @@ public:
 	void Draw() override;
 	void Finalize() override;
 private:
+	void MovePlanet();
+private:
 	std::shared_ptr<Planet> star;
 
 	std::unique_ptr<GameCamera> cam;
@@ -41,4 +43,6 @@ private:
 	std::unique_ptr<FbxModel> templeModel;
 	std::unique_ptr<FbxObject3D> temple;
 	std::unique_ptr<GravityPlayer> player;
+
+	bool isPause = false;
 };
