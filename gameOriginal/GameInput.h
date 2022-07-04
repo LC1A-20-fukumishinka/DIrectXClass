@@ -1,7 +1,17 @@
 #pragma once
 #include <DirectXMath.h>
-namespace GameInput
+#include <memory>
+class GameInput
 {
+public:
+	GameInput(const GameInput &obj) = delete;
+	GameInput operator=(const GameInput &obj) = delete;
+	static std::unique_ptr<GameInput> &Instance();
+public:
+	GameInput();
+	~GameInput();
+
+	void Update();
 	bool ATrigger();
 
 	bool A();
@@ -13,9 +23,20 @@ namespace GameInput
 	bool BTrigger();
 
 	bool GrabInput();
+	bool GrabTrigger();
+	bool GrabRelease();
 
 	bool LockOnInput();
+	bool LockOnTrigger();
+	bool LockOnRelease();
 
 	bool Pause();
-}
+private:
+	static bool isMakeInstance;
+private:
+	bool isGrab = false;
+	bool isOldGrab = false;
+	bool isLockOn = false;
+	bool isOldLockOn = false;
+};
 

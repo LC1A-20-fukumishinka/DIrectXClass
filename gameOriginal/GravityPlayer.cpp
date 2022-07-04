@@ -5,7 +5,6 @@
 #include "../EaseClass.h"
 #include "Planet.h"
 #include "gameConstData.h"
-using namespace GameInput;
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -18,6 +17,8 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 {
 	drawObject.Init();
 	drawObject.SetModel(model);
+	drawObject.SetPosition(Vector3(YVec));
+
 	SetBasePlanet(planet);
 
 	status = PlayerStatus::STAND;
@@ -40,7 +41,7 @@ void GravityPlayer::Update()
 	{//掴んでいる
 		GrabUpdate();
 	}
-	else if (LockOnInput())
+	else if (GameInput::Instance()->LockOnInput())
 	{//ロックオン用の移動
 		LockOnUpdate();
 	}
@@ -48,6 +49,7 @@ void GravityPlayer::Update()
 	{//通常状態
 		NormalUpdate();
 	}
+
 }
 
 void GravityPlayer::Finalize()
@@ -80,10 +82,10 @@ void GravityPlayer::Move(bool isSetAngle)
 
 void GravityPlayer::FloorMove(bool isSetAngle)
 {
-	XMFLOAT2 stick = LStick();
+	XMFLOAT2 stick = GameInput::Instance()->LStick();
 	
 #pragma region jump;
-	if (status == PlayerStatus::STAND && A())
+	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
 	{
 		jumpSpeed = jumpPower;
 		status = PlayerStatus::JUMP;
@@ -165,21 +167,32 @@ void GravityPlayer::JumpMove(bool isSetAngle)
 void GravityPlayer::PlayerRotation()
 {
 	//プレイヤーのローカルのX軸に対して回転
-	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetRightVec(), RStick().y * RotRate));
+	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetRightVec(), GameInput::Instance()->RStick().y * RotRate));
 	//ToDo///////////////
 	//世界のY軸でなく自分の立っている垂直方向に最終的に変更したいね
 	////////////////////
-	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetUpVec(), RStick().x * RotRate));
+	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetUpVec(), GameInput::Instance()->RStick().x * RotRate));
 
 }
 
 void GravityPlayer::NormalUpdate()
 {
 	//フィールドが球体になったらそれに合わせて変化
-	//XMVECTOR playerUp = drawObject.GetFrontVec();
-	//playerUp.m128_f32[1] = 0.0f;
-	//drawObject.SetRotationVector(playerUp);
+
+	if (GameInput::Instance()->LockOnRelease())
+	{
+		PostureReset();
+	}
 	Move(true);
+}
+
+void GravityPlayer::PostureReset()
+{
+	Vector3 BasePlanetToPlayer = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+	XMVECTOR BasePlanetToPlayerAngleV = XMLoadFloat3(&BasePlanetToPlayer.normalize());
+	XMVECTOR frontVec = XMVector3Cross(drawObject.GetRightVec(), BasePlanetToPlayerAngleV);
+
+	drawObject.SetRotationVector(frontVec, BasePlanetToPlayerAngleV);
 }
 
 void GravityPlayer::LockOnUpdate()
@@ -247,6 +260,12 @@ const std::weak_ptr<Planet> &GravityPlayer::GetBasePlanet()
 	return basePlanet;
 }
 
+const bool GravityPlayer::GetIsJump()
+{
+	bool isJump = status == PlayerStatus::JUMP;
+	return isJump;
+}
+
 void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 {
 	if (grabPlanet.expired())
@@ -269,8 +288,26 @@ void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 
 void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
 {
+	//元の惑星が
+	if (!this->basePlanet.expired())
+	{
+		//高さの調整
+		float basePlanetToPlayerLength = (drawObject.GetPosition() - planet->GetPos()).length();
+
+		//惑星の半径を引いて高さ完成
+		basePlanetToPlayerLength -= planet->GetScale();
+
+		jumpHeight = basePlanetToPlayerLength;
+
+		//ジャンプの速度修正
+		jumpSpeed = 0;
+		this->basePlanet.lock()->ReleaseBase();
+	}
+
 	this->basePlanet = planet;
 	basePlanet.lock()->OnPlayer();
+	PostureReset();
+
 }
 
 void GravityPlayer::ReleasePlanet()
@@ -283,7 +320,8 @@ void GravityPlayer::ReleasePlanet()
 
 void GravityPlayer::GrabUpdate()
 {
-	Move(false);
+	//とりあえず動けないようにしますバグるからね
+	//Move(false);
 
 	//星とプレイヤーの二点間の距離を計算
 	Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
