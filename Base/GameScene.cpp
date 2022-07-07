@@ -42,11 +42,21 @@ void GameScene::Init()
 	lightGroup->SetPoinntLight(pointLight.get());
 	lightGroup->SetSpotLight(spotLight.get());
 
-	lightGroup->SetAmbientColor(XMFLOAT3{0.3f,0.3f, 0.3f });
+	lightGroup->SetAmbientColor(XMFLOAT3{ 0.1f,0.1f, 0.1f });
 	groundModel = make_unique<Model>();
 	groundModel->CreateModel("ground");
 	playerModel = make_unique<Model>();
 	playerModel->CreateModel("chr_sword");
+	domeModel = make_unique<Model>();
+	domeModel->CreateModel("skydome");
+
+	objDome = make_unique<Object3D>();
+	objDome->Init();
+	objDome->SetModel(domeModel.get());
+	objDome->SetCamera(cam->GetCamera());
+	objDome->SetScale(XMFLOAT3(3.0f, 3.0f, 3.0f));
+	//objDome->SetLight(light.get());
+	objDome->SetLightGroup(lightGroup.get());
 	objGround = make_unique<Object3D>();
 	objGround->Init();
 	objGround->SetModel(groundModel.get());
@@ -60,7 +70,7 @@ void GameScene::Init()
 	PlanetManager::Instance()->Init();
 	for (int i = 0; i < 6; i++)
 	{
-		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f,1.0f));
+		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
 	}
 
 	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
@@ -79,7 +89,7 @@ void GameScene::Update()
 	{
 		isPause = !isPause;
 	}
-	if(isPause) return;
+	if (isPause) return;
 	GameInput::Instance()->Update();
 	lightGroup->Update();
 
@@ -108,6 +118,8 @@ void GameScene::Update()
 
 	MovePlanet();
 	player->Update();
+	objDome->SetPosition(player->GetPos());
+	objDome->Update();
 
 	objGround->Update();
 	PlanetManager::Instance()->Update();
@@ -121,6 +133,8 @@ void GameScene::Update()
 
 void GameScene::Draw()
 {
+	objDome->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	DepthReset();
 	PlanetManager::Instance()->Draw();
 	player->Draw();
 	//objGround->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
@@ -145,7 +159,7 @@ void GameScene::MovePlanet()
 			cam->IsAnimationOn();
 		}
 	}
-	else if(cam->GetIsChangeBasePlanet())
+	else if (cam->GetIsChangeBasePlanet())
 	{
 		cam->StartCameraAnimation(false, 60);
 	}

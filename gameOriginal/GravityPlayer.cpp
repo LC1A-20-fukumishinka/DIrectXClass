@@ -326,6 +326,18 @@ void GravityPlayer::GrabUpdate()
 	//星とプレイヤーの二点間の距離を計算
 	Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
 
+
+
+	const float moveLengthSpeed = 0.1f;
+	if (GameInput::Instance()->B())
+	{
+	baseLength -= moveLengthSpeed;
+	}
+
+	if (GameInput::Instance()->X())
+	{
+		baseLength += moveLengthSpeed;
+	}
 	//二点間の長さを計算
 	float length = baseLength;
 	if (false)

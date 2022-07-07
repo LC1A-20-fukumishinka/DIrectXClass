@@ -12,7 +12,8 @@ std::unique_ptr<GameInput> &GameInput::Instance()
 	static std::unique_ptr<GameInput> instance;
 	if (!isMakeInstance)
 	{
-		instance = std::make_unique<GameInput>();
+		GameInput *makeInstance = new(GameInput);
+		instance = std::unique_ptr<GameInput>(makeInstance);
 		isMakeInstance = true;
 	}
 	return instance;
@@ -32,6 +33,16 @@ bool GameInput::ATrigger()
 bool GameInput::A()
 {
 	return Input::Instance()->Key(DIK_Z) || Input::Instance()->Button(XINPUT_GAMEPAD_A);
+}
+
+bool GameInput::X()
+{
+	return Input::Instance()->Key(DIK_C) || Input::Instance()->Button(XINPUT_GAMEPAD_X);
+}
+
+bool GameInput::XTrigger()
+{
+	return Input::Instance()->KeyTrigger(DIK_C) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_X);
 }
 
 DirectX::XMFLOAT2 GameInput::LStick(bool YReverse, bool XReverse)
@@ -60,6 +71,11 @@ DirectX::XMFLOAT2 GameInput::RStick(bool YReverse, bool XReverse)
 		output.x = -output.x;
 	}
 	return output;
+}
+
+bool GameInput::B()
+{
+	return Input::Instance()->KeyTrigger(DIK_X) || Input::Instance()->Button(XINPUT_GAMEPAD_B);
 }
 
 bool GameInput::BTrigger()

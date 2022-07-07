@@ -38,7 +38,9 @@ private:
 
 	std::unique_ptr<Model> groundModel;
 	std::unique_ptr<Model> playerModel;
+	std::unique_ptr<Model> domeModel;
 
+	std::unique_ptr<Object3D> objDome;
 	std::unique_ptr<Object3D> objGround;
 	std::unique_ptr<FbxModel> templeModel;
 	std::unique_ptr<FbxObject3D> temple;

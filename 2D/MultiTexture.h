@@ -2,6 +2,9 @@
 #include "Sprite.h"
 #include <IGraphicsPipeline.h>
 #include <array>
+
+//複数のテクスチャを受け取って描画するClass(まだ改善できるだろう)
+//マルチレンダーターゲットと合わさってるじゃねえか
 class MultiTexture
 	//public Sprite
 {

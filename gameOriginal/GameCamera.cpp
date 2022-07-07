@@ -12,6 +12,8 @@ void GameCamera::Init()
 {
 	cam.Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
 	CameraAnimationEase.Init(60);
+
+	nextEyePos = cam.GetEye();
 }
 
 void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
@@ -20,6 +22,8 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 	{
 		IsAnimationOn();
 		StartCameraAnimation(true, 15);
+
+
 	}
 
 	if (GameInput::Instance()->GrabInput())
@@ -36,6 +40,11 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 	}
 
 
+
+	if (GameInput::Instance()->LockOnRelease())
+	{
+		nextEyePos = (playerPos - playerZVec * 100);
+	}
 
 	if (isChangeBasePlanetAnimation)
 	{
@@ -100,7 +109,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	nextTargetPos = playerPos;
 	nextTargetPos.y += 1.0f;
 	cam.SetTarget(nextTargetPos);
-	Vector3 camPos = cam.GetEye() - nextTargetPos;
+	Vector3 camPos = nextEyePos - nextTargetPos;
 	float length = camPos.length();
 
 
@@ -143,7 +152,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 void GameCamera::CameraAnimationUpdate()
 {
 	//easing
-	float t = CameraAnimationEase.Do(Easing::Out, Easing::Quad);
+	float t = CameraAnimationEase.Do(Easing::Out, Easing::Cubic);
 	//ˆÚ“®ˆ—
 
 	//‹——£‚ğ‚Æ‚Á‚Ä
