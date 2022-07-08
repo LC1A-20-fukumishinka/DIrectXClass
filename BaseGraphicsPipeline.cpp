@@ -113,7 +113,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	blenddesc.BlendEnable = true;					//ブレンドを有効にする
 	switch (blendName)
 	{
-	case GraphicsPipelineTypeName::ALPHA:
+	case GraphicsPipelineTypeName::BlendName::ALPHA:
 		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
 		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソース(描画する図形のピクセル)の値を100%使う
 		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デスト(描画対象ピクセル　　　)の値を  0%使う
@@ -122,7 +122,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			//ソースのアルファ値
 		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//1.0f - ソースのアルファ値
 		break;
-	case GraphicsPipelineTypeName::ADD:
+	case GraphicsPipelineTypeName::BlendName::ADD:
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;	//加算
 		blenddesc.SrcBlend = D3D12_BLEND_ONE;	//ソースの値を100%使う
 		blenddesc.DestBlend = D3D12_BLEND_ONE;	//デストの値を100%使う
@@ -131,7 +131,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
 		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 		break;
-	case GraphicsPipelineTypeName::Sub:
+	case GraphicsPipelineTypeName::BlendName::Sub:
 		blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	//減算
 		blenddesc.SrcBlend = D3D12_BLEND_ONE;				//ソースの値を100%使う
 		blenddesc.DestBlend = D3D12_BLEND_ONE;				//デストの値を100%使う
@@ -331,7 +331,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	switch (blendName)
 	{
-	case GraphicsPipelineTypeName::ALPHA:
+	case GraphicsPipelineTypeName::BlendName::ALPHA:
 		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
 		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソース(描画する図形のピクセル)の値を100%使う
 		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デスト(描画対象ピクセル　　　)の値を  0%使う
@@ -340,7 +340,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			//ソースのアルファ値
 		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//1.0f - ソースのアルファ値
 		break;
-	case GraphicsPipelineTypeName::ADD:
+	case GraphicsPipelineTypeName::BlendName::ADD:
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;	//加算
 		blenddesc.SrcBlend = D3D12_BLEND_ONE;	//ソースの値を100%使う
 		blenddesc.DestBlend = D3D12_BLEND_ONE;	//デストの値を100%使う
@@ -349,7 +349,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 		blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
 		blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 		break;
-	case GraphicsPipelineTypeName::Sub:
+	case GraphicsPipelineTypeName::BlendName::Sub:
 		blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	//減算
 		blenddesc.SrcBlend = D3D12_BLEND_ONE;				//ソースの値を100%使う
 		blenddesc.DestBlend = D3D12_BLEND_ONE;				//デストの値を100%使う
