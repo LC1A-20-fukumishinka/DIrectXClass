@@ -1,7 +1,7 @@
 #pragma once
-#include "Sprite.h"
+#include <DirectXMath.h>
 #include <IGraphicsPipeline.h>
-#include <array>
+#include <vector>
 
 //複数のテクスチャを受け取って描画するClass(まだ改善できるだろう)
 //マルチレンダーターゲットと合わさってるじゃねえか
@@ -24,24 +24,8 @@ public:
 	/// </summary>
 	void Init();
 
-	void PreDrawScene();
-
-	void PostDrawScene();
-private:
-
-	//テクスチャバッファの生成
-	void MakeTextureBuffer();
-
-	//イメージデータの転送
-	void SendImage();
-
-	void MakeDescHeap();
-
-	void MakeRTV();
-
-	void MakeDepthBuffer();
-
-	void MakeDSV();
+	void SetDescHeapSRV();
+	void SetTexBuff();
 private:
 	//座標
 	DirectX::XMFLOAT2 position;
@@ -82,7 +66,7 @@ private:
 	ID3D12GraphicsCommandList *cmdList = nullptr;
 
 	//テクスチャバッファ
-	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> texBuff;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> texBuff;
 	//SRV用デスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descHeapSRV;
 

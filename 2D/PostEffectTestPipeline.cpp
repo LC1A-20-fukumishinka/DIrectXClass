@@ -33,7 +33,7 @@ PostEffectTestPipeline::PostEffectTestPipeline()
 	};
 #pragma endregion
 #pragma region rootParameter
-//デスクリプタテーブルの設定
+	//デスクリプタテーブルの設定
 	CD3DX12_DESCRIPTOR_RANGE  descRangeSRV0;
 	descRangeSRV0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);	//t0 レジスタ
 	CD3DX12_DESCRIPTOR_RANGE  descRangeSRV1;
@@ -45,13 +45,14 @@ PostEffectTestPipeline::PostEffectTestPipeline()
 	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV1, D3D12_SHADER_VISIBILITY_ALL);
 #pragma endregion
 
-	pipelineSet =BaseGraphicsPipeline::CreatePipeLine(
-		L"Resources/shaders/PostEffectTestVS.hlsl",
-		L"Resources/shaders/PostEffectTestPS.hlsl",
-		inputLayout,
-		_countof(inputLayout),
-		rootparams,
-		_countof(rootparams));
+	PipelineDesc pipelineDesc;
+	pipelineDesc.VSname = L"Resources/shaders/PostEffectTestVS.hlsl";
+	pipelineDesc.PSname = L"Resources/shaders/PostEffectTestPS.hlsl";
+	pipelineDesc.inputLayout = inputLayout;
+	pipelineDesc.inputLayoutCount = _countof(inputLayout);
+	pipelineDesc.rootparams = rootparams;
+	pipelineDesc.rootparamsCount = _countof(rootparams);
+	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pipelineDesc);
 
 }
 

@@ -44,14 +44,16 @@ PostGBPipeline::PostGBPipeline()
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 #pragma endregion
 
+	PipelineDesc pd;
+		pd.VSname=  L"Resources/shaders/GBVS.hlsl";
+		pd.PSname =  L"Resources/shaders/GBPS.hlsl";
+		pd.inputLayout = inputLayout;
+		pd.inputLayoutCount = _countof(inputLayout);
+		pd.rootparams = rootparams;
+		pd.rootparamsCount = _countof(rootparams);
 
-	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(
-	L"Resources/shaders/GBVS.hlsl",
-		L"Resources/shaders/GBPS.hlsl",
-		inputLayout,
-		_countof(inputLayout),
-		rootparams,
-		_countof(rootparams));
+
+	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pd);
 }
 
 PostGBPipeline::~PostGBPipeline()
