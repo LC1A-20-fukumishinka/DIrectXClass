@@ -8,18 +8,18 @@ float FukuMath::CosineTheorem(const float a, const float b, const float c)
 	return (bunshi / bunbo);
 }
 
-DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTOR &up, DirectX::XMVECTOR &right)
+DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &v1, DirectX::XMVECTOR &v2, DirectX::XMVECTOR &cross)
 {
 	XMVECTOR upVector = XMVECTOR{ 0, 1, 0, 0 };
 
 	//(仮の) 上方向
-	if (!XMVector3Equal(up, XMVectorZero()) && !XMVector3IsInfinite(up))
+	if (!XMVector3Equal(v2, XMVectorZero()) && !XMVector3IsInfinite(v2))
 	{
-		upVector = up;
+		upVector = v2;
 	}
 
 	//カメラZ軸
-	XMVECTOR frontAxisZ = angle;
+	XMVECTOR frontAxisZ = v1;
 
 
 	//正面ベクトルが0だった場合
@@ -35,7 +35,7 @@ DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTO
 
 
 	//上ベクトルと正面ベクトルが同一だったら上ベクトルの方向を変更
-	if (XMVector3Equal(upVector, XMVectorZero()))
+	if (XMVector3Equal(upVector, frontAxisZ))
 	{//上ベクトルを変更する
 		XMVECTOR upVector = XMVECTOR{ 0, 0, -1, 0 };
 	}
@@ -50,7 +50,7 @@ DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTO
 	//ベクトルを正規化
 	rightAxisX = XMVector3Normalize(rightAxisX);
 	//右方向ベクトル
-	right = rightAxisX;
+	cross = rightAxisX;
 	//カメラのY軸
 	XMVECTOR upAxisY;
 	//Y軸はZ軸→X軸の外積で求まる
@@ -58,7 +58,7 @@ DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTO
 	//ベクトルの正規化
 	upAxisY = XMVector3Normalize(upAxisY);
 	//上方向ベクトルを書き換える
-	up = upAxisY;
+	v2 = upAxisY;
 	//カメラ回転行列
 	XMMATRIX matRot;
 	//カメラ座標系→ワールド座標系の変換行列

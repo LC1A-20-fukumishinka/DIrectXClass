@@ -14,11 +14,11 @@ namespace FukuMath
 	/// <summary>
 	/// ベクトルからその向きを向く行列を生成する
 	/// </summary>
-	/// <param name="angle">向く方向</param>
+	/// <param name="v1">向く方向</param>
 	/// <param name="up">上方向ベクトル</param>
-	/// <param name="right">右方向ベクトルを取得する場合入れておく</param>
+	/// <param name="cross">右方向ベクトルを取得する場合入れておく</param>
 	/// <returns></returns>
-	DirectX::XMMATRIX GetMatRot(DirectX::XMVECTOR &angle, DirectX::XMVECTOR &up = DirectX::XMVECTOR {}, DirectX::XMVECTOR &right = DirectX::XMVECTOR{});
+	DirectX::XMMATRIX GetMatRot(DirectX::XMVECTOR &v1, DirectX::XMVECTOR &v2 = DirectX::XMVECTOR {}, DirectX::XMVECTOR &cross = DirectX::XMVECTOR{});
 
 	const float PI = 3.14159265f;
 
