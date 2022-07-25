@@ -1,5 +1,5 @@
 #pragma once
-#include "Object3D.h"
+#include "../PlanetObject.h"
 #include "Model.h"
 #include "Vector3.h"
 #include <memory>
@@ -20,12 +20,15 @@ public:
 	const Vector3 &GetPos(){return pos;}
 	void SetPos(const DirectX::XMFLOAT3 &pos){this->pos = Vector3(pos.x, pos.y, pos.z);}
 	void SetScale(float scale);
+	Object3D *GetObject3d();
 	float GetScale();
-	std::unique_ptr<Object3D> object;
+	std::unique_ptr<PlanetObject> object;
 	std::unique_ptr <Model> model;
 public:
 	static void SetLight(LightGroup *lights);
 	static void SetCamera(Camera *cam);
+	static void SetShadowCamera(Camera *shadowCam);
+	static void SetShadowTexture(int texHandle);
 	void GrabOn();
 	void ReleaseGrab();
 	void OnPlayer();
@@ -34,7 +37,9 @@ public:
 	bool GetBase();
 private://Ã“Iƒƒ“ƒo•Ï”
 	static Camera *cam;
+	static Camera *shadowCam;
 	static LightGroup *lights;
+	static int shadowTextureNum;
 private://ƒƒ“ƒo•Ï”
 
 	Vector3 pos;

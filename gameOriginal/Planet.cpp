@@ -2,6 +2,7 @@
 #include "../Camera.h"
 #include "../LightGroup.h"
 #include "ModelPhongPipeline.h"
+#include "../ShadowDrawPipeline.h"
 #include "FukuMath.h"
 #include "GameInput.h"
 #include "gameConstData.h"
@@ -10,6 +11,8 @@ using namespace FukuMath;
 using namespace DirectX;
 using namespace GameDatas;
 Camera *Planet::cam = nullptr;
+Camera *Planet::shadowCam = nullptr;
+int Planet::shadowTextureNum;
 LightGroup *Planet::lights = nullptr;
 Planet::Planet()
 {
@@ -17,12 +20,13 @@ Planet::Planet()
 
 	model->CreateModel("sphere");
 	//model->CreateModel("chr_sword");//‰ñ“]Šm”F—p
-	object = make_unique<Object3D>();
+	object = make_unique<PlanetObject>();
 	object->Init();
 	object->SetModel(model.get());
 	object->SetCamera(Planet::cam);
 	object->SetScale(XMFLOAT3(scale, scale, scale));
-
+	object->SetShadowCamera(Planet::shadowCam);
+	object->SetShadowTextureNum(shadowTextureNum);
 	GrabRotateAxisY = YVec;
 	GrabRotateAxisX = XVec;
 }
@@ -59,22 +63,26 @@ void Planet::NormalUpdate()
 	object->SetPosition(pos);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
+	object->SetShadowCamera(shadowCam);
+	object->SetShadowTextureNum(shadowTextureNum);
 }
 
 void Planet::GrabUpdate()
 {
 	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxisY, GameInput::Instance()->RStick().x * RotRate);
-	Rot = XMQuaternionMultiply( Rot, XMQuaternionRotationAxis(GrabRotateAxisX, GameInput::Instance()->RStick().y * RotRate));
+	Rot = XMQuaternionMultiply(Rot, XMQuaternionRotationAxis(GrabRotateAxisX, GameInput::Instance()->RStick().y * RotRate));
 	object->AddRotation(Rot);
 	object->SetCamera(cam);
 	object->SetLightGroup(lights);
 	object->SetPosition(pos);
+	object->SetShadowCamera(shadowCam);
+	object->SetShadowTextureNum(shadowTextureNum);
 }
 
 void Planet::Draw()
 {
 	object->Update();
-	object->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	object->modelDraw(ShadowDrawPipeline::Instance()->GetPipeLine());
 }
 
 void Planet::Finalize()
@@ -85,6 +93,11 @@ void Planet::SetScale(float scale)
 {
 	this->scale = scale;
 	object->SetScale(XMFLOAT3(scale, scale, scale));
+}
+
+Object3D *Planet::GetObject3d()
+{
+	return object.get();
 }
 
 float Planet::GetScale()
@@ -100,6 +113,16 @@ void Planet::SetLight(LightGroup *lights)
 void Planet::SetCamera(Camera *cam)
 {
 	Planet::cam = cam;
+}
+
+void Planet::SetShadowCamera(Camera *shadowCam)
+{
+	Planet::shadowCam = shadowCam;
+}
+
+void Planet::SetShadowTexture(int shadowTextureNum)
+{
+	Planet::shadowTextureNum = shadowTextureNum;
 }
 
 void Planet::GrabOn()

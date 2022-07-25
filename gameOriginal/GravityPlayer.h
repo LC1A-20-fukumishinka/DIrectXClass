@@ -24,7 +24,7 @@ public://基本関数
 	void Update();
 	void Finalize();
 	void Draw();
-
+	void ShadowDraw();
 private:
 	/// <summary>
 	/// スティックによる移動関数
@@ -51,6 +51,7 @@ public://ゲッタセッタ
 	void SetRotation(const DirectX::XMFLOAT3 &rot);
 	void SetModel(Model *model);
 	void SetCamera(Camera *cam);
+	void SetShadowCamera(Camera *cam);
 	void SetLight(LightGroup *lights);
 	const XMFLOAT3 &GetPos();
 	const XMFLOAT3 GetAngle();
@@ -79,7 +80,9 @@ private:
 	Vector3 rotation;
 	Vector3 scale;
 	Object3D drawObject;
+	Object3D shadowObject;
 	Camera *cam;
+	Camera *shadowCamera;
 	std::weak_ptr<Planet> grabPlanet;
 
 	std::weak_ptr<Planet> basePlanet;
@@ -92,7 +95,7 @@ private:
 	float baseLength = 0.0f;
 
 	//惑星からの高さを(位置)
-	float jumpHeight = 0.0f;
+	float localHeight = 0.0f;
 	//ジャンプ中の速度(速度)
 	float jumpSpeed = 0.0f;
 

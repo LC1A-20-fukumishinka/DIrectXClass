@@ -5,6 +5,7 @@
 #include "../EaseClass.h"
 #include "Planet.h"
 #include "gameConstData.h"
+#include "../ShadowPipeline.h"
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -19,6 +20,9 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 	drawObject.SetModel(model);
 	drawObject.SetPosition(Vector3(YVec));
 
+	shadowObject.Init();
+	shadowObject.SetModel(model);
+	shadowObject.SetPosition(Vector3(YVec));
 	SetBasePlanet(planet);
 
 	status = PlayerStatus::STAND;
@@ -50,6 +54,8 @@ void GravityPlayer::Update()
 		NormalUpdate();
 	}
 
+	shadowObject.SetPosition(drawObject.GetPosition());
+	shadowObject.SetRotation(drawObject.GetRotQuaternion());
 }
 
 void GravityPlayer::Finalize()
@@ -60,6 +66,12 @@ void GravityPlayer::Draw()
 {
 	drawObject.Update();
 	drawObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+}
+
+void GravityPlayer::ShadowDraw()
+{
+	shadowObject.Update();
+	shadowObject.modelDraw(ShadowPipeline::Instance()->GetPipeLine());
 }
 
 void GravityPlayer::Move(bool isSetAngle)
@@ -84,7 +96,7 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 {
 	XMFLOAT2 stick = GameInput::Instance()->LStick();
 	
-#pragma region jump;
+#pragma region jump
 	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
 	{
 		jumpSpeed = jumpPower;
@@ -93,11 +105,11 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 	if (status == PlayerStatus::JUMP)
 	{
-		jumpHeight += jumpSpeed;
+		localHeight += jumpSpeed;
 		jumpSpeed += gravity;
-		if (jumpHeight <= 0)
+		if (localHeight <= 0)
 		{
-			jumpHeight = 0;
+			localHeight = 0;
 			status = PlayerStatus::STAND;
 		}
 	}
@@ -121,13 +133,13 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 	Vector3 dist = (nowPos + move) - basePlanet.lock()->GetPos();
 
-	float length = basePlanet.lock()->GetScale() + jumpHeight;
+	float length = basePlanet.lock()->GetScale() + localHeight;
 	//基本の惑星から距離を測って
 	dist = dist.normalize() * length;
 	drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
-
 	Vector3 up = {};
 
+	//球面上における上方向
 	up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
 
 	//法線方向
@@ -161,7 +173,17 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 void GravityPlayer::JumpMove(bool isSetAngle)
 {
-
+	//最終的に地上の処理と分割するから取り合えkズ記述しとくよ
+	//if (status == PlayerStatus::JUMP)
+	//{
+	//	localHeight += jumpSpeed;
+	//	jumpSpeed += gravity;
+	//	if (localHeight <= 0)
+	//	{
+	//		localHeight = 0;
+	//		status = PlayerStatus::STAND;
+	//	}
+	//}
 }
 
 void GravityPlayer::PlayerRotation()
@@ -214,6 +236,7 @@ void GravityPlayer::SetRotation(const DirectX::XMFLOAT3 &rot)
 void GravityPlayer::SetModel(Model *model)
 {
 	drawObject.SetModel(model);
+	shadowObject.SetModel(model);
 }
 
 void GravityPlayer::SetCamera(Camera *cam)
@@ -222,9 +245,15 @@ void GravityPlayer::SetCamera(Camera *cam)
 	drawObject.SetCamera(cam);
 }
 
+void GravityPlayer::SetShadowCamera(Camera *cam)
+{
+	shadowObject.SetCamera(cam);
+}
+
 void GravityPlayer::SetLight(LightGroup *lights)
 {
 	drawObject.SetLightGroup(lights);
+	shadowObject.SetLightGroup(lights);
 }
 
 const DirectX::XMFLOAT3 &GravityPlayer::GetPos()
@@ -297,7 +326,7 @@ void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
 		//惑星の半径を引いて高さ完成
 		basePlanetToPlayerLength -= planet->GetScale();
 
-		jumpHeight = basePlanetToPlayerLength;
+		localHeight = basePlanetToPlayerLength;
 
 		//ジャンプの速度修正
 		jumpSpeed = 0;

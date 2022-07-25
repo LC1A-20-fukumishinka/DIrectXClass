@@ -86,13 +86,34 @@ bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::X
 		float tmpDist = (e->GetPos() - pos).length();
 
 		tmpDist -= e->GetScale();
-		if(tmpDist <= minDist)
+		if (tmpDist <= minDist)
 		{
 			planet = e;
 			minDist = tmpDist;
 		}
 	}
 	return !planet->GetBase();
+}
+
+std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
+{
+	if (getPlanetNum < planets.size())
+	{
+		int planetNum = 0;
+		//‘S•”‚Ì˜f¯‚Ì‹ß‚¢˜f¯‚ð‚Æ‚é
+		for (auto &e : planets)
+		{
+			//˜f¯‚Ì”Ô†‚ªˆê’v‚µ‚½‚ç‚»‚Ì˜f¯‚ð•Ô‚·
+			if (planetNum == getPlanetNum)
+			{
+				return e;
+			}
+			//ˆê’v‚µ‚Ä‚È‚©‚Á‚½‚Ì‚Åˆê‚Â”Ô†‘‚â‚·
+			planetNum++;
+		}
+	}
+	//‘ÎÛ‚ª‚È‚©‚Á‚½‚çæ“ª‚Ì˜f¯‚ð“n‚·
+	return *planets.begin();
 }
 
 std::shared_ptr<Planet> PlanetManager::GetBasePlanet()
@@ -107,4 +128,20 @@ void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const Di
 	planet->Init(pos, size, color);
 	int hoge = 0;
 	planets.push_back(planet);
+}
+
+void PlanetManager::SetCamera(Camera *cam)
+{
+	Planet::SetCamera(cam);
+}
+
+void PlanetManager::SetShadowCamera(Camera *cam)
+{
+
+	Planet::SetShadowCamera(cam);
+}
+
+void PlanetManager::SetShadowTexture(int shadowTextureNum)
+{
+	Planet::SetShadowTexture(shadowTextureNum);
 }
