@@ -12,16 +12,15 @@ class Model;
 class BaseCollider;
 class Object3D
 {
-public:
-
+protected:
 	struct ConstBufferData
 	{
-		DirectX::XMFLOAT4 color;	//色(RGBA)
-		//DirectX::XMMATRIX mat;	//3D変換行列
-		DirectX::XMMATRIX viewproj;
-		DirectX::XMMATRIX world;
-		DirectX::XMFLOAT3 cameraPos;
+		DirectX::XMFLOAT4 color = {};	//色(RGBA)
+		DirectX::XMMATRIX viewproj = {};
+		DirectX::XMMATRIX world = {};
+		DirectX::XMFLOAT3 cameraPos = {};
 	};
+public:
 	Object3D() = default;
 
 	virtual ~Object3D();
@@ -53,16 +52,18 @@ public://セッタ
 	virtual void SetColor(DirectX::XMFLOAT4 color);
 	virtual void SetScale(DirectX::XMFLOAT3 scale);
 	virtual void SetRotation(DirectX::XMFLOAT3 rot);
+	virtual void SetRotation(DirectX::XMVECTOR quaternion);
 	virtual void AddRotation(DirectX::XMFLOAT3 rot);
 	virtual void AddRotation(DirectX::XMVECTOR rot);
 	/// <summary>
 	/// 向きたい方向をベクトルで指定する
 	/// </summary>
 	/// <param name="rot">向く方向</param>
-	virtual void SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up = DirectX::XMVECTOR {0.0f, 1.0f, 0.0f , 0.0f});
+	virtual void SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up = DirectX::XMVECTOR{ 0.0f, 1.0f, 0.0f , 0.0f });
 public:
 	const DirectX::XMFLOAT4 &GetColor();
 	const DirectX::XMFLOAT3 &GetPosition();
+	const DirectX::XMFLOAT3 GetWorldPos();
 	const DirectX::XMFLOAT3 &GetScale();
 	const DirectX::XMFLOAT3 &GetRotation();
 	const DirectX::XMVECTOR &GetQuaternion();
@@ -90,8 +91,8 @@ protected:
 	//座標
 	DirectX::XMFLOAT3 position = { 0.0f,0.0f ,0.0f };
 	DirectX::XMVECTOR front = { 0.0f,0.0f ,1.0f , 0.0f };
-	DirectX::XMVECTOR up = {0.0f,1.0f ,0.0f , 0.0f};
-	DirectX::XMVECTOR right = {1.0f, 0.0f, 0.0f, 0.0f};
+	DirectX::XMVECTOR up = { 0.0f,1.0f ,0.0f , 0.0f };
+	DirectX::XMVECTOR right = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 	//描画フラグ
 	bool isInvisible = false;
@@ -108,7 +109,7 @@ public://あったほうがいいかもね関数
 	void Separate();
 
 	void ConnectObject(Object3D *parent);
-private:
+protected:
 	//定数バッファ
 	Microsoft::WRL::ComPtr<ID3D12Resource> constBuff;
 
@@ -125,6 +126,8 @@ private:
 	bool isMakeConstBuffer = false;
 
 	Model *model = nullptr;
+
+	ConstBufferData buffData;
 };
 
 //深度値リセット

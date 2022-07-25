@@ -99,13 +99,15 @@ void Object3D::Update()
 	{
 		assert(0);
 	}
-	ConstBufferData *constMap = nullptr;
 
-	HRESULT result = constBuff->Map(0, nullptr, (void **)&constMap);
-	constMap->color = color;//FŽw’è(RGBA)
-	constMap->viewproj = camera->GetMatView() * camera->GetMatProjection();
-	constMap->world = matWorld;
-	constMap->cameraPos = Vector3(camera->GetEye());
+	buffData.cameraPos = camera->GetEye();
+	buffData.color = color;
+	buffData.viewproj = camera->GetMatViewProj();
+	buffData.world = matWorld;
+
+	void *constMap = nullptr;
+	HRESULT result = constBuff->Map(0, nullptr, &constMap);
+	std::memcpy(constMap, &buffData, sizeof(buffData));
 	constBuff->Unmap(0, nullptr);
 
 	if (collider)
@@ -246,6 +248,12 @@ void Object3D::SetRotation(XMFLOAT3 rot)
 	UpdateVector();
 }
 
+void Object3D::SetRotation(DirectX::XMVECTOR quaternion)
+{
+	this->quaternion = quaternion;
+	UpdateVector();
+}
+
 void Object3D::AddRotation(DirectX::XMFLOAT3 rot)
 {
 	rotation.x += rot.x;
@@ -284,6 +292,17 @@ const XMFLOAT4 &Object3D::GetColor()
 const XMFLOAT3 &Object3D::GetPosition()
 {
 	return position;
+}
+
+const DirectX::XMFLOAT3 Object3D::GetWorldPos()
+{
+	Vector3 worldPos = position;
+	if (parent != nullptr)
+	{
+		worldPos *= Vector3(parent->GetScale());
+		worldPos += parent->GetWorldPos();
+	}
+	return worldPos;
 }
 
 const XMFLOAT3 &Object3D::GetScale()
