@@ -156,6 +156,8 @@ private: // メンバ変数
 	VertexPos vertices[vertexCount];
 
 	Camera *camera;
+
+	bool isBillboard_ = true;
 private:
 	ParticleManager();
 	void Init();

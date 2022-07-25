@@ -15,7 +15,7 @@ using namespace Microsoft::WRL;
 ID3D12Device *ParticleManager::device = nullptr;
 ComPtr<ID3D12RootSignature> ParticleManager::rootsignature;
 ComPtr<ID3D12PipelineState> ParticleManager::pipelinestate;
-//ComPtr<ID3D12Resource> ParticleManager::vertBuff;
+//ComPtr<ID3D12Resource> ParticleManager::vertBuff_;
 //D3D12_VERTEX_BUFFER_VIEW ParticleManager::vbView{};
 //ParticleManager::VertexPos ParticleManager::vertices[vertexCount];
 bool ParticleManager::StaticInitialize()
@@ -317,7 +317,7 @@ void ParticleManager::Update()
 		it->position = it->position + it->velocity;
 
 		//進行度を0~1の範囲に換算
-		float f = (float)it->num_frame / it->frame;
+		float f = it->frame / (float)it->num_frame;
 
 		//スケールの線形補間
 		it->scale = (it->e_scale - it->s_scale)/f;
@@ -354,11 +354,16 @@ void ParticleManager::Update()
 		vertBuff->Unmap(0, nullptr);
 	}
 
+	XMMATRIX billMat = XMMatrixIdentity();
+	if (isBillboard_)
+	{
+		billMat = camera->GetMatBillboard();
+	}
 	// 定数バッファへデータ転送
 	ConstBufferData *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->mat = camera->GetMatView() * camera->GetMatProjection();	//行列の合成
-	constMap->matBillboard = camera->GetMatBillboard();	//行列の合成
+	constMap->matBillboard = billMat;	//行列の合成
 	constMap->color = setColor;
 	constBuff->Unmap(0, nullptr);
 }
