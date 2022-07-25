@@ -24,6 +24,12 @@ const Vector3 operator*(float s, const Vector3 &v)
 	return v * s;
 }
 
+const Vector3 operator*(const Vector3 &v1, const Vector3 &v2)
+{
+	Vector3 temp(v1);
+	return temp *= v2;
+}
+
 const Vector3 operator/(const Vector3 &v, float s)
 {
 	Vector3 temp(v);
@@ -112,6 +118,14 @@ Vector3 &Vector3::operator*=(float s)
 	x = x * s;
 	y = y * s;
 	z = z * s;
+	return *this;
+}
+
+Vector3 &Vector3::operator*=(const Vector3 &v)
+{
+	x = x * v.x;
+	y = y * v.y;
+	z = z * v.z;
 	return *this;
 }
 
