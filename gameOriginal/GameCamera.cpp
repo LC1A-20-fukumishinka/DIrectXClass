@@ -18,32 +18,17 @@ void GameCamera::Init()
 
 void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
 {
-	if (GameInput::Instance()->LockOnTrigger() || GameInput::Instance()->LockOnRelease())
+	//if (GameInput::Instance()->BTrigger())
+	//{
+	//	ClearAnimationStart(playerPos);
+	//}
+	if (isClearMode_)
 	{
-		IsAnimationOn();
-		StartCameraAnimation(true, 15);
-
-
-	}
-
-	if (GameInput::Instance()->GrabInput())
-	{
-		LockonUpdate(playerPos, playerZVec, playerYVec);
-	}
-	else if (GameInput::Instance()->LockOnInput())
-	{
-		LockonUpdate(playerPos, playerZVec, playerYVec);
+		ClearCameraUpdate();
 	}
 	else
 	{
-		NormalUpdate(playerPos);
-	}
-
-
-
-	if (GameInput::Instance()->LockOnRelease())
-	{
-		nextEyePos = (playerPos - playerZVec * 100);
+		IngameCameraUpdate(playerPos, playerZVec, playerYVec);
 	}
 
 	if (isChangeBasePlanetAnimation)
@@ -104,6 +89,29 @@ void GameCamera::StartCameraAnimation(bool isTargetEase , int EaseTimer)
 		oldCamUpRot = XMQuaternionRotationMatrix(FukuMath::GetMatRot(frontVec, upVec));
 }
 
+void GameCamera::ClearAnimationStart(const Vector3 &playerPos)
+{
+	nextTargetPos = planet.lock()->GetPos();
+	Vector3 eyeDir = playerPos - nextTargetPos;
+	eyeDir.y = 0.0f;
+
+	if (eyeDir.length() == 0.0f)
+	{
+		eyeDir = Vector3{0, 0, 1};
+	}
+	eyeDir.normalize();
+	eyeDir *= 300.0f;
+
+	nextEyePos = eyeDir + nextTargetPos;
+
+	nextCamUpRot = XMQuaternionIdentity();
+
+	isClearMode_ = true;
+
+	IsAnimationOn();
+	StartCameraAnimation(true, 30);
+}
+
 void GameCamera::NormalUpdate(const Vector3 &playerPos)
 {
 	nextTargetPos = playerPos;
@@ -146,7 +154,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	nextCamUpRot = XMQuaternionRotationMatrix(camUpMat);
 	nextEyePos = camPos;
 
-	camRot();
+	camRot(GameInput::Instance()->RStick());
 }
 
 void GameCamera::CameraAnimationUpdate()
@@ -211,17 +219,55 @@ void GameCamera::GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec)
 {
 }
 
+void GameCamera::ClearCameraUpdate()
+{
+	//XMVECTOR rotQ;
+	//float deg = degree;
+	//XMQuaternionToAxisAngle(&rotQ, &deg, YVec);
+	//nextCamUpRot = XMQuaternionMultiply(nextCamUpRot, rotQ)
+	camRot(XMFLOAT2(-0.2f, 0));
+}
+
+void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
+{
+	if (GameInput::Instance()->LockOnTrigger() || GameInput::Instance()->LockOnRelease())
+	{
+		IsAnimationOn();
+		StartCameraAnimation(true, 15);
+	}
+
+	if (GameInput::Instance()->GrabInput())
+	{
+		LockonUpdate(playerPos, playerZVec, playerYVec);
+	}
+	else if (GameInput::Instance()->LockOnInput())
+	{
+		LockonUpdate(playerPos, playerZVec, playerYVec);
+	}
+	else
+	{
+		NormalUpdate(playerPos);
+	}
+
+
+
+	if (GameInput::Instance()->LockOnRelease())
+	{
+		nextEyePos = (playerPos - playerZVec * 100);
+	}
+}
+
 void GameCamera::IsAnimationOn()
 {
 	isChangeBasePlanet = true;
 	isChangeBasePlanetAnimation = false;
 }
 
-void GameCamera::camRot()
+void GameCamera::camRot(DirectX::XMFLOAT2 rot)
 {
 	XMVECTOR rotQ = XMQuaternionIdentity();
 
-	rotQ = XMQuaternionRotationAxis(XMLoadFloat3(&cam.up), GameInput::Instance()->RStick().x * RotRate);
+	rotQ = XMQuaternionRotationAxis(XMLoadFloat3(&cam.up), rot.x * RotRate);
 	//targetからnextPosの視点座標までのベクトルを計算
 	XMVECTOR nextVec = XMLoadFloat3(&(nextEyePos - nextTargetPos));
 	//回転させる

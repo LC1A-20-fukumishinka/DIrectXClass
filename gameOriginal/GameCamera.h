@@ -23,17 +23,22 @@ public:
 	void IsAnimationOn();
 
 	/// <summary>
-	/// 惑星変更アニメーション
+	/// 現在のカメラの状態を保存しアニメーションをスタート
 	/// </summary>
+	/// <param name="isTargetEase">目標座標を遷移させるか</param>
+	/// <param name="EaseTimer">アニメーション時間</param>
 	void StartCameraAnimation(bool isTargetEase, int EaseTimer);
 
+	void ClearAnimationStart(const Vector3 &playerPos);
 private:
 	void NormalUpdate(const Vector3 &playerPos);
 	void CameraAnimationUpdate();
 	void LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
 	void GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec);
+	void ClearCameraUpdate();
+	void IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
 private:
-	void camRot();
+	void camRot(DirectX::XMFLOAT2 rot);
 private:
 	Camera cam;
 
@@ -49,5 +54,7 @@ private://挙動のイージング
 	bool isChangeBasePlanetAnimation;
 	Easing CameraAnimationEase;
 	bool isTargetEase = false;
+
+	bool isClearMode_ = false;
 };
 
