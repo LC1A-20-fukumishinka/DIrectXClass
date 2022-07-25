@@ -34,7 +34,7 @@ public://Getter
 	ID3D12GraphicsCommandList *GetCommandList();
 	CD3DX12_CPU_DESCRIPTOR_HANDLE GetDsvH();
 private:
-	Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
 	Microsoft::WRL::ComPtr <ID3D12Device> dev;
 	Microsoft::WRL::ComPtr<IDXGIFactory6> dxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapchain;
