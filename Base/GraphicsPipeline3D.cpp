@@ -94,13 +94,14 @@ GraphicsPipeline3D::GraphicsPipeline3D()
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 #pragma endregion
 
-	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(
-		L"Resources/shaders/BasicVS.hlsl",
-		L"Resources/shaders/BasicPS.hlsl",
-		inputLayout,
-		_countof(inputLayout),
-		rootparams,
-		_countof(rootparams));
+	PipelineDesc pipelineDesc;
+	pipelineDesc.VSname = L"Resources/shaders/BasicVS.hlsl";
+	pipelineDesc.PSname = L"Resources/shaders/BasicPS.hlsl";
+	pipelineDesc.inputLayout = inputLayout;
+	pipelineDesc.inputLayoutCount = _countof(inputLayout);
+	pipelineDesc.rootparams = rootparams;
+	pipelineDesc.rootparamsCount = _countof(rootparams);
+	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pipelineDesc);
 }
 GraphicsPipeline3D::~GraphicsPipeline3D()
 {

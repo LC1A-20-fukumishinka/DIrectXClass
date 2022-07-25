@@ -1,12 +1,13 @@
-#include "PostMonochromePipeline.h"
+#include "PostBasePipeline.h"
 #include <d3dcompiler.h>
 #include "MyDirectX.h"
 #include<cassert>
 using namespace PipeClass;
 using namespace Microsoft::WRL;
 
-PostMonochromePipeline::PostMonochromePipeline()
+PostBasePipeline::PostBasePipeline()
 {
+	//頂点レイアウトの宣言と設定
 #pragma region inputLayOut
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 	{
@@ -31,9 +32,8 @@ PostMonochromePipeline::PostMonochromePipeline()
 		},
 	};
 #pragma endregion
-
 #pragma region rootParameter
-//デスクリプタテーブルの設定
+	//デスクリプタテーブルの設定
 	CD3DX12_DESCRIPTOR_RANGE  descRangeSRV;
 
 
@@ -45,8 +45,8 @@ PostMonochromePipeline::PostMonochromePipeline()
 #pragma endregion
 
 	PipelineDesc pd;
-	pd.VSname = L"Resources/shaders/MonochromeVS.hlsl";
-	pd.PSname = L"Resources/shaders/MonochromePS.hlsl";
+	pd.VSname = L"Resources/shaders/BaseDrawVS.hlsl";
+	pd.PSname = L"Resources/shaders/BaseDrawPS.hlsl";
 	pd.inputLayout = inputLayout;
 	pd.inputLayoutCount = _countof(inputLayout);
 	pd.rootparams = rootparams;
@@ -54,17 +54,11 @@ PostMonochromePipeline::PostMonochromePipeline()
 	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pd);
 }
 
-PostMonochromePipeline::~PostMonochromePipeline()
+PostBasePipeline::~PostBasePipeline()
 {
 }
 
-PipeClass::PipelineSet *PostMonochromePipeline::GetPipeLine()
+PipeClass::PipelineSet *PostBasePipeline::GetPipeLine()
 {
 	return pipelineSet.get();
-}
-
-PostMonochromePipeline *PostMonochromePipeline::Instance()
-{
-	static PostMonochromePipeline instance;
-	return &instance;
 }

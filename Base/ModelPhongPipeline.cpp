@@ -36,13 +36,15 @@ ModelPhongPipeline::ModelPhongPipeline()
 	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 	rootparams[3].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
-	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(
-		L"Resources/shaders/OBJPhongVS.hlsl",	// シェーダファイル名
-		L"Resources/shaders/OBJPhongPS.hlsl",	// シェーダファイル名
-		inputLayout,
-		_countof(inputLayout),
-		rootparams,
-		_countof(rootparams));
+	PipelineDesc pipelineDesc;
+	pipelineDesc.VSname = L"Resources/shaders/OBJPhongVS.hlsl";
+	pipelineDesc.PSname = L"Resources/shaders/OBJPhongPS.hlsl";
+	pipelineDesc.inputLayout = inputLayout;
+	pipelineDesc.inputLayoutCount = _countof(inputLayout);
+	pipelineDesc.rootparams = rootparams;
+	pipelineDesc.rootparamsCount = _countof(rootparams);
+
+	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pipelineDesc);
 }
 
 ModelPhongPipeline::~ModelPhongPipeline()

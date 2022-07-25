@@ -45,13 +45,16 @@ PostMosaicPipeline::PostMosaicPipeline()
 	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);	//定数バッファビューとして初期化(b0)
 	rootparams[1].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
 #pragma endregion
-	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(
-		L"Resources/shaders/MosaicVS.hlsl",//シェーダファイル名
-		L"Resources/shaders/MosaicPS.hlsl",//シェーダファイル名
-		inputLayout,
-		_countof(inputLayout),
-		rootparams,
-		_countof(rootparams));
+
+	PipelineDesc pd;
+	pd.VSname = L"Resources/shaders/MosaicVS.hlsl";
+	pd.PSname = L"Resources/shaders/MosaicPS.hlsl";
+	pd.inputLayout = inputLayout;
+	pd.inputLayoutCount = _countof(inputLayout);
+	pd.rootparams = rootparams;
+	pd.rootparamsCount = _countof(rootparams);
+
+	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pd);
 }
 
 PostMosaicPipeline::~PostMosaicPipeline()

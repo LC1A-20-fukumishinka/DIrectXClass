@@ -5,7 +5,7 @@ using namespace PipeClass;
 using namespace std;
 using namespace GraphicsPipelineTypeName;
 using namespace Microsoft::WRL;
-std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount, BlendName blendName, int renderTargetCount)
+std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(const PipelineDesc &pipelineDesc)
 {
 
 	unique_ptr<PipelineSet> pipeSet = make_unique<PipelineSet>();
@@ -17,7 +17,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	//頂点シェーダの読み込みとコンパイル
 #pragma region VShader
 	result = D3DCompileFromFile(
-		VSname,//シェーダファイル名
+		pipelineDesc.VSname,//シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,//インクルード可能にする
 		"main", "vs_5_0",//エントリーポイント名、シェーダーモデル指定
@@ -28,7 +28,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	//ピクセルシェーダー読み込み
 #pragma region PShader
 	result = D3DCompileFromFile(
-		PSname,//シェーダファイル名
+		pipelineDesc.PSname,//シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,//インクルード可能にする
 		"main", "ps_5_0",//エントリーポイント名、シェーダモデル指定
@@ -87,7 +87,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	//};
 #pragma endregion
 
-	int count = renderTargetCount;
+	int count = pipelineDesc.renderTargetCount;
 
 	if (count > 8)
 	{
@@ -111,7 +111,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	D3D12_RENDER_TARGET_BLEND_DESC blenddesc = {};
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;//RGBA全てのチャンネルを描画
 	blenddesc.BlendEnable = true;					//ブレンドを有効にする
-	switch (blendName)
+	switch (pipelineDesc.blendName)
 	{
 	case GraphicsPipelineTypeName::BlendName::ALPHA:
 		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
@@ -158,8 +158,8 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	gpipeline.DSVFormat = DXGI_FORMAT_D32_FLOAT;								//深度値フォーマット
 #pragma endregion
 
-	gpipeline.InputLayout.pInputElementDescs = inputLayout;
-	gpipeline.InputLayout.NumElements = static_cast<UINT>(inputLayoutCount);
+	gpipeline.InputLayout.pInputElementDescs = pipelineDesc.inputLayout;
+	gpipeline.InputLayout.NumElements = static_cast<UINT>(pipelineDesc.inputLayoutCount);
 
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
@@ -187,10 +187,11 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 
 #pragma region textureSampler
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
-
+	samplerDesc.AddressU = pipelineDesc.loopMode;
+	samplerDesc.AddressV = pipelineDesc.loopMode;
 #pragma endregion
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init_1_0(static_cast<UINT>(rootparamsCount), rootparams, 1, &samplerDesc,
+	rootSignatureDesc.Init_1_0(static_cast<UINT>(pipelineDesc.rootparamsCount), pipelineDesc.rootparams, 1, &samplerDesc,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	Microsoft::WRL::ComPtr<ID3DBlob>rootSigBlob;
@@ -212,7 +213,7 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname
 	return pipeSet;
 }
 
-std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(LPCWSTR VSname, LPCWSTR PSname, LPCWSTR GSname, D3D12_INPUT_ELEMENT_DESC *inputLayout, size_t inputLayoutCount, CD3DX12_ROOT_PARAMETER *rootparams, size_t rootparamsCount, GraphicsPipelineTypeName::BlendName blendName, bool isDepthWrite, int renderTargetCount)
+std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(const PipelineDesc &pipelineDesc, LPCWSTR GSname)
 {
 
 	HRESULT result = S_FALSE;
@@ -226,7 +227,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		/*L"Resources/shaders/particleVS.hlsl"*/VSname,	// シェーダファイル名
+		/*L"Resources/shaders/particleVS.hlsl"*/pipelineDesc.VSname,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -249,7 +250,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		/*L"Resources/shaders/particlePS.hlsl"*/PSname,	// シェーダファイル名
+		/*L"Resources/shaders/particlePS.hlsl"*/pipelineDesc.PSname,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -293,7 +294,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 		exit(1);
 	}
 
-	int count = renderTargetCount;
+	int count = pipelineDesc.renderTargetCount;
 
 	if (count > 8)
 	{
@@ -319,7 +320,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 	gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
 	//深度バッファに書き込みを行うかどうか
-	if (!isDepthWrite)
+	if (!pipelineDesc.isDepthWrite)
 	{
 		gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	}
@@ -329,7 +330,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 	blenddesc.BlendEnable = true;
 
 
-	switch (blendName)
+	switch (pipelineDesc.blendName)
 	{
 	case GraphicsPipelineTypeName::BlendName::ALPHA:
 		blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
@@ -372,8 +373,8 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 	gpipeline.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 
 	// 頂点レイアウトの設定
-	gpipeline.InputLayout.pInputElementDescs = inputLayout;
-	gpipeline.InputLayout.NumElements = static_cast<UINT>(inputLayoutCount);
+	gpipeline.InputLayout.pInputElementDescs = pipelineDesc.inputLayout;
+	gpipeline.InputLayout.NumElements = static_cast<UINT>(pipelineDesc.inputLayoutCount);
 
 	// 図形の形状設定（三角形）
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
@@ -394,7 +395,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(L
 
 	// ルートシグネチャの設定
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init_1_0(static_cast<UINT>(rootparamsCount), rootparams, 1, &samplerDesc, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	rootSignatureDesc.Init_1_0(static_cast<UINT>(pipelineDesc.rootparamsCount), pipelineDesc.rootparams, 1, &samplerDesc, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> rootSigBlob;
 	// バージョン自動判定のシリアライズ
