@@ -15,6 +15,7 @@ public:
 
 public:
 	void Update();
+	void PreDraw();
 	void Draw();
 private:
 	IScene *scene_ = nullptr;

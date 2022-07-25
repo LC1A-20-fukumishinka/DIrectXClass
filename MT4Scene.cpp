@@ -8,7 +8,11 @@ void MT4Scene::Update()
 {
 }
 
-void MT4Scene::Draw()
+void MT4Scene::PreDraw()
+{
+}
+
+void MT4Scene::MainDraw()
 {
 }
 

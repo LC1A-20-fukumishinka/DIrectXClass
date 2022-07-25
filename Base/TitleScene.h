@@ -14,7 +14,8 @@ class TitleScene : public IScene
 public:
 	void Init() override;
 	void Update() override;
-	void Draw() override;
+	void PreDraw() override;
+	void MainDraw() override;
 	void Finalize() override;
 private:
 

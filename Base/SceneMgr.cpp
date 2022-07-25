@@ -42,10 +42,15 @@ void SceneMgr::Update()
 		nextScene_ = nullptr;
 		scene_->Init();
 	}
-scene_->Update();
+	scene_->Update();
+}
+
+void SceneMgr::PreDraw()
+{
+	scene_->PreDraw();
 }
 
 void SceneMgr::Draw()
 {
-	scene_->Draw();
+	scene_->MainDraw();
 }

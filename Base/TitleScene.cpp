@@ -22,7 +22,11 @@ void TitleScene::Update()
 	debug->Print("Granet", 100, 100, 10);
 }
 
-void TitleScene::Draw()
+void TitleScene::PreDraw()
+{
+}
+
+void TitleScene::MainDraw()
 {
 	debug->DrawAll();
 }
