@@ -33,7 +33,7 @@ public:
 		XMMATRIX bones[MAX_BONES];
 	};
 public:
-	static void CreateGraphicsPipeline();
+	static void FBXCreateGraphicsPipeline();
 	static void SetCamera(Camera *camera) { FbxObject3D::camera = camera; }
 	static void SetDevice();
 public:
@@ -63,6 +63,7 @@ private:
 	ComPtr<ID3D12Resource> constBufferTransform;
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	static ComPtr<ID3D12PipelineState> pipelinestate;
+
 	//定数バッファ(スキン)
 	ComPtr<ID3D12Resource> constBuffSkin;
 private:
