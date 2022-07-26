@@ -5,7 +5,7 @@
 #include "TextureMgr.h"
 #include "SafeDelete.h"
 #include "particleManager.h"
-
+#include "../imgui/ImguiManager.h"
 void Framework::Run()
 {
 	Init();
@@ -36,6 +36,7 @@ void Framework::Init()
 	myDirectX = MyDirectX::Instance();
 	myDirectX->Init();
 
+	ImguiManager::Init(myDirectX->GetDevice(), myDirectX->GetCommandList());
 	FbxLoader::GetInstance()->Initialize();
 
 	Input *input = Input::Instance();
@@ -54,12 +55,12 @@ void Framework::Update()
 	if (Win->loopBreak() || Input::Instance()->Key(DIK_ESCAPE))
 	{
 		isEnd = true;
-		return;
 	}
 	Win->msgCheck();
 	Input::Instance()->Update();
 
 
+	ImguiManager::PreDraw();
 }
 
 void Framework::Finalize()
@@ -78,5 +79,5 @@ void Framework::Finalize()
 
 void Framework::Draw()
 {
-
+ImguiManager::Draw();
 }

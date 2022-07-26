@@ -22,7 +22,6 @@ void Game::Update()
 {
 	Framework::Update();
 	sceneMgr->Update();
-
 }
 
 
@@ -32,6 +31,7 @@ void Game::Draw()
 
 	myDirectX->PreDraw();
 	sceneMgr->Draw();
+	Framework::Draw();
 	myDirectX->PostDraw();
 }
 

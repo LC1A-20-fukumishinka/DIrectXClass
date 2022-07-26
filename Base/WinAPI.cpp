@@ -1,5 +1,9 @@
 #include "WinAPI.h"
 #include "MyDirectX.h"
+#include "../imgui/imgui_impl_win32.h"
+
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
+
 WinAPI::WinAPI()
 {
 }
@@ -89,5 +93,7 @@ LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		PostQuitMessage(0);//OSに対して、アプリの修了を伝える
 		return 0;
 	}
+
+	ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
 	return DefWindowProc(hwnd, msg, wparam, lparam);//標準の処理を行う
 }

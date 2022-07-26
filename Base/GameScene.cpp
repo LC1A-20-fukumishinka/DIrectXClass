@@ -17,6 +17,7 @@
 #include "PostGBPipeline.h"
 #include "postMosaicPipeline.h"
 #include "PostMonochromePipeline.h"
+#include "../imgui/ImguiManager.h"
 using namespace FukuMath;
 using namespace DirectX;
 using namespace std;
@@ -203,11 +204,14 @@ void GameScene::Update()
 		isGameClear = true;
 		cam_->ClearAnimationStart(player_->GetPos());
 	}
+
+	ImGui::Begin("Test");
+	ImGui::SetWindowSize(ImVec2(1000, 1000), ImGuiCond_::ImGuiCond_FirstUseEver);
+	ImGui::End();
 }
 
 void GameScene::PreDraw()
 {
-
 	shadowRenderTarget_->PreDrawScene();
 	player_->ShadowDraw();
 	shadowRenderTarget_->PostDrawScene();
