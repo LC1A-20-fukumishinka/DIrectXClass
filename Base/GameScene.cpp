@@ -111,6 +111,7 @@ void GameScene::Init()
 
 	shadowCam_->Init(player_->GetPos());
 
+
 	player_->SetShadowCamera(shadowCam_->GetCamera());
 
 	postTest_ = std::make_unique<PostEffect>();
@@ -125,8 +126,6 @@ void GameScene::Init()
 	MakeFlag(a, Vector3(0, 1, 0), 2.0f);
 	MakeFlag(a, Vector3(1, 0, 0), 2.0f);
 	MakeFlag(a, Vector3(0, -1, 0), 2.0f);
-
-
 
 
 
@@ -191,7 +190,6 @@ void GameScene::Update()
 	cam_->SetBasePlanet(player_->GetBasePlanet());
 	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec());
 
-	shadowCam_->Update(player_->GetPos());
 
 	for (auto &flag : testFlag_)
 	{
@@ -205,9 +203,22 @@ void GameScene::Update()
 		cam_->ClearAnimationStart(player_->GetPos());
 	}
 
-	ImGui::Begin("Test");
-	ImGui::SetWindowSize(ImVec2(1000, 1000), ImGuiCond_::ImGuiCond_FirstUseEver);
+	ImGui::Begin("light");
+	ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_::ImGuiCond_FirstUseEver);
+
+	Vector3 angle = light_->GetLightDir();
+	float directionalLightAngle[3] = { angle.x,angle.y ,angle.z };
+	ImGui::SliderFloat3("Directional", directionalLightAngle, -1.0f, 1.0f);
+
+	angle = Vector3(directionalLightAngle[0], directionalLightAngle[1], directionalLightAngle[2]);
+
+	light_->SetLightDir(XMLoadFloat3(&angle));
 	ImGui::End();
+
+	shadowCam_->SetAngle(angle);
+
+	shadowCam_->Update(player_->GetPos());
+	lightGroup_->Update();
 }
 
 void GameScene::PreDraw()
@@ -232,6 +243,13 @@ void GameScene::PreDraw()
 
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
+
+	ImGui::Begin("SimpleEffect");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	ImGui::Checkbox("GB", &isGB_);
+	ImGui::Checkbox("Monocrome", &isMono_);
+	ImGui::Checkbox("Mosaic", &isMosaic_);
+	ImGui::End();
 	if (isMosaic_)
 	{
 		vector<int> textureNum;

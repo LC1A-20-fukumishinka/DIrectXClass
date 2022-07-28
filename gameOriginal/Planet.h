@@ -1,5 +1,5 @@
 #pragma once
-#include "../PlanetObject.h"
+#include "PlanetObject.h"
 #include "Model.h"
 #include "Vector3.h"
 #include <memory>

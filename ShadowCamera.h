@@ -14,12 +14,13 @@ public:
 	void Finalize();
 
 	Camera *GetCamera();
+	void SetAngle(const Vector3 &angle);
 private:
-	std::unique_ptr<Camera> cam;
-	std::weak_ptr<GravityPlayer> player;
+	std::unique_ptr<Camera> cam_;
+	std::weak_ptr<GravityPlayer> player_;
 
-	Vector3 camAngle;
+	Vector3 camAngle_;
 
-	float dist;
+	float dist_;
 };
 
