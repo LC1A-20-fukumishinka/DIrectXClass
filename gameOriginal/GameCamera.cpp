@@ -109,7 +109,7 @@ void GameCamera::ClearAnimationStart(const Vector3 &playerPos)
 	isClearMode_ = true;
 
 	IsAnimationOn();
-	StartCameraAnimation(true, 30);
+	StartCameraAnimation(true, 120);
 }
 
 void GameCamera::NormalUpdate(const Vector3 &playerPos)
@@ -221,11 +221,10 @@ void GameCamera::GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec)
 
 void GameCamera::ClearCameraUpdate()
 {
-	//XMVECTOR rotQ;
-	//float deg = degree;
-	//XMQuaternionToAxisAngle(&rotQ, &deg, YVec);
-	//nextCamUpRot = XMQuaternionMultiply(nextCamUpRot, rotQ)
-	camRot(XMFLOAT2(-0.2f, 0));
+	float t = (1.0f - CameraAnimationEase.Read());
+
+	float rotRate = 0.15f + (t * 4.0f);
+	camRot(XMFLOAT2(-rotRate, 0));
 }
 
 void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
@@ -267,7 +266,7 @@ void GameCamera::camRot(DirectX::XMFLOAT2 rot)
 {
 	XMVECTOR rotQ = XMQuaternionIdentity();
 
-	rotQ = XMQuaternionRotationAxis(XMLoadFloat3(&cam.up), rot.x * RotRate);
+	rotQ = XMQuaternionRotationAxis(XMVector3Rotate(YVec, nextCamUpRot), rot.x * RotRate);
 	//targetからnextPosの視点座標までのベクトルを計算
 	XMVECTOR nextVec = XMLoadFloat3(&(nextEyePos - nextTargetPos));
 	//回転させる
