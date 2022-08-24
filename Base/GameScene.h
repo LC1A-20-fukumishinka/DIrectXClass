@@ -20,6 +20,11 @@
 #include "PostEffect.h"
 #include "PostBasePipeline.h"
 #include "../gameOriginal/Flag.h"
+#include "../gameOriginal/Block.h"
+#include "../gameOriginal/TitlePostEffect.h"
+#include "Sprite.h"
+#include "../Box3D.h"
+#include "../InformationBoard.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -30,7 +35,29 @@ public:
 	void MainDraw() override;
 	void Finalize() override;
 private:
+	//リスタート関数
+	void Restart();
+
+	//それに付随するそれぞれのリセット関数
+	void lightsRestart();
+	void ObjectRestart();
 	void MovePlanet();
+	void ImguiUpdate();
+
+private:
+
+	enum ClearAnimationStatus
+	{
+		STANDBY,
+		STOP,
+		MOVECAM,
+		SPAWNPLANET,
+		RETURNCAM,
+	};
+	/// <summary>
+	/// 惑星群出現アニメーション全体フロー（とりあえずさっさと作れ関数化）
+	/// </summary>
+	void AnimationTestUpdate();
 private:
 
 	std::shared_ptr<Planet> star;
@@ -58,20 +85,29 @@ private:
 	std::unique_ptr<FbxObject3D> temple_;
 	std::unique_ptr<GravityPlayer> player_;
 	std::unique_ptr<PostEffect> postTest_;
-
+	TitlePostEffect titlePostEffect_;
+	std::unique_ptr<Sprite> clearText_;
 	PostBasePipeline NormalDrawPipeline_;
 
 	std::list<Flag> testFlag_;
+	std::list<Block> testBlock_;
+
+
+	InformationBoard testBoard_;
+	Sprite Dark_;
+	//BoxObj3D box;
 	bool isPause_ = false;
 	bool isGB_ = false;
 	bool isMono_ = false;
 	bool isMosaic_ = false;
 	int DrawTexture_ = -1;
 
+	ClearAnimationStatus clearStatus_ = STANDBY;
 private:
-	void MakeFlag(std::weak_ptr<Planet> base,Vector3 angle, float scale);
+	void MakeFlag(std::weak_ptr<Planet> base, Vector3 angle, float scale);
 
 	int GetFlagCount();
 
-	bool isGameClear = false;
+	bool isGameClear_ = false;
+	bool isGameTitle_ = true;
 };

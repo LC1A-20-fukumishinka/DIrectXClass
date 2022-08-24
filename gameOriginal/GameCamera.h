@@ -30,13 +30,46 @@ public:
 	void StartCameraAnimation(bool isTargetEase, int EaseTimer);
 
 	void ClearAnimationStart(const Vector3 &playerPos);
+
+
+	void TitleAnimationStart();
+	/// <summary>
+	/// クリアからゲームに遷移
+	/// </summary>
+	void ClearToIngme();
+
+	/// <summary>
+	/// タイトルからゲームに遷移
+	/// </summary>
+	void TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZVec);
+
+	/// <summary>
+	/// クリア時にカメラが向く座標
+	/// </summary>
+	void SetNextPlantPos(const Vector3 pos);
+
+	/// <summary>
+	/// アニメーションが終了したかどうか
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsAnimationEnd();
 private:
-	void NormalUpdate(const Vector3 &playerPos);
+	static const float sTitleCameraDistance;
+private:
 	void CameraAnimationUpdate();
-	void LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
-	void GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec);
-	void ClearCameraUpdate();
 	void IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
+private://状況別更新処理
+	//クリア時カメラ挙動処理
+	void ClearCameraUpdate();
+	//通常時のカメラ挙動
+	void NormalUpdate(const Vector3 &playerPos);
+	//注目状態のカメラ挙動
+	void LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
+	//掴み状態のカメラ挙動
+	void GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec);
+	//タイトル時のカメラ挙動
+	void TitleUpdate();
+
 private:
 	void camRot(DirectX::XMFLOAT2 rot);
 private:
@@ -50,11 +83,14 @@ private:
 	DirectX::XMVECTOR oldCamUpRot = {};
 	std::weak_ptr<Planet> planet;
 	bool isChangeBasePlanet = false;
+	//次の惑星の座標
+	Vector3 nextPlanetPos_ = {};
 private://挙動のイージング
 	bool isChangeBasePlanetAnimation;
 	Easing CameraAnimationEase;
 	bool isTargetEase = false;
 
 	bool isClearMode_ = false;
+	bool isTitleMode_ = true;
 };
 

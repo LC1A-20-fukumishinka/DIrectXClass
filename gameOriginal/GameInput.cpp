@@ -20,10 +20,13 @@ std::unique_ptr<GameInput> &GameInput::Instance()
 }
 void GameInput::Update()
 {
-	isOldGrab = isGrab;
-	isOldLockOn = isLockOn;
-	isGrab = Input::Instance()->Key(DIK_X) || Input::Instance()->RTrigger();
-	isLockOn = Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
+	if (isControl_)
+	{
+		isOldGrab = isGrab;
+		isOldLockOn = isLockOn;
+		isGrab = Input::Instance()->Key(DIK_X) || Input::Instance()->RTrigger();
+		isLockOn = Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
+	}
 }
 bool GameInput::ATrigger()
 {
@@ -32,22 +35,26 @@ bool GameInput::ATrigger()
 
 bool GameInput::A()
 {
-	return Input::Instance()->Key(DIK_Z) || Input::Instance()->Button(XINPUT_GAMEPAD_A);
+	return Input::Instance()->Key(DIK_Z) || Input::Instance()->Button(XINPUT_GAMEPAD_A) && isControl_;
 }
 
 bool GameInput::X()
 {
-	return Input::Instance()->Key(DIK_C) || Input::Instance()->Button(XINPUT_GAMEPAD_X);
+	return Input::Instance()->Key(DIK_C) || Input::Instance()->Button(XINPUT_GAMEPAD_X) && isControl_;
 }
 
 bool GameInput::XTrigger()
 {
-	return Input::Instance()->KeyTrigger(DIK_C) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_X);
+	return Input::Instance()->KeyTrigger(DIK_C) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_X) && isControl_;
 }
 
 DirectX::XMFLOAT2 GameInput::LStick(bool YReverse, bool XReverse)
 {
 	DirectX::XMFLOAT2 output = Input::Instance()->LStick();
+	if (!isControl_)
+	{
+		output = DirectX::XMFLOAT2();
+	}
 	if (YReverse)
 	{
 		output.y = -output.y;
@@ -62,6 +69,11 @@ DirectX::XMFLOAT2 GameInput::LStick(bool YReverse, bool XReverse)
 DirectX::XMFLOAT2 GameInput::RStick(bool YReverse, bool XReverse)
 {
 	DirectX::XMFLOAT2 output = Input::Instance()->RStick();
+
+	if (!isControl_)
+	{
+		output = DirectX::XMFLOAT2();
+	}
 	if (YReverse)
 	{
 		output.y = -output.y;
@@ -75,45 +87,50 @@ DirectX::XMFLOAT2 GameInput::RStick(bool YReverse, bool XReverse)
 
 bool GameInput::B()
 {
-	return Input::Instance()->KeyTrigger(DIK_X) || Input::Instance()->Button(XINPUT_GAMEPAD_B);
+	return Input::Instance()->KeyTrigger(DIK_X) || Input::Instance()->Button(XINPUT_GAMEPAD_B) && isControl_;
 }
 
 bool GameInput::BTrigger()
 {
-	return Input::Instance()->KeyTrigger(DIK_X) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_B);
+	return Input::Instance()->KeyTrigger(DIK_X) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_B) && isControl_;
 }
 
 bool GameInput::GrabInput()
 {
-	return isGrab;
+	return isGrab && isControl_;
 }
 
 bool GameInput::GrabTrigger()
 {
-	return (isGrab && !isOldGrab);
+	return (isGrab && !isOldGrab) && isControl_;
 }
 
 bool GameInput::GrabRelease()
 {
-	return (!isGrab && isOldGrab);
+	return (!isGrab && isOldGrab) && isControl_;
 }
 
 bool GameInput::LockOnInput()
 {
-	return isLockOn;
+	return isLockOn && isControl_;
 }
 
 bool GameInput::LockOnTrigger()
 {
-	return (isLockOn && !isOldLockOn);
+	return (isLockOn && !isOldLockOn) && isControl_;
 }
 
 bool GameInput::LockOnRelease()
 {
-	return (!isLockOn && isOldLockOn);
+	return (!isLockOn && isOldLockOn) && isControl_;
 }
 
 bool GameInput::Pause()
 {
-	return Input::Instance()->KeyTrigger(DIK_Q) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_START);
+	return Input::Instance()->KeyTrigger(DIK_Q) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_START) && isControl_;
+}
+
+void GameInput::SetIsControll(bool ControllFlag)
+{
+	isControl_ = ControllFlag;
 }

@@ -16,10 +16,10 @@ ObjectOnSphere::~ObjectOnSphere()
 
 void ObjectOnSphere::Init(std::weak_ptr<Planet> basePlanet, Vector3 angle, float scale)
 {
-	upVec_ = angle;
+	upVec_ = angle;//オブジェクトの方向を設定
 	worldScale_ = scale;
-	upVec_.normalize();
-
+	upVec_.normalize();//一応正規化
+	frontVec_ = Vector3(upVec_.y, -upVec_.x, 0.0f).cross(upVec_);
 	basePlanet_ = basePlanet;
 	object_.Init();
 
@@ -30,13 +30,14 @@ void ObjectOnSphere::Init(std::weak_ptr<Planet> basePlanet, Vector3 angle, float
 
 	if (!basePlanet_.expired())
 	{
-		Vector3 pos = {};
-
-		object_.SetParent(basePlanet_.lock()->GetObject3d());
-		pos += (upVec_ * 1.0f);
+		//惑星の中心から
+		Vector3 pos = basePlanet_.lock()->GetPos();
+		//指定した方向(upVec)に惑星の半径分移動させた場所が
+		pos += (upVec_ * basePlanet_.lock()->GetStartScale());
+		//座標になる
 		object_.SetPosition(pos);
 		Vector3 identity = { 1.0f,1.0f ,1.0f };
-		object_.SetScale(identity * (worldScale_ / basePlanet_.lock()->GetScale()));
+		object_.SetScale(identity * (worldScale_));
 	}
 }
 
@@ -52,6 +53,8 @@ void ObjectOnSphere::Draw()
 {
 	object_.Update();
 	//後でオリジナルのシェーダーを作れ
+
+	if(!basePlanet_.lock()->GetIsSpawn()) return;
 	object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
@@ -73,6 +76,41 @@ float ObjectOnSphere::GetWorldScale()
 {
 	return worldScale_;
 }
+
+DirectX::XMVECTOR ObjectOnSphere::GetRotationQ()
+{
+	return object_.GetRotQuaternion();
+}
+
+bool ObjectOnSphere::GetIsPlanetSpawn()
+{
+	return basePlanet_.lock()->GetIsSpawn();
+}
+
+//void ObjectOnSphere::Move(Vector3 MoveVec)
+//{
+//	//現在位置から
+//	Vector3 pos = GetWorldPos();
+//
+//	//移動量を加算して移動後の位置を作る
+//	pos += MoveVec;
+//
+//	//現在位置 - 惑星の位置 = 惑星からの相対位置
+//	pos -= basePlanet_.lock()->GetPos();
+//
+//	//相対位置から惑星からの方向を取得(ついでに上方向修正)
+//	upVec_ = pos.normalize();
+//	//方向と惑星の半径を使って惑星表面の座標に補正
+//	pos = pos.normalize() * basePlanet_.lock()->GetScale();
+//
+//	//惑星の座標を足して相対座標からワールド座標にする
+//	pos += basePlanet_.lock()->GetPos();
+//	object_.SetPosition(pos);
+//
+//
+//	upVec_.normalize();
+//	pos += (upVec_ * basePlanet_.lock()->GetScale());
+//}
 
 void ObjectOnSphere::SetCamera(Camera *camera)
 {

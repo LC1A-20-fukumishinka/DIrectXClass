@@ -30,6 +30,7 @@ public:
 
 	/// <summary>
 	/// 法線の計算
+	/// ex)時計回りで手前ベクトル
 	/// </summary>
 	void ComputeNormal();
 };
@@ -42,7 +43,7 @@ struct Ray
 	DirectX::XMVECTOR dir = { 1.0f, 0.0f ,0.0f ,0.0f };
 };
 
-struct Box
+struct Box3D
 {
 	//上(Top), 左(Left), 近(Near)
 	DirectX::XMVECTOR TLN;

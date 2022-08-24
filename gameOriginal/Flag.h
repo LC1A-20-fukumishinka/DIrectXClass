@@ -14,7 +14,7 @@ public:
 
 	void DrawShadow();
 
-protected://staic•Ï”
+private://staic•Ï”
 	static std::unique_ptr<Model> sFlagModel;
 	static Camera *sShadowCamera;
 public://staticŠÖ”
@@ -37,11 +37,11 @@ public:
 	bool CollisionPlayer(float radius, const Vector3 pos);
 
 	bool GetIsDraw();
+
+	void Reset();
 private://ƒƒ“ƒo•Ï”
 
 	Object3D shadowObject_;
-
-	std::weak_ptr<Planet> basePlanet_;
 
 	float worldScale_ = 1.0f;
 

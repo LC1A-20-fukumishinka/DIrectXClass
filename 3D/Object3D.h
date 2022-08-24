@@ -51,7 +51,15 @@ public://セッタ
 	virtual void SetPosition(DirectX::XMFLOAT3 pos);
 	virtual void SetColor(DirectX::XMFLOAT4 color);
 	virtual void SetScale(DirectX::XMFLOAT3 scale);
+	/// <summary>
+	/// 回転を各軸回転で設定する
+	/// </summary>
+	/// <param name="rot">Z->X->Y軸順での各軸回転</param>
 	virtual void SetRotation(DirectX::XMFLOAT3 rot);
+	/// <summary>
+	/// 回転をquaternionで設定する
+	/// </summary>
+	/// <param name="quaternion">回転quaternion</param>
 	virtual void SetRotation(DirectX::XMVECTOR quaternion);
 	virtual void AddRotation(DirectX::XMFLOAT3 rot);
 	virtual void AddRotation(DirectX::XMVECTOR rot);
@@ -100,8 +108,7 @@ protected:
 	//ワールド行列
 	DirectX::XMMATRIX matWorld;
 
-	void UpdateVector
-	();
+	void UpdateVector();
 public://あったほうがいいかもね関数
 	/// <summary>
 	/// 親子関係を分離する

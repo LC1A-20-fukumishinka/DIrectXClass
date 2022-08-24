@@ -26,7 +26,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
-	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), true);
 }
 
 void PlanetManager::Update()
@@ -100,7 +100,7 @@ std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
 	if (getPlanetNum < planets.size())
 	{
 		int planetNum = 0;
-		//全部の惑星の近い惑星をとる
+
 		for (auto &e : planets)
 		{
 			//惑星の番号が一致したらその惑星を返す
@@ -121,13 +121,66 @@ std::shared_ptr<Planet> PlanetManager::GetBasePlanet()
 	return *planets.begin();
 }
 
-void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color)
+void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, bool isSpawn)
 {
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();
-	planet->Init(pos, size, color);
+	planet->Init(pos, size, color, isSpawn);
 	int hoge = 0;
 	planets.push_back(planet);
+}
+
+void PlanetManager::Reset()
+{
+	for (auto &e : planets)
+	{
+		e->Reset();
+	}
+}
+
+void PlanetManager::AllSpawn()
+{
+	//アニメーション中フラグをオンにする
+	isSpawnAnimation_ = true;
+
+	for (auto &e : planets)
+	{
+		//現在存在しない惑星を選択
+		if (!e->GetIsSpawn())
+		{
+			e->SpawnAnimationStart();
+		}
+	}
+}
+
+bool PlanetManager::SpawnAnimationEnd()
+{
+	//アニメーション中かどうかを確認
+	bool isAnimationEnd = isSpawnAnimation_;
+
+	//アニメーション中かつ
+	if (isAnimationEnd)
+	{
+		for (auto &e : planets)
+		{
+			//アニメーションが終了していたらtrue
+			isAnimationEnd = e->GetIsSpawnAnimationEnd();
+			if (isAnimationEnd)
+			{
+				break;
+			}
+
+		}
+	}
+
+	//丁度アニメーションが終了していたら
+	if (isAnimationEnd)
+	{
+		//アニメーション中であるフラグをオフにする
+		isSpawnAnimation_ = false;
+	}
+
+	return isAnimationEnd;
 }
 
 void PlanetManager::SetCamera(Camera *cam)

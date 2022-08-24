@@ -17,6 +17,8 @@ public:
 	/// </summary>
 	void Draw(PipeClass::PipelineSet *pipelineSet, const std::vector<int> &textureHandles);
 
+	void SetDrawBuffer(PipeClass::PipelineSet *pipelineSet, const std::vector<int> &textureHandles);
+	void DrawCommand();
 	/// <summary>
 	/// ‰Šú‰»
 	/// </summary>

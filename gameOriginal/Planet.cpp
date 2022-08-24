@@ -35,17 +35,24 @@ Planet::~Planet()
 {
 }
 
-void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color)
+void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, bool Spawn)
 {
-	SetScale(size);
-	this->pos = pos;
-	object->SetPosition(pos);
-	object->SetColor(color);
+	startPos_ = pos;
+	startScale_ = size;
+	startColor_ = color;
+	startIsSpawn_ = Spawn;
+	SpawnAnimationEase_.Init(20);
+	Reset();
 }
 
 void Planet::Update()
 {
-	if (!isGrab)
+	if (isSpawnAnimation_)
+	{
+		SpawnAnimationUpdate();
+	}
+
+	if (!isGrab_)
 	{
 		NormalUpdate();
 	}
@@ -79,6 +86,40 @@ void Planet::GrabUpdate()
 	object->SetShadowTextureNum(shadowTextureNum);
 }
 
+void Planet::SpawnAnimationUpdate()
+{
+	//設定した通常のサイズまで拡大していく
+		//イージングしていく
+	float rate = SpawnAnimationEase_.Do(Easing::EaseMove::Out, Easing::Type::Back);
+
+	//いーじんぐの値を使ってスケーリング
+	float scaleRate = rate * startScale_;
+
+	//用意したスケールをobjectに適用
+	SetScale(scaleRate);
+
+
+	//拡大の演出が終了したら存在フラグをオンにする
+		//イージングの処理が全て終了したら
+	if (SpawnAnimationEase_.IsEnd())
+	{
+		//アニメーションをするフラグをオフに
+		isSpawnAnimation_ = false;
+		//生存フラグをオンに
+		isSpawn_ = true;
+	}
+
+}
+
+void Planet::SpawnAnimationStart()
+{
+	//アニメーション開始フラグをオンにする
+	isSpawnAnimation_ = true;
+//アニメーション開始時に設定する必要があるものはここに記述する
+	//イージングの初期化処理(またリセット処理)
+	SpawnAnimationEase_.Reset();
+}
+
 void Planet::Draw()
 {
 	object->Update();
@@ -105,6 +146,21 @@ float Planet::GetScale()
 	return scale;
 }
 
+float Planet::GetStartScale()
+{
+	return startScale_;
+}
+
+bool Planet::GetIsSpawn()
+{
+	return isSpawn_;
+}
+
+bool Planet::GetIsSpawnAnimationEnd()
+{
+	return SpawnAnimationEase_.IsEnd();
+}
+
 void Planet::SetLight(LightGroup *lights)
 {
 	Planet::lights = lights;
@@ -127,22 +183,22 @@ void Planet::SetShadowTexture(int shadowTextureNum)
 
 void Planet::GrabOn()
 {
-	isGrab = true;
+	isGrab_ = true;
 }
 
 void Planet::ReleaseGrab()
 {
-	isGrab = false;
+	isGrab_ = false;
 }
 
 void Planet::OnPlayer()
 {
-	isBase = true;
+	isBase_ = true;
 }
 
 void Planet::ReleaseBase()
 {
-	isBase = false;
+	isBase_ = false;
 }
 
 void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX)
@@ -153,5 +209,23 @@ void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XM
 
 bool Planet::GetBase()
 {
-	return isBase;
+	return isBase_;
+}
+
+void Planet::Reset()
+{
+	if (startIsSpawn_)
+	{
+		SetScale(startScale_);
+		isSpawn_ = true;
+	}
+	else
+	{
+		SetScale(0.0f);
+		isSpawn_ = false;
+		isSpawnAnimation_ = false;
+	}
+	this->pos = startPos_;
+	object->SetPosition(startPos_);
+	object->SetColor(startColor_);
 }

@@ -65,5 +65,5 @@ public:
 	/// <returns></returns>
 	static bool CheckRay2Sphere(const Ray &ray, const Sphere &sphere, float *distance = nullptr, DirectX::XMVECTOR *inter = nullptr);
 
-	static bool CheckAABB(const Box &box1, const Box &box2);
+	static bool CheckAABB(const Box3D &box1, const Box3D &box2);
 };

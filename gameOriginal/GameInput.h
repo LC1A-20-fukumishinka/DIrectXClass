@@ -35,6 +35,12 @@ public:
 	bool LockOnRelease();
 
 	bool Pause();
+
+	/// <summary>
+	/// 操作全部オンオフ
+	/// </summary>
+	/// <param name="ControllFlag">フラグ</param>
+	void SetIsControll(bool ControllFlag);
 private:
 	static bool isMakeInstance;
 private:
@@ -42,5 +48,6 @@ private:
 	bool isOldGrab = false;
 	bool isLockOn = false;
 	bool isOldLockOn = false;
+	bool isControl_ = true;
 };
 

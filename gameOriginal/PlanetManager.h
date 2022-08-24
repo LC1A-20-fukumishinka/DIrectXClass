@@ -35,8 +35,20 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::shared_ptr<Planet> GetBasePlanet();
-	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color);
+	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, bool isSpawn = true);
 
+	void Reset();
+
+	/// <summary>
+	/// 現在いない状態になっている惑星を出現させる
+	/// </summary>
+	void AllSpawn();
+
+	/// <summary>
+	/// アニメーションが終了した瞬間のみtrueを返す
+	/// </summary>
+	/// <returns>アニメーションが終了したフラグ</returns>
+	bool SpawnAnimationEnd();
 public:
 	void SetCamera(Camera *cam);
 	void SetShadowCamera(Camera *cam);
@@ -44,6 +56,9 @@ public:
 private:
 	std::list<std::shared_ptr<Planet>> planets;
 
+	bool isSpawnAnimation_ = false;
+
 	static bool isMakeInstance;
+
 };
 

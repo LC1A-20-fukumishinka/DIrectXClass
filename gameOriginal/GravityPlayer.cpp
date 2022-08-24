@@ -6,6 +6,7 @@
 #include "Planet.h"
 #include "gameConstData.h"
 #include "../ShadowPipeline.h"
+#include "../Collision/Collision.h"
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -25,6 +26,7 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 	shadowObject.SetPosition(Vector3(YVec));
 	SetBasePlanet(planet);
 
+	localHeight = 0;
 	status = PlayerStatus::STAND;
 
 	if (!basePlanet.expired())
@@ -95,7 +97,7 @@ void GravityPlayer::Move(bool isSetAngle)
 void GravityPlayer::FloorMove(bool isSetAngle)
 {
 	XMFLOAT2 stick = GameInput::Instance()->LStick();
-	
+
 #pragma region jump
 	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
 	{
@@ -360,7 +362,7 @@ void GravityPlayer::GrabUpdate()
 	const float moveLengthSpeed = 0.1f;
 	if (GameInput::Instance()->B())
 	{
-	baseLength -= moveLengthSpeed;
+		baseLength -= moveLengthSpeed;
 	}
 
 	if (GameInput::Instance()->X())
@@ -403,4 +405,41 @@ void GravityPlayer::GrabUpdate()
 	grabPlanet.lock()->SetPos(planetPos);
 	grabPlanet.lock()->SetGrabRotateAngle(drawObject.GetUpVec(), drawObject.GetRightVec());
 
+}
+
+void GravityPlayer::BlockCollision(const std::vector<Triangle> &boxPlanes)
+{
+	//プレイヤーの落下のray
+	XMVECTOR downVec = -drawObject.GetUpVec();
+	Ray playerDownVec;
+	playerDownVec.dir = downVec;
+	playerDownVec.start = XMLoadFloat3(&(drawObject.GetPosition() + (drawObject.GetUpVec() * 0.5f)));
+
+	for (auto &e : boxPlanes)
+	{
+		float distance = 1000;
+		DirectX::XMVECTOR onPlayerPos;
+		bool isOnPlayer = false;
+		//乗る判定
+		//法線方向がプレイヤーの重力方向と内積をとって１に近いかどうかを判定
+		if (XMVector3Dot(downVec, -e.normal).m128_f32[0] >= 0.7f)
+		{
+		//例と足場の接触判定
+			isOnPlayer = Collision::CheckRay2Triangle(playerDownVec, e, &distance, &onPlayerPos);
+		}
+
+		if (isOnPlayer)
+		{
+			int hoge = 1;
+		}
+		if (isOnPlayer && distance <= 1.1f)
+		{
+			XMVECTOR identity = {2.0f,2.0f ,2.0f ,0.0f };
+			onPlayerPos += identity * drawObject.GetUpVec();
+			drawObject.SetPosition(Vector3(onPlayerPos));
+			jumpSpeed = 0.0f;
+		}
+		////押し返す判定
+		//Collision::CheckSphere2Triangle();
+	}
 }

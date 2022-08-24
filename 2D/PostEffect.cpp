@@ -18,7 +18,12 @@ PostEffect::~PostEffect()
 
 void PostEffect::Draw(PipeClass::PipelineSet *pipelineSet, const std::vector<int> &textureHandles)
 {
+	SetDrawBuffer(pipelineSet, textureHandles);
+	DrawCommand();
+}
 
+void PostEffect::SetDrawBuffer(PipeClass::PipelineSet *pipelineSet, const std::vector<int> &textureHandles)
+{
 	for (auto &textureHandle : textureHandles)
 	{
 		if (!TextureMgr::Instance()->CheckHandle(textureHandle))
@@ -63,6 +68,11 @@ void PostEffect::Draw(PipeClass::PipelineSet *pipelineSet, const std::vector<int
 				textureHandle,
 				myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)));
 	}
+}
+
+void PostEffect::DrawCommand()
+{
+	MyDirectX *myD = MyDirectX::Instance();
 	//•`‰æƒRƒ}ƒ“ƒh
 	myD->GetCommandList()->DrawInstanced(4, 1, 0, 0);
 }

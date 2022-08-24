@@ -2,7 +2,6 @@
 #include "TextureMgr.h"
 #include "MyDirectX.h"
 #include "SpriteCommon.h"
-
 Sprite::Sprite()
 {
 	anchorpoint = { 0.5f, 0.5f };

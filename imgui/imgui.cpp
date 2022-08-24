@@ -4141,7 +4141,7 @@ void ImGui::UpdateMouseWheel()
 {
     ImGuiContext& g = *GImGui;
 
-    // Reset the locked window if we move the mouse or after the timer elapses
+    // ClearToIngme the locked window if we move the mouse or after the timer elapses
     if (g.WheelingWindow != NULL)
     {
         g.WheelingWindowTimer -= g.IO.DeltaTime;
@@ -9570,7 +9570,7 @@ ImVec2 ImGui::FindBestWindowPosForPopupEx(const ImVec2& ref_pos, const ImVec2& s
     //GetForegroundDrawList()->AddRect(r_avoid.Min, r_avoid.Max, IM_COL32(255,0,0,255));
     //GetForegroundDrawList()->AddRect(r_outer.Min, r_outer.Max, IM_COL32(0,255,0,255));
 
-    // Combo Box policy (we want a connecting edge)
+    // Combo Box3D policy (we want a connecting edge)
     if (policy == ImGuiPopupPositionPolicy_ComboBox)
     {
         const ImGuiDir dir_prefered_order[ImGuiDir_COUNT] = { ImGuiDir_Down, ImGuiDir_Right, ImGuiDir_Left, ImGuiDir_Up };

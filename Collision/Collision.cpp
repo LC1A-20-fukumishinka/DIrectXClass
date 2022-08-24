@@ -278,7 +278,7 @@ bool Collision::CheckRay2Sphere(const Ray &ray, const Sphere &sphere, float *dis
 	return true;
 }
 
-bool Collision::CheckAABB(const Box &box1, const Box &box2)
+bool Collision::CheckAABB(const Box3D &box1, const Box3D &box2)
 {
 	if (box1.TLN.m128_f32[0] <= box2.BRF.m128_f32[0] &&
 		box2.TLN.m128_f32[0] <= box1.BRF.m128_f32[0] &&

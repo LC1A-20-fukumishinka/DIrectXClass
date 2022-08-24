@@ -127,6 +127,7 @@ bool ParticleManager::InitializeGraphicsPipeline()
 	}
 
 	// 頂点レイアウト
+
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 		{ // xy座標(1行で書いたほうが見やすい)
 			"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,

@@ -3,6 +3,7 @@
 #include "Vector3.h"
 #include "Model.h"
 #include <memory>
+#include "../Collision/CollisionPrimitive.h"
 class Planet;
 
 enum class PlayerStatus
@@ -75,6 +76,8 @@ public://˜f¯ü‚è‚Ìˆ—
 
 	//’Í‚ñ‚Å‚¢‚éÛ‚ÌXVˆ—‚Ğ‚å‚Á‚Æ‚µ‚½‚ç—v‚ç‚È‚¢‚©‚à
 	void GrabUpdate();
+
+	void BlockCollision(const std::vector<Triangle> &boxPlanes);
 private:
 	Vector3 pos;
 	Vector3 rotation;

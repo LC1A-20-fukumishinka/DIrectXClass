@@ -12,7 +12,7 @@ Flag::Flag()
 	if (!sFlagModel)
 	{
 		sFlagModel = std::make_unique<Model>();
-		sFlagModel->CreateModel("chr_sword");
+		sFlagModel->CreateModel("Flag");
 	}
 }
 
@@ -74,5 +74,10 @@ bool Flag::CollisionPlayer(float radius, const Vector3 pos)
 
 bool Flag::GetIsDraw()
 {
-	return isDraw_;
+	return isDraw_ && ObjectOnSphere::GetIsPlanetSpawn();
+}
+
+void Flag::Reset()
+{
+	isDraw_ = true;
 }

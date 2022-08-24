@@ -5,24 +5,33 @@
 #include "GameInput.h"
 #include <algorithm>
 #include "Planet.h"
+#include "DirectInput.h"
 using namespace FukuMath;
 using namespace GameDatas;
 using namespace DirectX;
+
+const float GameCamera::sTitleCameraDistance = 200.0f;
 void GameCamera::Init()
 {
 	cam.Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
 	CameraAnimationEase.Init(60);
 
 	nextEyePos = cam.GetEye();
+	nextCamUpRot = XMQuaternionIdentity();
 }
 
 void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
 {
-	//if (GameInput::Instance()->BTrigger())
-	//{
-	//	ClearAnimationStart(playerPos);
-	//}
-	if (isClearMode_)
+	if (Input::Instance()->KeyTrigger(DIK_0))
+	{
+		TitleAnimationStart();
+	}
+
+	if (isTitleMode_)
+	{
+		TitleUpdate();
+	}
+	else if (isClearMode_)
 	{
 		ClearCameraUpdate();
 	}
@@ -35,7 +44,7 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 	{
 		CameraAnimationUpdate();
 	}
-	else if(!isChangeBasePlanet)
+	else if (!isChangeBasePlanet)
 	{
 		//次の対象の場所に即移動する
 		cam.SetEye(nextEyePos);
@@ -76,40 +85,85 @@ void GameCamera::SetBasePlanet(const std::weak_ptr<Planet> planet)
 	this->planet = planet;
 }
 
-void GameCamera::StartCameraAnimation(bool isTargetEase , int EaseTimer)
+void GameCamera::StartCameraAnimation(bool isTargetEase, int EaseTimer)
 {
-		isChangeBasePlanet = false;
-		isChangeBasePlanetAnimation = true;
-		this->isTargetEase = isTargetEase;
-		CameraAnimationEase.Init(EaseTimer);
-		oldEyePos = cam.GetEye();
-		oldTargetPos = cam.GetTarget();
-		XMVECTOR frontVec = XMLoadFloat3(&(cam.GetTarget() - cam.GetEye()));
-		XMVECTOR upVec = XMLoadFloat3(&cam.up);
-		oldCamUpRot = XMQuaternionRotationMatrix(FukuMath::GetMatRot(frontVec, upVec));
+	isChangeBasePlanet = false;
+	isChangeBasePlanetAnimation = true;
+	this->isTargetEase = isTargetEase;
+	CameraAnimationEase.Init(EaseTimer);
+	oldEyePos = cam.GetEye();
+	oldTargetPos = cam.GetTarget();
+	XMVECTOR frontVec = XMLoadFloat3(&(cam.GetTarget() - cam.GetEye()));
+	XMVECTOR upVec = XMLoadFloat3(&cam.up);
+	oldCamUpRot = XMQuaternionRotationMatrix(FukuMath::GetMatRot(frontVec, upVec));
 }
 
 void GameCamera::ClearAnimationStart(const Vector3 &playerPos)
 {
-	nextTargetPos = planet.lock()->GetPos();
-	Vector3 eyeDir = playerPos - nextTargetPos;
-	eyeDir.y = 0.0f;
+	//nextTargetPos = planet.lock()->GetPos();
+	nextTargetPos = nextPlanetPos_;
 
+	Vector3 eyeDir = cam.GetEye() - planet.lock()->GetPos();
+
+	//向きが存在しなかった場合の修正
 	if (eyeDir.length() == 0.0f)
 	{
-		eyeDir = Vector3{0, 0, 1};
+		eyeDir = Vector3{ 0, 0, 1 };
 	}
+
+	//距離をとる
 	eyeDir.normalize();
 	eyeDir *= 300.0f;
 
-	nextEyePos = eyeDir + nextTargetPos;
+	//基準点から動かしてワールド座標を作成
+	nextEyePos = eyeDir + planet.lock()->GetPos();
 
+	//上ベクトルをしゅせう性
 	nextCamUpRot = XMQuaternionIdentity();
 
+	//状態の設定
 	isClearMode_ = true;
 
+	//アニメーション開始処理
 	IsAnimationOn();
-	StartCameraAnimation(true, 120);
+	StartCameraAnimation(true, 90);
+}
+
+void GameCamera::TitleAnimationStart()
+{
+	//カメラの向きを初期化
+	Vector3 eyeDir = Vector3{ 0, -0.4f, 1 };
+
+	//正規化
+	eyeDir.normalize();
+	XMMATRIX rot = GetMatRot(XMLoadFloat3(&eyeDir));
+
+	//ターゲットの位置を修正
+	nextTargetPos = Vector3(0, 0, 0);
+
+	//基準点から動かしてワールド座標を作成
+	nextEyePos = (eyeDir * -sTitleCameraDistance) + nextTargetPos;
+
+	//上ベクトルをしゅせう性
+	nextCamUpRot = XMQuaternionRotationMatrix(rot);
+	//nextCamUpRot = XMQuaternionIdentity();
+	IsAnimationOn();
+	StartCameraAnimation(true, 60);
+}
+
+void GameCamera::ClearToIngme()
+{
+	isClearMode_ = false;
+	IsAnimationOn();
+	StartCameraAnimation(true, 30);
+}
+
+void GameCamera::TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZVec)
+{
+	isTitleMode_ = false;
+	IsAnimationOn();
+	nextEyePos = playerPos - (playerZVec * 10);
+	StartCameraAnimation(true, 30);
 }
 
 void GameCamera::NormalUpdate(const Vector3 &playerPos)
@@ -157,6 +211,16 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	camRot(GameInput::Instance()->RStick());
 }
 
+void GameCamera::SetNextPlantPos(const Vector3 pos)
+{
+	nextPlanetPos_ = pos;
+}
+
+bool GameCamera::GetIsAnimationEnd()
+{
+	return CameraAnimationEase.IsEnd();
+}
+
 void GameCamera::CameraAnimationUpdate()
 {
 	//easing
@@ -164,9 +228,9 @@ void GameCamera::CameraAnimationUpdate()
 	//移動処理
 
 	//距離をとって
-		Vector3 eyeDist = nextEyePos - oldEyePos;
+	Vector3 eyeDist = nextEyePos - oldEyePos;
 	//距離をイージングの値で乗算
-		eyeDist *= t;
+	eyeDist *= t;
 	//元の視点にさっきの距離を加算
 	cam.SetEye(oldEyePos + eyeDist);
 
@@ -219,12 +283,24 @@ void GameCamera::GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec)
 {
 }
 
+void GameCamera::TitleUpdate()
+{
+	XMVECTOR angle = XMVector3Rotate(ZVec, nextCamUpRot);
+	//追加する回転
+	XMVECTOR addRot = XMQuaternionRotationAxis(YVec, degree/4);
+	angle = XMVector3Rotate(angle, addRot);
+	//基準点から動かしてワールド座標を作成
+	nextEyePos = (angle * -sTitleCameraDistance) + nextTargetPos;
+
+	nextCamUpRot = XMQuaternionMultiply(nextCamUpRot, addRot);
+}
+
 void GameCamera::ClearCameraUpdate()
 {
-	float t = (1.0f - CameraAnimationEase.Read());
+	//float t = (1.0f - CameraAnimationEase.Read());
 
-	float rotRate = 0.15f + (t * 4.0f);
-	camRot(XMFLOAT2(-rotRate, 0));
+	//float rotRate = 0.15f + (t * 4.0f);
+	//camRot(XMFLOAT2(-rotRate, 0));
 }
 
 void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
