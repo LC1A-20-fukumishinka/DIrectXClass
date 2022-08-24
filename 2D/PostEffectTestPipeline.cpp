@@ -52,6 +52,8 @@ PostEffectTestPipeline::PostEffectTestPipeline()
 	pipelineDesc.inputLayoutCount = _countof(inputLayout);
 	pipelineDesc.rootparams = rootparams;
 	pipelineDesc.rootparamsCount = _countof(rootparams);
+	pipelineDesc.blendName = GraphicsPipelineTypeName::BlendName::NONE;
+
 	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pipelineDesc);
 
 }

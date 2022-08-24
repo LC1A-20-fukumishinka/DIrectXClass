@@ -51,6 +51,7 @@ PostBasePipeline::PostBasePipeline()
 	pd.inputLayoutCount = _countof(inputLayout);
 	pd.rootparams = rootparams;
 	pd.rootparamsCount = _countof(rootparams);
+	pd.blendName = GraphicsPipelineTypeName::BlendName::NONE;
 	pipelineSet = BaseGraphicsPipeline::CreatePipeLine(pd);
 }
 

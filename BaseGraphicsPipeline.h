@@ -21,6 +21,7 @@ namespace GraphicsPipelineTypeName
 {
 	enum class BlendName
 	{
+		NONE,
 		ALPHA,
 		ADD,
 		Sub

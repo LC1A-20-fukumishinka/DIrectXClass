@@ -18,6 +18,7 @@
 #include "postMosaicPipeline.h"
 #include "PostMonochromePipeline.h"
 #include "../imgui/ImguiManager.h"
+#include "BaseData.h"
 using namespace FukuMath;
 using namespace DirectX;
 using namespace std;
@@ -42,23 +43,15 @@ void GameScene::Init()
 
 	cam_ = make_unique<GameCamera>();
 	cam_->Init();
-
+	cam_->TitleAnimationStart();
 	light_ = unique_ptr<Light>(Light::Create());
-	light_->SetLightColor({ 0.6f, 0.6f, 0.6f });
-	light_->SetLightDir({ 1.0f,-1.0f ,1.0f ,0.0f });
-	light_->SetLightActive(true);
-	light_->Update();
+
 
 	pointLight_ = make_unique<PointLight>();
-	pointLight_->SetActive(true);
-	pointLight_->SetLightPos(XMFLOAT3{ 0, 1.5, 0 });
-	pointLight_->SetLightAtten(XMFLOAT3(0.2f, 0.2f, 0.2f));
+
 
 	spotLight_ = unique_ptr<SpotLight>(SpotLight::Create());
-	spotLight_->SetLightDir({ -0.0f, -1.0f, 0.0f });
-	spotLight_->SetLightPos({ 0.0f, 1.0f, 0.0f });
-	spotLight_->SetLightAtten({ 0.01f, 0.01f, 0.01f });
-	spotLight_->SetActive(true);
+
 
 	lightGroup_ = unique_ptr<LightGroup>(LightGroup::Create());
 	lightGroup_->SetLight(light_.get());
@@ -66,6 +59,14 @@ void GameScene::Init()
 	lightGroup_->SetSpotLight(spotLight_.get());
 
 	lightGroup_->SetAmbientColor(XMFLOAT3{ 0.1f,0.1f, 0.1f });
+
+
+	int clearTextHandle = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/clearText.png");
+
+	clearText_ = make_unique<Sprite>();
+	clearText_->Init(clearTextHandle);
+
+
 	groundModel_ = make_unique<Model>();
 	groundModel_->CreateModel("ground");
 	playerModel_ = make_unique<Model>();
@@ -78,8 +79,8 @@ void GameScene::Init()
 	objDome_->SetModel(domeModel_.get());
 	objDome_->SetCamera(cam_->GetCamera());
 	objDome_->SetScale(XMFLOAT3(3.0f, 3.0f, 3.0f));
-	//objDome_->SetLight(light_.get());
 	objDome_->SetLightGroup(lightGroup_.get());
+
 	objGround_ = make_unique<Object3D>();
 	objGround_->Init();
 	objGround_->SetModel(groundModel_.get());
@@ -97,12 +98,12 @@ void GameScene::Init()
 
 	for (int i = 0; i < 6; i++)
 	{
-		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), false);
 	}
 
-	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f));
+	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), false);
 
-	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f));
+	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f), false);
 
 	player_ = make_unique<GravityPlayer>();
 	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet());
@@ -122,17 +123,35 @@ void GameScene::Init()
 	Flag::SetShadowCamera(shadowCam_->GetCamera());
 
 	weak_ptr<Planet> a = PlanetManager::Instance()->GetPlanet(8);
+	cam_->SetNextPlantPos(a.lock()->GetPos());
+
+	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, -1, 0), 2.0f);
 	MakeFlag(a, Vector3(-1, 0, 0), 2.0f);
 	MakeFlag(a, Vector3(0, 1, 0), 2.0f);
 	MakeFlag(a, Vector3(1, 0, 0), 2.0f);
 	MakeFlag(a, Vector3(0, -1, 0), 2.0f);
 
+	Block::SetCamera(cam_->GetCamera());
+	Block::SetLights(lightGroup_.get());
+	Block tmpBlock;
+	tmpBlock.Init(PlanetManager::Instance()->GetPlanet(0), Vector3(0.0f, 1.0f, 1.0f), 1.0f);
 
+	testBlock_.emplace_back(tmpBlock);
+
+	//box.Init(player_->GetPos(), ZVec, YVec);
+	//box.SetCamera(cam_->GetCamera());
+	titlePostEffect_.Init();
+
+	InformationBoard::SetCamera(cam_->GetCamera());
+	InformationBoard::SetLightGroup(lightGroup_.get());
+	testBoard_.Init(L"Resources/UpArrow.png", Vector3(0, 50, 0), Vector3(1, 1, 0), Vector3(2, 1, 0));
+	Restart();
 
 }
 
 void GameScene::Update()
 {
+	
 	if (Input::Instance()->KeyTrigger(DIK_1))
 	{
 		isGB_ = !isGB_;
@@ -154,6 +173,12 @@ void GameScene::Update()
 	GameInput::Instance()->Update();
 	lightGroup_->Update();
 
+	if (isGameTitle_ && GameInput::Instance()->B())
+	{
+		isGameTitle_ = false;
+		cam_->TitleToIngame(player_->GetPos(), player_->GetAngle());
+	}
+
 	//掴む
 	if (GameInput::Instance()->LockOnInput())
 	{
@@ -172,18 +197,34 @@ void GameScene::Update()
 		}
 	}
 	//離す
-	if (!GameInput::Instance()->GrabInput())
+
+	//タイトルじゃなかったらプレイヤーを動かせる
+	if (!isGameTitle_)
 	{
-		player_->ReleasePlanet();
+		if (!GameInput::Instance()->GrabInput())
+		{
+			player_->ReleasePlanet();
+		}
+
+		MovePlanet();
+		player_->Update();
 	}
 
-	MovePlanet();
-	player_->Update();
+	for (auto e : testBlock_)
+	{
+		player_->BlockCollision(e.GetCollisionPlanes());
+	}
 
 	objDome_->SetPosition(cam_->GetCameraPos());
 	objDome_->Update();
 
 	objGround_->Update();
+
+	if (Input::Instance()->KeyTrigger(DIK_9))
+	{
+		PlanetManager::Instance()->AllSpawn();
+	}
+
 	PlanetManager::Instance()->Update();
 	//star->Update();
 	//temple_->Update();
@@ -197,28 +238,37 @@ void GameScene::Update()
 
 		flag.CollisionPlayer(1.0f, player_->GetPos());
 	}
-	if (GetFlagCount() <= 0 && !isGameClear)
+	for (auto &e : testBlock_)
 	{
-		isGameClear = true;
+		e.Update();
+	}
+	if (GetFlagCount() <= 0 && !isGameClear_)
+	{
+		isGameClear_ = true;
 		cam_->ClearAnimationStart(player_->GetPos());
 	}
 
-	ImGui::Begin("light");
-	ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_::ImGuiCond_FirstUseEver);
 
-	Vector3 angle = light_->GetLightDir();
-	float directionalLightAngle[3] = { angle.x,angle.y ,angle.z };
-	ImGui::SliderFloat3("Directional", directionalLightAngle, -1.0f, 1.0f);
-
-	angle = Vector3(directionalLightAngle[0], directionalLightAngle[1], directionalLightAngle[2]);
-
-	light_->SetLightDir(XMLoadFloat3(&angle));
-	ImGui::End();
-
-	shadowCam_->SetAngle(angle);
+	ImguiUpdate();
 
 	shadowCam_->Update(player_->GetPos());
 	lightGroup_->Update();
+
+
+	bool SpeedReset = false;
+	ImGui::Begin("Debug");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	SpeedReset = ImGui::Button("Reset");
+	ImGui::End();
+	if (GameInput::Instance()->ATrigger() && isGameClear_ || SpeedReset)
+	{
+		Restart();
+		cam_->ClearToIngme();
+	}
+	//box.Update();
+	AnimationTestUpdate();
+	titlePostEffect_.Update();
+	testBoard_.Update();
 }
 
 void GameScene::PreDraw()
@@ -231,6 +281,7 @@ void GameScene::PreDraw()
 	//オブジェクトの描画
 	StartTarget_->PreDrawScene();
 
+#pragma region bugDraw
 	objDome_->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	StartTarget_->DepthReset();
 	PlanetManager::Instance()->Draw();
@@ -239,23 +290,30 @@ void GameScene::PreDraw()
 	{
 		flag.Draw();
 	}
+
+	for (auto &e : testBlock_)
+	{
+		e.Draw();
+	}
+
+	testBoard_.Draw();
+#pragma endregion
+
+
+	//box.Draw();
 	StartTarget_->PostDrawScene();
 
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
 
-	ImGui::Begin("SimpleEffect");
-	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
-	ImGui::Checkbox("GB", &isGB_);
-	ImGui::Checkbox("Monocrome", &isMono_);
-	ImGui::Checkbox("Mosaic", &isMosaic_);
-	ImGui::End();
+
 	if (isMosaic_)
 	{
 		vector<int> textureNum;
 		textureNum.emplace_back(DrawTexture_);
 		MosaicTarget_->PreDrawScene();
-		postTest_->Draw(PostMosaicPipeline::Instance()->GetPipeLine(), textureNum);
+		//postTest_->Draw(PostMosaicPipeline::Instance()->GetPipeLine(), textureNum);
+		titlePostEffect_.Draw(DrawTexture_);
 		MosaicTarget_->PostDrawScene();
 		DrawTexture_ = MosaicTarget_->GetTextureNum(0);
 	}
@@ -285,13 +343,80 @@ void GameScene::MainDraw()
 {
 	vector<int> textureNum;
 	textureNum.emplace_back(DrawTexture_);
+
 	postTest_->Draw(NormalDrawPipeline_.GetPipeLine(), textureNum);
 
+	////直書き
+#pragma region MainDraw
+	//objDome_->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	//DepthReset();
+	//PlanetManager::Instance()->Draw();
+	//player_->Draw();
+	//for (auto &flag : testFlag_)
+	//{
+	//	flag.Draw();
+	//}
+	//for (auto &e : testBlock_)
+	//{
+	//	e.Draw();
+	//}
+	//testBoard_.Draw();
+#pragma endregion
+
+
+
+	if (isGameClear_)
+	{
+		clearText_->Draw();
+	}
 }
 
 void GameScene::Finalize()
 {
 
+}
+
+void GameScene::Restart()
+{
+	lightsRestart();
+	ObjectRestart();
+	isGameClear_ = false;
+}
+
+void GameScene::lightsRestart()
+{
+	light_->SetLightColor({ 0.6f, 0.6f, 0.6f });
+	light_->SetLightDir({ 1.0f,-1.0f ,1.0f ,0.0f });
+	light_->SetLightActive(true);
+	light_->Update();
+
+	pointLight_->SetActive(true);
+	pointLight_->SetLightPos(XMFLOAT3{ 0, 1.5, 0 });
+	pointLight_->SetLightAtten(XMFLOAT3(0.2f, 0.2f, 0.2f));
+
+	spotLight_->SetLightDir({ -0.0f, -1.0f, 0.0f });
+	spotLight_->SetLightPos({ 0.0f, 1.0f, 0.0f });
+	spotLight_->SetLightAtten({ 0.01f, 0.01f, 0.01f });
+	spotLight_->SetActive(true);
+}
+
+void GameScene::ObjectRestart()
+{
+	clearText_->size = clearText_->texSize;
+	clearText_->position = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
+	clearText_->Update();
+
+	PlanetManager::Instance()->Reset();
+	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet());
+	for (auto &e : testFlag_)
+	{
+		e.Reset();
+	}
+
+	for (auto &e : testBlock_)
+	{
+		e.Update();
+	}
 }
 
 void GameScene::MovePlanet()
@@ -311,6 +436,90 @@ void GameScene::MovePlanet()
 	else if (cam_->GetIsChangeBasePlanet())
 	{
 		cam_->StartCameraAnimation(false, 60);
+	}
+}
+
+void GameScene::ImguiUpdate()
+{
+#pragma region directionalLight
+
+	ImGui::Begin("light");
+	ImGui::SetWindowSize(ImVec2(500, 200), ImGuiCond_::ImGuiCond_FirstUseEver);
+
+	Vector3 angle = light_->GetLightDir();
+	float directionalLightAngle[3] = { angle.x,angle.y ,angle.z };
+	ImGui::SliderFloat3("Directional", directionalLightAngle, -1.0f, 1.0f);
+
+	angle = Vector3(directionalLightAngle[0], directionalLightAngle[1], directionalLightAngle[2]);
+
+	light_->SetLightDir(XMLoadFloat3(&angle));
+	ImGui::End();
+	shadowCam_->SetAngle(angle);
+
+#pragma endregion
+
+
+#pragma region PostEffect
+	ImGui::Begin("SimpleEffect");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	ImGui::Checkbox("GB", &isGB_);
+	ImGui::Checkbox("Monocrome", &isMono_);
+	ImGui::Checkbox("Mosaic", &isMosaic_);
+	ImGui::End();
+#pragma endregion
+
+}
+
+void GameScene::AnimationTestUpdate()
+{
+	//クリア状態じゃなかったら抜ける
+	if (!isGameClear_) { return; }
+	switch (clearStatus_)
+	{
+	case GameScene::STANDBY:
+		//アニメーションが開始します（状態0）操作不能状態に
+		GameInput::Instance()->SetIsControll(false);
+		clearStatus_ = STOP;
+		break;
+	case GameScene::STOP:
+		//一時停止 タイマー + フラグ（状態１）カメラ移動状態に
+		if (true)
+		{
+			clearStatus_ = MOVECAM;
+			cam_->ClearAnimationStart(XMFLOAT3());
+		}
+		break;
+	case GameScene::MOVECAM:
+		//カメラが移動＋次の惑星に向けて回転 イージング（状態２）惑星出現状態に
+		if (cam_->GetIsAnimationEnd())
+		{
+			clearStatus_ = SPAWNPLANET;
+			PlanetManager::Instance()->AllSpawn();
+		}
+		break;
+	case GameScene::SPAWNPLANET:
+		//惑星の出現 内部にイージングがあるんでフラグ処理（状態３）カメラ回収状態に
+		if (PlanetManager::Instance()->SpawnAnimationEnd())
+		{
+			cam_->ClearToIngme();
+			clearStatus_ = RETURNCAM;
+		}
+		break;
+	case GameScene::RETURNCAM:
+		//カメラが戻る（状態４）終了処理に
+		if (cam_->GetIsAnimationEnd())
+		{
+			//戻りきったらアニメーション終了（状態４）待機状態に
+			isGameClear_ = false;
+			clearStatus_ = STANDBY;
+			GameInput::Instance()->SetIsControll(true);
+		}
+		break;
+	default:
+		isGameClear_ = false;
+		clearStatus_ = STANDBY;
+		GameInput::Instance()->SetIsControll(true);
+		break;
 	}
 }
 

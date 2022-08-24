@@ -54,7 +54,7 @@ InformationBoard::InformationBoard()
 	desc.inputLayoutCount = _countof(inputLayout);
 	desc.rootparams = rootparams;
 	desc.rootparamsCount = _countof(rootparams);
-	desc.blendName = GraphicsPipelineTypeName::BlendName::ADD;
+	desc.blendName = GraphicsPipelineTypeName::BlendName::ALPHA;
 	sPipeline = BaseGraphicsPipeline::CreatePipeLine(desc);
 	}
 }

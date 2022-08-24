@@ -110,7 +110,14 @@ std::unique_ptr<PipelineSet> BaseGraphicsPipeline::CreatePipeLine(const Pipeline
 
 	D3D12_RENDER_TARGET_BLEND_DESC blenddesc = {};
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;//RGBA全てのチャンネルを描画
-	blenddesc.BlendEnable = true;					//ブレンドを有効にする
+	if (pipelineDesc.blendName == GraphicsPipelineTypeName::BlendName::NONE)
+	{
+		blenddesc.BlendEnable = false;					//ブレンドを有効にする+
+	}
+	else
+	{
+		blenddesc.BlendEnable = true;					//ブレンドを有効にする+
+	}
 	switch (pipelineDesc.blendName)
 	{
 	case GraphicsPipelineTypeName::BlendName::ALPHA:
@@ -376,7 +383,7 @@ std::unique_ptr<PipeClass::GSPipelineSet> BaseGraphicsPipeline::CreatePipeLine(c
 	gpipeline.InputLayout.pInputElementDescs = pipelineDesc.inputLayout;
 	gpipeline.InputLayout.NumElements = static_cast<UINT>(pipelineDesc.inputLayoutCount);
 
-	// 図形の形状設定（三角形）
+	// 図形の形状設定（点）
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	gpipeline.NumRenderTargets = count;	// 描画対象は1つ
