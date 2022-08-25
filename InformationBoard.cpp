@@ -1,6 +1,8 @@
 #include "InformationBoard.h"
 #include "TextureMgr.h"
-
+#include "Collision/Collision.h"
+#include "EaseClass.h"
+#include <algorithm>
 using namespace std;
 using namespace DirectX;
 unique_ptr<Model> InformationBoard::sModel;
@@ -70,6 +72,7 @@ void InformationBoard::Init(const wchar_t *filename, const Vector3 &basePos, con
 	drawObject_.SetCamera(sCamera);
 	drawObject_.SetLightGroup(sLightGroup);
 	drawObject_.SetModel(sModel.get());
+	baseScale_ = scale;
 	drawObject_.SetScale(scale);
 	basePos_ = basePos;
 	movePos_ = movePos;
@@ -77,6 +80,22 @@ void InformationBoard::Init(const wchar_t *filename, const Vector3 &basePos, con
 
 void InformationBoard::Update()
 {
+	float changeRate = 1.0f / 60.0f;
+	if (isInDrawLength_)
+	{
+		objectScale_ += changeRate;
+	}
+	else
+	{
+		objectScale_ -= changeRate;
+	}
+	objectScale_ = std::clamp(objectScale_,0.0f, 1.0f);
+
+	float easeScale = Easing::easeOutExpo(objectScale_);
+	easeScale = std::clamp(easeScale *= 1.1f, 0.0f, 1.0f);
+
+	drawObject_.SetScale((baseScale_ * easeScale));
+
 	XMVECTOR bill = XMQuaternionRotationMatrix(sCamera->GetMatBillboard());
 	Vector3 pos = XMVector3Rotate(XMLoadFloat3(&movePos_), bill);
 	pos += basePos_;
@@ -93,6 +112,22 @@ void InformationBoard::Draw()
 
 void InformationBoard::Finalize()
 {
+}
+
+bool InformationBoard::CollisionPlayer(const Vector3 &pos)
+{
+	//     player,   informationBoard
+	Sphere pSphere, iSphere;
+
+
+	pSphere.center = XMLoadFloat3(&pos);
+	pSphere.radius = 0.1f;
+
+	iSphere.center = XMLoadFloat3(&basePos_);
+	iSphere.radius = drawLength_;
+
+	isInDrawLength_ = Collision::CheckSphere2Sphere(pSphere, iSphere);
+	return isInDrawLength_;
 }
 
 void InformationBoard::SetCamera(Camera *camera)

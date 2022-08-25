@@ -144,7 +144,7 @@ void GameScene::Init()
 
 	InformationBoard::SetCamera(cam_->GetCamera());
 	InformationBoard::SetLightGroup(lightGroup_.get());
-	testBoard_.Init(L"Resources/UpArrow.png", Vector3(0, 50, 0), Vector3(1, 1, 0), Vector3(2, 1, 0));
+	testBoard_.Init(L"Resources/kana_a.png", Vector3(0, 50, 0), Vector3(1, 1, 0), Vector3(2, 1, 0));
 	Restart();
 
 }
@@ -268,6 +268,8 @@ void GameScene::Update()
 	//box.Update();
 	AnimationTestUpdate();
 	titlePostEffect_.Update();
+
+	testBoard_.CollisionPlayer(player_->GetPos());
 	testBoard_.Update();
 }
 

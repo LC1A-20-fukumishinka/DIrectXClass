@@ -16,6 +16,7 @@ public:
 	void Draw();
 	void Finalize();
 
+	bool CollisionPlayer(const Vector3 &pos);
 private:
 	static std::unique_ptr<Model> sModel;
 	static Camera *sCamera;
@@ -30,4 +31,9 @@ private:
 	int textureHandle_;
 	Vector3 movePos_;
 	Vector3 basePos_;
+
+	Vector3 baseScale_;
+	bool isInDrawLength_ = false;
+	float objectScale_ =false;
+	float drawLength_ = 10.0f;
 };
