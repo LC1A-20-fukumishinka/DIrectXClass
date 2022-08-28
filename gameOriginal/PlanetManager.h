@@ -35,10 +35,15 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::shared_ptr<Planet> GetBasePlanet();
-	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, bool isSpawn = true);
+	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID,  bool isSpawn = true, PlanetType type = BRIDGE);
 
 	void Reset();
 
+	/// <summary>
+	/// 惑星の持つIDを参照して出現させる
+	/// </summary>
+	/// <param name="ID">出現させる</param>
+	void IDSpawn(int ID);
 	/// <summary>
 	/// 現在いない状態になっている惑星を出現させる
 	/// </summary>

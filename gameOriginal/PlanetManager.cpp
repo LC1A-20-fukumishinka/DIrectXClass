@@ -26,7 +26,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
-	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), true);
+	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),0, true, PlanetType::BASE);
 }
 
 void PlanetManager::Update()
@@ -121,11 +121,11 @@ std::shared_ptr<Planet> PlanetManager::GetBasePlanet()
 	return *planets.begin();
 }
 
-void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, bool isSpawn)
+void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int ID, bool isSpawn, PlanetType type)
 {
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();
-	planet->Init(pos, size, color, isSpawn);
+	planet->Init(pos, size, color, ID, isSpawn, type );
 	int hoge = 0;
 	planets.push_back(planet);
 }
@@ -135,6 +135,22 @@ void PlanetManager::Reset()
 	for (auto &e : planets)
 	{
 		e->Reset();
+	}
+}
+
+void PlanetManager::IDSpawn(int ID)
+{
+	//アニメーション中フラグをオンにする
+	isSpawnAnimation_ = true;
+
+	for (auto &e : planets)
+	{
+		int tmpID = e->GetID();
+		//現在存在しない惑星を選択
+		if (!e->GetIsSpawn() && (tmpID == ID))
+		{
+			e->SpawnAnimationStart();
+		}
 	}
 }
 

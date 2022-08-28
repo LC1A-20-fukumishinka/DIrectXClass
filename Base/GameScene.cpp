@@ -98,12 +98,12 @@ void GameScene::Init()
 
 	for (int i = 0; i < 6; i++)
 	{
-		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), false);
+		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
 	}
 
-	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), false);
+	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
 
-	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f), false);
+	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f), 2, false, PlanetType::BASE);
 
 	player_ = make_unique<GravityPlayer>();
 	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet());
@@ -144,7 +144,7 @@ void GameScene::Init()
 
 	InformationBoard::SetCamera(cam_->GetCamera());
 	InformationBoard::SetLightGroup(lightGroup_.get());
-	testBoard_.Init(L"Resources/kana_a.png", Vector3(0, 50, 0), Vector3(1, 1, 0), Vector3(2, 1, 0));
+	testBoard_.Init(L"Resources/welcome.png", Vector3(0, 50, 0), Vector3(0, 3, 0), Vector3(3, 1, 0));
 	Restart();
 
 }
@@ -222,9 +222,13 @@ void GameScene::Update()
 
 	if (Input::Instance()->KeyTrigger(DIK_9))
 	{
-		PlanetManager::Instance()->AllSpawn();
+		PlanetManager::Instance()->IDSpawn(1);
 	}
 
+	if (Input::Instance()->KeyTrigger(DIK_8))
+	{
+		PlanetManager::Instance()->IDSpawn(2);
+	}
 	PlanetManager::Instance()->Update();
 	//star->Update();
 	//temple_->Update();

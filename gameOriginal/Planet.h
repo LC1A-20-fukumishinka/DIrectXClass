@@ -6,13 +6,20 @@
 #include "../EaseClass.h"
 class Camera;
 class LightGroup;
+
+const enum PlanetType
+{
+	NONE,
+	BASE,
+	BRIDGE,
+};
 class Planet
 {
 public:
 	Planet();
 	~Planet();
 
-	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, bool Spawn = true);
+	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID, bool Spawn = true, PlanetType type = BRIDGE);
 	void Update();
 	void NormalUpdate();
 	void GrabUpdate();
@@ -44,7 +51,8 @@ public:
 	void ReleaseBase();
 	void SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX);
 	bool GetBase();
-
+	int GetID();
+	PlanetType GetType();
 	void Reset();
 private://静的メンバ変数
 	static Camera *cam;
@@ -67,6 +75,11 @@ private://メンバ変数
 	Vector3 startPos_;
 	float startScale_;
 	bool startIsSpawn_;
+
+	PlanetType type_ = NONE;
+
+	//どのステージ番号で出現するか
+	int ID_ = -1;
 	DirectX::XMFLOAT4 startColor_;
 	Easing SpawnAnimationEase_;
 };
