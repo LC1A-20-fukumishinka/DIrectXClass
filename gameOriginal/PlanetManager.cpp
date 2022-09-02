@@ -1,5 +1,9 @@
 #include "PlanetManager.h"
 #include "../Collision/Collision.h"
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include "LoadPlanet.h"
 using namespace std;
 using namespace DirectX;
 bool PlanetManager::isMakeInstance = false;
@@ -26,7 +30,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
-	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),0, true, PlanetType::BASE);
+	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 0, true, PlanetType::BASE);
 }
 
 void PlanetManager::Update()
@@ -116,17 +120,11 @@ std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
 	return *planets.begin();
 }
 
-std::shared_ptr<Planet> PlanetManager::GetBasePlanet()
-{
-	return *planets.begin();
-}
-
-void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int ID, bool isSpawn, PlanetType type)
+void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn, PlanetType type)
 {
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();
-	planet->Init(pos, size, color, ID, isSpawn, type );
-	int hoge = 0;
+	planet->Init(pos, size, color, ID, isSpawn, type);
 	planets.push_back(planet);
 }
 
@@ -169,7 +167,7 @@ void PlanetManager::AllSpawn()
 	}
 }
 
-bool PlanetManager::SpawnAnimationEnd()
+bool PlanetManager::SpawnAnimationEnd(int ID)
 {
 	//アニメーション中かどうかを確認
 	bool isAnimationEnd = isSpawnAnimation_;
@@ -179,13 +177,15 @@ bool PlanetManager::SpawnAnimationEnd()
 	{
 		for (auto &e : planets)
 		{
-			//アニメーションが終了していたらtrue
-			isAnimationEnd = e->GetIsSpawnAnimationEnd();
-			if (isAnimationEnd)
+			if (e->GetID() == ID)
 			{
-				break;
+				//アニメーションが終了していたらtrue
+				isAnimationEnd = e->GetIsSpawnAnimationEnd();
+				if (isAnimationEnd)
+				{
+					break;
+				}
 			}
-
 		}
 	}
 
@@ -213,4 +213,93 @@ void PlanetManager::SetShadowCamera(Camera *cam)
 void PlanetManager::SetShadowTexture(int shadowTextureNum)
 {
 	Planet::SetShadowTexture(shadowTextureNum);
+}
+
+bool PlanetManager::LoadStage(int stage)
+{
+
+	shared_ptr<Planet> tmpPlanet;
+
+	bool isLoad = LoadStageFile(stage, tmpPlanet);
+
+	if (isLoad)
+	{
+		Vector3 newPlanetPos = tmpPlanet->GetPos();
+
+		weak_ptr<Planet> beforePlanet = GetBasePlanet();
+
+		planets.emplace_back(tmpPlanet);
+
+		//惑星間の距離の長さを計算
+		Vector3 distance = newPlanetPos - beforePlanet.lock()->GetPos();
+		float length = distance.length();
+
+		//それぞれの惑星の半径を引く
+		float beforePlanetScale = beforePlanet.lock()->GetStartScale();
+		length -= beforePlanetScale;
+		length -= tmpPlanet->GetStartScale();
+
+
+		const float bridgeLength = 25.0f;
+		length -= (bridgeLength / 2);
+		//惑星同士の間に必要な個数を計算
+		int bridgeCount = static_cast<int>(length / bridgeLength);
+
+		//個数で割って間をつなぐ惑星同士の長さを計算
+		length = (length / bridgeCount);
+
+		//距離を正規化して方向を出す
+		Vector3 angle = distance.normalize();
+		for (int i = 0; i <= bridgeCount; i++)
+		{
+			//開始地点(ひとつ前の惑星)
+			Vector3 pos = beforePlanet.lock()->GetPos();
+
+			//半径分移動
+			pos += (angle * (beforePlanetScale + (bridgeLength) / 2));
+
+			pos += (angle * (length * i));
+			shared_ptr<Planet> bridgePlanet;
+			bridgePlanet = make_shared<Planet>();
+			bridgePlanet->Init(pos, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), stage, false);
+			//一覧に追加
+			planets.emplace_back(bridgePlanet);
+		}
+	}
+	return isLoad;
+}
+
+std::shared_ptr<Planet> PlanetManager::GetBasePlanet(int stageNum)
+{
+	//最終的に返す惑星のポインタ
+	shared_ptr<Planet> returnPlanet, lastBase;
+
+	//該当要素が見つからなかった
+	bool isNotFound = true;
+
+	for (auto &e : planets)
+	{
+		bool isBase = e->GetType() == PlanetType::BASE;
+
+		if (isBase)
+		{
+			lastBase = e;
+			int tmpID = e->GetID();
+			// base属性かつIDが一致している
+			if (tmpID == stageNum)
+			{
+				returnPlanet = e;
+				isNotFound = false;
+				break;
+			}
+		}
+	}
+
+	//要素が見つからなかったら最後の要素を参照
+	if (isNotFound)
+	{
+		returnPlanet = lastBase;
+	}
+
+	return returnPlanet;
 }

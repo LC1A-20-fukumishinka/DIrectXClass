@@ -194,6 +194,7 @@
     <ClCompile Include="gameOriginal\GameCamera.cpp" />
     <ClCompile Include="gameOriginal\GameInput.cpp" />
     <ClCompile Include="gameOriginal\GravityPlayer.cpp" />
+    <ClCompile Include="gameOriginal\LoadPlanet.cpp" />
     <ClCompile Include="imgui\ImguiManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -285,6 +286,7 @@
     <ClInclude Include="gameOriginal\gameConstData.h" />
     <ClInclude Include="gameOriginal\GameInput.h" />
     <ClInclude Include="gameOriginal\GravityPlayer.h" />
+    <ClInclude Include="gameOriginal\LoadPlanet.h" />
     <ClInclude Include="imgui\ImguiManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

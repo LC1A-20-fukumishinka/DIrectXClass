@@ -30,11 +30,7 @@ public:
 	/// <param name="getPlanetNum">番号</param>
 	/// <returns>指定された惑星（存在しない番号の場合は先頭の番号を返す）</returns>
 	std::weak_ptr<Planet> GetPlanet(int getPlanetNum);
-	/// <summary>
-	/// 基本の惑星を受け渡す
-	/// </summary>
-	/// <returns></returns>
-	std::shared_ptr<Planet> GetBasePlanet();
+
 	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID,  bool isSpawn = true, PlanetType type = BRIDGE);
 
 	void Reset();
@@ -53,11 +49,20 @@ public:
 	/// アニメーションが終了した瞬間のみtrueを返す
 	/// </summary>
 	/// <returns>アニメーションが終了したフラグ</returns>
-	bool SpawnAnimationEnd();
+	bool SpawnAnimationEnd(int ID);
 public:
 	void SetCamera(Camera *cam);
 	void SetShadowCamera(Camera *cam);
 	void SetShadowTexture(int shadowTextureNum);
+
+	bool LoadStage(int stage);
+
+	/// <summary>
+	/// 指定の番号のbase属性の惑星のポインタを取得する
+	/// </summary>
+	/// <param name="stageNum">番号の指定（ない場合や範囲外を指定している場合一番後ろの惑星を返す）</param>
+	/// <returns>惑星のポインタ</returns>
+	std::shared_ptr<Planet> GetBasePlanet(int stageNum = -1);
 private:
 	std::list<std::shared_ptr<Planet>> planets;
 

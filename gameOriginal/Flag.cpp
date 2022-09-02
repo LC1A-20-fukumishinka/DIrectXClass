@@ -56,6 +56,8 @@ void Flag::SetShadowCamera(Camera *camera)
 
 bool Flag::CollisionPlayer(float radius, const Vector3 pos)
 {
+	if (!isDraw_) return false;
+
 	Sphere playerSphere, flagSphere;
 	playerSphere.center = XMLoadFloat3(&pos);
 	playerSphere.radius = radius;

@@ -96,17 +96,28 @@ void GameScene::Init()
 
 	PlanetManager::Instance()->Init();
 
-	for (int i = 0; i < 6; i++)
+	//for (int i = 0; i < 6; i++)
+	//{
+	//	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
+	//}
+
+	//PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
+
+	//PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f), 2, false, PlanetType::BASE);
+
+	int stageCount = 0;
+	while (true)
 	{
-		PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
+	stageCount++;
+	if (!PlanetManager::Instance()->LoadStage(stageCount))
+	{
+		break;
+	}
 	}
 
-	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
-
-	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f), 2, false, PlanetType::BASE);
 
 	player_ = make_unique<GravityPlayer>();
-	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet());
+	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet(0));
 	player_->SetCamera(cam_->GetCamera());
 	player_->SetLight(lightGroup_.get());
 
@@ -122,14 +133,20 @@ void GameScene::Init()
 	Flag::SetLights(lightGroup_.get());
 	Flag::SetShadowCamera(shadowCam_->GetCamera());
 
-	weak_ptr<Planet> a = PlanetManager::Instance()->GetPlanet(8);
-	cam_->SetNextPlantPos(a.lock()->GetPos());
+	weak_ptr<Planet> FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(1);
+	cam_->SetNextPlantPos(FlagOnPlanet.lock()->GetPos());
 
 	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, -1, 0), 2.0f);
-	MakeFlag(a, Vector3(-1, 0, 0), 2.0f);
-	MakeFlag(a, Vector3(0, 1, 0), 2.0f);
-	MakeFlag(a, Vector3(1, 0, 0), 2.0f);
-	MakeFlag(a, Vector3(0, -1, 0), 2.0f);
+	MakeFlag(FlagOnPlanet, Vector3(-1, 0, 0), 2.0f);
+	//MakeFlag(a, Vector3(0, 1, 0), 2.0f);
+	MakeFlag(FlagOnPlanet, Vector3(1, 0, 0), 2.0f);
+	MakeFlag(FlagOnPlanet, Vector3(0, -1, 0), 2.0f);
+
+	for (int i = 1; i < stageCount; i++)
+	{
+		FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(i);
+		MakeFlag(FlagOnPlanet, Vector3(0, 1, 0), 2.0f);
+	}
 
 	Block::SetCamera(cam_->GetCamera());
 	Block::SetLights(lightGroup_.get());
@@ -236,19 +253,25 @@ void GameScene::Update()
 	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec());
 
 
+	bool isGetNow = false;
+
 	for (auto &flag : testFlag_)
 	{
 		flag.Update();
 
-		flag.CollisionPlayer(1.0f, player_->GetPos());
+		if (flag.CollisionPlayer(1.0f, player_->GetPos()))
+		{
+			isGetNow = true;
+		}
 	}
 	for (auto &e : testBlock_)
 	{
 		e.Update();
 	}
-	if (GetFlagCount() <= 0 && !isGameClear_)
+	if (GetFlagCount() <= 0 && !isGameClear_ && isGetNow)
 	{
 		isGameClear_ = true;
+		stageNum++;
 		cam_->ClearAnimationStart(player_->GetPos());
 	}
 
@@ -287,7 +310,6 @@ void GameScene::PreDraw()
 	//オブジェクトの描画
 	StartTarget_->PreDrawScene();
 
-#pragma region bugDraw
 	objDome_->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	StartTarget_->DepthReset();
 	PlanetManager::Instance()->Draw();
@@ -303,7 +325,6 @@ void GameScene::PreDraw()
 	}
 
 	testBoard_.Draw();
-#pragma endregion
 
 
 	//box.Draw();
@@ -352,25 +373,6 @@ void GameScene::MainDraw()
 
 	postTest_->Draw(NormalDrawPipeline_.GetPipeLine(), textureNum);
 
-	////直書き
-#pragma region MainDraw
-	//objDome_->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
-	//DepthReset();
-	//PlanetManager::Instance()->Draw();
-	//player_->Draw();
-	//for (auto &flag : testFlag_)
-	//{
-	//	flag.Draw();
-	//}
-	//for (auto &e : testBlock_)
-	//{
-	//	e.Draw();
-	//}
-	//testBoard_.Draw();
-#pragma endregion
-
-
-
 	if (isGameClear_)
 	{
 		clearText_->Draw();
@@ -413,7 +415,7 @@ void GameScene::ObjectRestart()
 	clearText_->Update();
 
 	PlanetManager::Instance()->Reset();
-	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet());
+	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet(0));
 	for (auto &e : testFlag_)
 	{
 		e.Reset();
@@ -500,12 +502,12 @@ void GameScene::AnimationTestUpdate()
 		if (cam_->GetIsAnimationEnd())
 		{
 			clearStatus_ = SPAWNPLANET;
-			PlanetManager::Instance()->AllSpawn();
+			PlanetManager::Instance()->IDSpawn(stageNum);
 		}
 		break;
 	case GameScene::SPAWNPLANET:
 		//惑星の出現 内部にイージングがあるんでフラグ処理（状態３）カメラ回収状態に
-		if (PlanetManager::Instance()->SpawnAnimationEnd())
+		if (PlanetManager::Instance()->SpawnAnimationEnd(stageNum))
 		{
 			cam_->ClearToIngme();
 			clearStatus_ = RETURNCAM;
@@ -517,6 +519,8 @@ void GameScene::AnimationTestUpdate()
 		{
 			//戻りきったらアニメーション終了（状態４）待機状態に
 			isGameClear_ = false;
+			weak_ptr<Planet> nextPlanet = PlanetManager::Instance()->GetBasePlanet(stageNum + 1);
+			cam_->SetNextPlantPos(nextPlanet.lock()->GetPos());
 			clearStatus_ = STANDBY;
 			GameInput::Instance()->SetIsControll(true);
 		}

@@ -101,7 +101,7 @@ private:
 	bool isMono_ = false;
 	bool isMosaic_ = false;
 	int DrawTexture_ = -1;
-
+	int stageNum = 0;
 	ClearAnimationStatus clearStatus_ = STANDBY;
 private:
 	void MakeFlag(std::weak_ptr<Planet> base, Vector3 angle, float scale);
