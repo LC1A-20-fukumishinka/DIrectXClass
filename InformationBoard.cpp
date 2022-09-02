@@ -3,18 +3,26 @@
 #include "Collision/Collision.h"
 #include "EaseClass.h"
 #include <algorithm>
+#include "ModelPhongPipeline.h"
 using namespace std;
 using namespace DirectX;
-unique_ptr<Model> InformationBoard::sModel;
+unique_ptr<Model> InformationBoard::sInformationModel;
+unique_ptr<Model> InformationBoard::sBoardModel;
 unique_ptr<PipeClass::PipelineSet> InformationBoard::sPipeline;
 Camera *InformationBoard::sCamera = nullptr;
 LightGroup *InformationBoard::sLightGroup = nullptr;
+Vector3 InformationBoard::sBoardScale = Vector3(1.0f, 1.0f, 1.0f);
 InformationBoard::InformationBoard()
 {
-	if (!sModel)
+	if (!sInformationModel)
 	{
-		sModel = std::make_unique<Model>();
-		sModel->CreateModel("InformationBoard");
+		sInformationModel = std::make_unique<Model>();
+		sInformationModel->CreateModel("InformationBoard");
+	}
+	if (!sBoardModel)
+	{
+		sBoardModel = std::make_unique<Model>();
+		sBoardModel->CreateModel("chr_sword");
 	}
 	if (!sPipeline)
 	{
@@ -37,27 +45,27 @@ InformationBoard::InformationBoard()
 			},
 		};
 
-	// デスクリプタレンジ
-	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
-	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
+		// デスクリプタレンジ
+		CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
+		descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
-	// ルートパラメータ
-	CD3DX12_ROOT_PARAMETER rootparams[4];
-	rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
-	rootparams[3].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+		// ルートパラメータ
+		CD3DX12_ROOT_PARAMETER rootparams[4];
+		rootparams[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+		rootparams[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+		rootparams[2].InitAsDescriptorTable(1, &descRangeSRV, D3D12_SHADER_VISIBILITY_ALL);
+		rootparams[3].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
 
-	PipelineDesc desc;
+		PipelineDesc desc;
 
-	desc.VSname = L"Resources/shaders/InformationBoardVS.hlsl";
-	desc.PSname = L"Resources/shaders/InformationBoardPS.hlsl";
-	desc.inputLayout = inputLayout;
-	desc.inputLayoutCount = _countof(inputLayout);
-	desc.rootparams = rootparams;
-	desc.rootparamsCount = _countof(rootparams);
-	desc.blendName = GraphicsPipelineTypeName::BlendName::ALPHA;
-	sPipeline = BaseGraphicsPipeline::CreatePipeLine(desc);
+		desc.VSname = L"Resources/shaders/InformationBoardVS.hlsl";
+		desc.PSname = L"Resources/shaders/InformationBoardPS.hlsl";
+		desc.inputLayout = inputLayout;
+		desc.inputLayoutCount = _countof(inputLayout);
+		desc.rootparams = rootparams;
+		desc.rootparamsCount = _countof(rootparams);
+		desc.blendName = GraphicsPipelineTypeName::BlendName::ALPHA;
+		sPipeline = BaseGraphicsPipeline::CreatePipeLine(desc);
 	}
 }
 
@@ -67,13 +75,23 @@ InformationBoard::~InformationBoard()
 
 void InformationBoard::Init(const wchar_t *filename, const Vector3 &basePos, const Vector3 &movePos, const Vector3 &scale)
 {
-	drawObject_.Init();
 	textureHandle_ = TextureMgr::Instance()->SpriteLoadTexture(filename);
+	drawObject_.Init();
 	drawObject_.SetCamera(sCamera);
 	drawObject_.SetLightGroup(sLightGroup);
-	drawObject_.SetModel(sModel.get());
+	drawObject_.SetModel(sInformationModel.get());
+
+	baseBoard_.Init();
+	baseBoard_.SetCamera(sCamera);
+	baseBoard_.SetLightGroup(sLightGroup);
+	baseBoard_.SetModel(sBoardModel.get());
+
 	baseScale_ = scale;
 	drawObject_.SetScale(scale);
+	baseBoard_.SetScale(sBoardScale);
+
+	baseBoard_.SetPosition(basePos);
+
 	basePos_ = basePos;
 	movePos_ = movePos;
 }
@@ -89,15 +107,16 @@ void InformationBoard::Update()
 	{
 		objectScale_ -= changeRate;
 	}
-	objectScale_ = std::clamp(objectScale_,0.0f, 1.0f);
+	objectScale_ = std::clamp(objectScale_, 0.0f, 1.0f);
 
 	float easeScale = Easing::easeOutExpo(objectScale_);
 	easeScale = std::clamp(easeScale *= 1.1f, 0.0f, 1.0f);
 
 	drawObject_.SetScale((baseScale_ * easeScale));
+	baseBoard_.SetScale((sBoardScale * (1.0f - easeScale)));
 
 	XMVECTOR bill = XMQuaternionRotationMatrix(sCamera->GetMatBillboard());
-	Vector3 pos = XMVector3Rotate(XMLoadFloat3(&movePos_), bill);
+	Vector3 pos = XMVector3Rotate(XMLoadFloat3(&(movePos_ * easeScale)), bill);
 	pos += basePos_;
 
 	drawObject_.SetPosition(pos);
@@ -106,6 +125,8 @@ void InformationBoard::Update()
 
 void InformationBoard::Draw()
 {
+	baseBoard_.Update();
+	baseBoard_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	drawObject_.Update();
 	drawObject_.modelDraw(sPipeline.get(), true, textureHandle_);
 }
@@ -137,5 +158,5 @@ void InformationBoard::SetCamera(Camera *camera)
 
 void InformationBoard::SetLightGroup(LightGroup *lightGroup)
 {
-sLightGroup = lightGroup;
+	sLightGroup = lightGroup;
 }

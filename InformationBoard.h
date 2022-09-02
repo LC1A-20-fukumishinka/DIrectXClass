@@ -18,16 +18,18 @@ public:
 
 	bool CollisionPlayer(const Vector3 &pos);
 private:
-	static std::unique_ptr<Model> sModel;
+	static std::unique_ptr<Model> sInformationModel;
+	static std::unique_ptr<Model> sBoardModel;
 	static Camera *sCamera;
 	static LightGroup *sLightGroup;
 	static std::unique_ptr<PipeClass::PipelineSet> sPipeline;
-
+	static 	Vector3 sBoardScale;
 public:
 	static void SetLightGroup(LightGroup *lightGroup);
 	static void SetCamera(Camera *camera);
 private:
 	Object3D drawObject_;
+	Object3D baseBoard_;
 	int textureHandle_;
 	Vector3 movePos_;
 	Vector3 basePos_;
