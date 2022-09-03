@@ -108,11 +108,11 @@ void GameScene::Init()
 	int stageCount = 0;
 	while (true)
 	{
-	stageCount++;
-	if (!PlanetManager::Instance()->LoadStage(stageCount))
-	{
-		break;
-	}
+		stageCount++;
+		if (!PlanetManager::Instance()->LoadStage(stageCount))
+		{
+			break;
+		}
 	}
 
 
@@ -161,14 +161,14 @@ void GameScene::Init()
 
 	InformationBoard::SetCamera(cam_->GetCamera());
 	InformationBoard::SetLightGroup(lightGroup_.get());
-	testBoard_.Init(L"Resources/welcome.png", Vector3(0, 50, 0), Vector3(0, 3, 0), Vector3(3, 1, 0));
+	testBoard_.Init(L"Resources/welcome.png",PlanetManager::Instance()->GetBasePlanet(0), Vector3(1, 1, 0), Vector3(0, 3, 0), Vector3(3, 1, 0));
 	Restart();
 
 }
 
 void GameScene::Update()
 {
-	
+
 	if (Input::Instance()->KeyTrigger(DIK_1))
 	{
 		isGB_ = !isGB_;

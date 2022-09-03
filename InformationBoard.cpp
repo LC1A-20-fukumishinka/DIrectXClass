@@ -4,6 +4,7 @@
 #include "EaseClass.h"
 #include <algorithm>
 #include "ModelPhongPipeline.h"
+#include "FukuMath.h"
 using namespace std;
 using namespace DirectX;
 unique_ptr<Model> InformationBoard::sInformationModel;
@@ -12,6 +13,8 @@ unique_ptr<PipeClass::PipelineSet> InformationBoard::sPipeline;
 Camera *InformationBoard::sCamera = nullptr;
 LightGroup *InformationBoard::sLightGroup = nullptr;
 Vector3 InformationBoard::sBoardScale = Vector3(1.0f, 1.0f, 1.0f);
+
+int InformationBoard::sBoardTextureHandle = -1;
 InformationBoard::InformationBoard()
 {
 	if (!sInformationModel)
@@ -22,7 +25,8 @@ InformationBoard::InformationBoard()
 	if (!sBoardModel)
 	{
 		sBoardModel = std::make_unique<Model>();
-		sBoardModel->CreateModel("chr_sword");
+		sBoardModel->CreateModel("QuestionMark");
+		sBoardTextureHandle = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/white1x1.png");
 	}
 	if (!sPipeline)
 	{
@@ -73,7 +77,7 @@ InformationBoard::~InformationBoard()
 {
 }
 
-void InformationBoard::Init(const wchar_t *filename, const Vector3 &basePos, const Vector3 &movePos, const Vector3 &scale)
+void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> basePlanet, const Vector3 &angle, const Vector3 &movePos, const Vector3 &scale)
 {
 	textureHandle_ = TextureMgr::Instance()->SpriteLoadTexture(filename);
 	drawObject_.Init();
@@ -85,16 +89,35 @@ void InformationBoard::Init(const wchar_t *filename, const Vector3 &basePos, con
 	baseBoard_.SetCamera(sCamera);
 	baseBoard_.SetLightGroup(sLightGroup);
 	baseBoard_.SetModel(sBoardModel.get());
-
 	baseScale_ = scale;
 	drawObject_.SetScale(scale);
 	baseBoard_.SetScale(sBoardScale);
 
-	baseBoard_.SetPosition(basePos);
+	basePlanet_ = basePlanet;
 
-	basePos_ = basePos;
+	basePos_ = basePlanet.lock()->GetPos();
+
+	Vector3 tmpAngle = angle;
+
+	basePos_ += (tmpAngle.normalize() * basePlanet_.lock()->GetScale());
 	movePos_ = movePos;
+
+	baseBoard_.SetPosition(basePos_);
+
+
+	Vector3 frontVec = Vector3(tmpAngle.y, -tmpAngle.x, 0.0f).cross(tmpAngle);
+
+	XMVECTOR frontVecV = XMLoadFloat3(&frontVec);
+	XMVECTOR upVecV = XMLoadFloat3(&tmpAngle.normalize());
+	if (XMVector3Equal(frontVecV, upVecV))
+	{
+		frontVec = Vector3(0.0f, -1.0f, 0.0f);
+
+		frontVecV = XMLoadFloat3(&frontVec);
+	}
+	baseBoard_.SetRotationVector(frontVecV, upVecV);
 }
+
 
 void InformationBoard::Update()
 {
@@ -126,7 +149,7 @@ void InformationBoard::Update()
 void InformationBoard::Draw()
 {
 	baseBoard_.Update();
-	baseBoard_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	baseBoard_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine(), true, sBoardTextureHandle);
 	drawObject_.Update();
 	drawObject_.modelDraw(sPipeline.get(), true, textureHandle_);
 }

@@ -5,13 +5,15 @@
 #include "Camera.h"
 #include "../LightGroup.h"
 #include "IGraphicsPipeline.h"
+#include <memory>
+#include "gameOriginal/Planet.h"
 class InformationBoard
 {
 public:
 	InformationBoard();
 	~InformationBoard();
 
-	void Init(const wchar_t *filename, const Vector3 &basePos, const Vector3 &movePos, const Vector3 &scale);
+	void Init(const wchar_t *filename, std::weak_ptr<Planet> basePlanet, const Vector3 &angle, const Vector3 &movePos, const Vector3 &scale);
 	void Update();
 	void Draw();
 	void Finalize();
@@ -23,7 +25,8 @@ private:
 	static Camera *sCamera;
 	static LightGroup *sLightGroup;
 	static std::unique_ptr<PipeClass::PipelineSet> sPipeline;
-	static 	Vector3 sBoardScale;
+	static Vector3 sBoardScale;
+	static int sBoardTextureHandle;
 public:
 	static void SetLightGroup(LightGroup *lightGroup);
 	static void SetCamera(Camera *camera);
@@ -33,6 +36,7 @@ private:
 	int textureHandle_;
 	Vector3 movePos_;
 	Vector3 basePos_;
+	std::weak_ptr<Planet> basePlanet_;
 
 	Vector3 baseScale_;
 	bool isInDrawLength_ = false;

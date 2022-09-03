@@ -245,12 +245,13 @@ bool PlanetManager::LoadStage(int stage)
 		//˜f¯“¯m‚ÌŠÔ‚É•K—v‚ÈŒÂ”‚ğŒvZ
 		int bridgeCount = static_cast<int>(length / bridgeLength);
 
+		bridgeCount++;
 		//ŒÂ”‚ÅŠ„‚Á‚ÄŠÔ‚ğ‚Â‚È‚®˜f¯“¯m‚Ì’·‚³‚ğŒvZ
 		length = (length / bridgeCount);
 
 		//‹——£‚ğ³‹K‰»‚µ‚Ä•ûŒü‚ğo‚·
 		Vector3 angle = distance.normalize();
-		for (int i = 0; i <= bridgeCount; i++)
+		for (int i = 0; i < bridgeCount; i++)
 		{
 			//ŠJn’n“_(‚Ğ‚Æ‚Â‘O‚Ì˜f¯)
 			Vector3 pos = beforePlanet.lock()->GetPos();
