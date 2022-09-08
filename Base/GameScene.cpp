@@ -41,6 +41,8 @@ void GameScene::Init()
 	StartTarget_ = make_unique<MultiRenderTarget>();
 	StartTarget_->Init(1);
 
+	TitleTarget_ = make_unique<MultiRenderTarget>();
+	TitleTarget_->Init(1);
 	cam_ = make_unique<GameCamera>();
 	cam_->Init();
 	cam_->TitleAnimationStart();
@@ -67,6 +69,16 @@ void GameScene::Init()
 	clearText_->Init(clearTextHandle);
 
 
+	int AToStartTextHandle = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/A_To_Start_2.png");
+	pressStartText_ = make_unique<Sprite>();
+	pressStartText_->Init(AToStartTextHandle);
+	pressStartText_->position = { WINDOW_WIDTH / 2, WINDOW_HEIGHT * (3.0f / 4.0f) };
+	pressStartText_->size = pressStartText_->texSize;
+	pressStartText_->size.x *= 0.5f;
+	pressStartText_->size.y *= 0.5f;
+
+	pressStartText_->Update();
+	pressStartTextAnimationEase_.Init(120);
 	groundModel_ = make_unique<Model>();
 	groundModel_->CreateModel("ground");
 	playerModel_ = make_unique<Model>();
@@ -136,7 +148,7 @@ void GameScene::Init()
 	weak_ptr<Planet> FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(1);
 	cam_->SetNextPlantPos(FlagOnPlanet.lock()->GetPos());
 
-	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, -1, 0), 2.0f);
+	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3), 2.0f);
 	MakeFlag(FlagOnPlanet, Vector3(-1, 0, 0), 2.0f);
 	//MakeFlag(a, Vector3(0, 1, 0), 2.0f);
 	MakeFlag(FlagOnPlanet, Vector3(1, 0, 0), 2.0f);
@@ -148,12 +160,12 @@ void GameScene::Init()
 		MakeFlag(FlagOnPlanet, Vector3(0, 1, 0), 2.0f);
 	}
 
-	Block::SetCamera(cam_->GetCamera());
-	Block::SetLights(lightGroup_.get());
-	Block tmpBlock;
-	tmpBlock.Init(PlanetManager::Instance()->GetPlanet(0), Vector3(0.0f, 1.0f, 1.0f), 1.0f);
+	//Block::SetCamera(cam_->GetCamera());
+	//Block::SetLights(lightGroup_.get());
+	//Block tmpBlock;
+	//tmpBlock.Init(PlanetManager::Instance()->GetPlanet(0), Vector3(0.0f, 1.0f, 1.0f), 1.0f);
 
-	testBlock_.emplace_back(tmpBlock);
+	//testBlock_.emplace_back(tmpBlock);
 
 	//box.Init(player_->GetPos(), ZVec, YVec);
 	//box.SetCamera(cam_->GetCamera());
@@ -161,7 +173,14 @@ void GameScene::Init()
 
 	InformationBoard::SetCamera(cam_->GetCamera());
 	InformationBoard::SetLightGroup(lightGroup_.get());
-	testBoard_.Init(L"Resources/welcome.png",PlanetManager::Instance()->GetBasePlanet(0), Vector3(1, 1, 0), Vector3(0, 3, 0), Vector3(3, 1, 0));
+	InformationBoard welcomeBoard, AtoJump, LTtoLockOn;
+	welcomeBoard.Init(L"Resources/welcome.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0));
+	AtoJump.Init(L"Resources/A_To_Jump.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0));
+	LTtoLockOn.Init(L"Resources/LT_To_LockOn.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(-0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0));
+	testBoards_.emplace_back(welcomeBoard);
+	testBoards_.emplace_back(AtoJump);
+	testBoards_.emplace_back(LTtoLockOn);
+
 	Restart();
 
 }
@@ -187,117 +206,24 @@ void GameScene::Update()
 		isPause_ = !isPause_;
 	}
 	if (isPause_) return;
+
 	GameInput::Instance()->Update();
 	lightGroup_->Update();
 
-	if (isGameTitle_ && GameInput::Instance()->B())
+	if (isGameTitle_)
 	{
-		isGameTitle_ = false;
-		cam_->TitleToIngame(player_->GetPos(), player_->GetAngle());
+		TitleUpdate();
+	}
+	else
+	{
+		IngameUpdate();
 	}
 
-	//掴む
-	if (GameInput::Instance()->LockOnInput())
-	{
-
-		if (GameInput::Instance()->GrabInput())
-		{
-			XMFLOAT3 tmp = cam_->GetCameraPos();
-			bool isCollision;
-			shared_ptr<Planet> grabPlanet;
-
-			isCollision = PlanetManager::Instance()->GetGrabPlanet(grabPlanet, tmp, cam_->GetCamera()->GetAngle());
-			if (isCollision)
-			{
-				player_->SetGrabPlanet(grabPlanet);
-			}
-		}
-	}
-	//離す
-
-	//タイトルじゃなかったらプレイヤーを動かせる
-	if (!isGameTitle_)
-	{
-		if (!GameInput::Instance()->GrabInput())
-		{
-			player_->ReleasePlanet();
-		}
-
-		MovePlanet();
-		player_->Update();
-	}
-
-	for (auto e : testBlock_)
-	{
-		player_->BlockCollision(e.GetCollisionPlanes());
-	}
-
-	objDome_->SetPosition(cam_->GetCameraPos());
-	objDome_->Update();
-
-	objGround_->Update();
-
-	if (Input::Instance()->KeyTrigger(DIK_9))
-	{
-		PlanetManager::Instance()->IDSpawn(1);
-	}
-
-	if (Input::Instance()->KeyTrigger(DIK_8))
-	{
-		PlanetManager::Instance()->IDSpawn(2);
-	}
-	PlanetManager::Instance()->Update();
-	//star->Update();
-	//temple_->Update();
 	cam_->SetBasePlanet(player_->GetBasePlanet());
 	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec());
 
-
-	bool isGetNow = false;
-
-	for (auto &flag : testFlag_)
-	{
-		flag.Update();
-
-		if (flag.CollisionPlayer(1.0f, player_->GetPos()))
-		{
-			isGetNow = true;
-		}
-	}
-	for (auto &e : testBlock_)
-	{
-		e.Update();
-	}
-	if (GetFlagCount() <= 0 && !isGameClear_ && isGetNow)
-	{
-		isGameClear_ = true;
-		stageNum++;
-		cam_->ClearAnimationStart(player_->GetPos());
-	}
-
-
-	ImguiUpdate();
-
-	shadowCam_->Update(player_->GetPos());
-	lightGroup_->Update();
-
-
-	bool SpeedReset = false;
-	ImGui::Begin("Debug");
-	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
-	SpeedReset = ImGui::Button("Reset");
-	ImGui::End();
-	if (GameInput::Instance()->ATrigger() && isGameClear_ || SpeedReset)
-	{
-		Restart();
-		cam_->ClearToIngme();
-	}
-	//box.Update();
-	AnimationTestUpdate();
-	titlePostEffect_.Update();
-
-	testBoard_.CollisionPlayer(player_->GetPos());
-	testBoard_.Update();
+	objDome_->SetPosition(cam_->GetCameraPos());
+	objDome_->Update();
 }
 
 void GameScene::PreDraw()
@@ -319,28 +245,41 @@ void GameScene::PreDraw()
 		flag.Draw();
 	}
 
-	for (auto &e : testBlock_)
+	//for (auto &e : testBlock_)
+	//{
+	//	e.Draw();
+	//}
+
+	for (auto &e : testBoards_)
 	{
 		e.Draw();
 	}
-
-	testBoard_.Draw();
-
-
+	if (isGameTitle_)
+	{
+		pressStartText_->Draw();
+	}
 	//box.Draw();
 	StartTarget_->PostDrawScene();
 
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
 
+	if (isGameTitle_)
+	{
+		vector<int> textureNum;
+		textureNum.emplace_back(DrawTexture_);
+		TitleTarget_->PreDrawScene();
+		titlePostEffect_.Draw(DrawTexture_);
+		TitleTarget_->PostDrawScene();
+		DrawTexture_ = TitleTarget_->GetTextureNum(0);
+	}
 
 	if (isMosaic_)
 	{
 		vector<int> textureNum;
 		textureNum.emplace_back(DrawTexture_);
 		MosaicTarget_->PreDrawScene();
-		//postTest_->Draw(PostMosaicPipeline::Instance()->GetPipeLine(), textureNum);
-		titlePostEffect_.Draw(DrawTexture_);
+		postTest_->Draw(PostMosaicPipeline::Instance()->GetPipeLine(), textureNum);
 		MosaicTarget_->PostDrawScene();
 		DrawTexture_ = MosaicTarget_->GetTextureNum(0);
 	}
@@ -384,6 +323,134 @@ void GameScene::Finalize()
 
 }
 
+void GameScene::IngameUpdate()
+{
+	//掴む
+	if (GameInput::Instance()->LockOnInput())
+	{
+
+		if (GameInput::Instance()->GrabInput())
+		{
+			XMFLOAT3 tmp = cam_->GetCameraPos();
+			bool isCollision;
+			shared_ptr<Planet> grabPlanet;
+
+			isCollision = PlanetManager::Instance()->GetGrabPlanet(grabPlanet, tmp, cam_->GetCamera()->GetAngle());
+			if (isCollision)
+			{
+				player_->SetGrabPlanet(grabPlanet);
+			}
+		}
+	}
+	//離す
+
+	//タイトルじゃなかったらプレイヤーを動かせる
+	if (!isGameTitle_)
+	{
+		if (!GameInput::Instance()->GrabInput())
+		{
+			player_->ReleasePlanet();
+		}
+
+		MovePlanet();
+		player_->Update();
+	}
+
+	for (auto e : testBlock_)
+	{
+		player_->BlockCollision(e.GetCollisionPlanes());
+	}
+
+	objGround_->Update();
+
+	if (Input::Instance()->KeyTrigger(DIK_9))
+	{
+		PlanetManager::Instance()->IDSpawn(1);
+	}
+
+	if (Input::Instance()->KeyTrigger(DIK_8))
+	{
+		PlanetManager::Instance()->IDSpawn(2);
+	}
+	PlanetManager::Instance()->Update();
+	//star->Update();
+	//temple_->Update();
+
+
+	bool isGetNow = false;
+
+	for (auto &flag : testFlag_)
+	{
+		flag.Update();
+
+		if (flag.CollisionPlayer(1.0f, player_->GetPos()))
+		{
+			isGetNow = true;
+		}
+	}
+	//for (auto &e : testBlock_)
+	//{
+	//	e.Update();
+	//}
+	if (GetFlagCount() <= 0 && !isGameClear_ && isGetNow)
+	{
+		isGameClear_ = true;
+		stageNum++;
+		cam_->ClearAnimationStart(player_->GetPos());
+	}
+
+
+	ImguiUpdate();
+
+	shadowCam_->Update(player_->GetPos());
+	lightGroup_->Update();
+
+
+	bool SpeedReset = false;
+	ImGui::Begin("Debug");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	SpeedReset = ImGui::Button("Reset");
+	ImGui::End();
+	if (GameInput::Instance()->ATrigger() && isGameClear_ || SpeedReset)
+	{
+		Restart();
+		cam_->ClearToIngme();
+	}
+	//box.Update();
+	AnimationTestUpdate();
+
+	for (auto &e : testBoards_)
+	{
+		e.CollisionPlayer(player_->GetPos());
+		e.Update();
+	}
+}
+
+void GameScene::TitleUpdate()
+{
+	if (GameInput::Instance()->A())
+	{
+		isGameTitle_ = false;
+		cam_->TitleToIngame(player_->GetPos(), player_->GetAngle());
+	}
+
+	float rate = pressStartTextAnimationEase_.Do(Easing::InOut, Easing::Cubic);
+	if (isTitleAnimationFlip)
+	{
+		rate = 1 - rate;
+	}
+	if (pressStartTextAnimationEase_.IsEnd())
+	{
+		pressStartTextAnimationEase_.Reset();
+		isTitleAnimationFlip = !isTitleAnimationFlip;
+	}
+
+	pressStartText_->color.w = rate;
+
+	pressStartText_->Update();
+	titlePostEffect_.Update();
+}
+
 void GameScene::Restart()
 {
 	lightsRestart();
@@ -421,10 +488,10 @@ void GameScene::ObjectRestart()
 		e.Reset();
 	}
 
-	for (auto &e : testBlock_)
-	{
-		e.Update();
-	}
+	//for (auto &e : testBlock_)
+	//{
+	//	e.Update();
+	//}
 }
 
 void GameScene::MovePlanet()

@@ -44,6 +44,10 @@ void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLO
 	startColor_ = color;
 	startIsSpawn_ = Spawn;
 	SpawnAnimationEase_.Init(20);
+	object->SetCamera(cam);
+	object->SetLightGroup(lights);
+	object->SetShadowCamera(shadowCam);
+	object->SetShadowTextureNum(shadowTextureNum);
 	Reset();
 }
 

@@ -27,5 +27,6 @@ private:
 	int Titletype = 0;
 	PostEffect obj;
 	Easing animationTimer;
+	int startTimer_;
 };
 

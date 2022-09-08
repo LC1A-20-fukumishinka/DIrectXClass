@@ -99,6 +99,7 @@ void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> baseP
 
 	Vector3 tmpAngle = angle;
 
+	//Œ³‚Ì˜f¯‚ÉˆÊ’u‚ð‡‚í‚¹‚é
 	basePos_ += (tmpAngle.normalize() * basePlanet_.lock()->GetScale());
 	movePos_ = movePos;
 
@@ -148,6 +149,7 @@ void InformationBoard::Update()
 
 void InformationBoard::Draw()
 {
+	if(!basePlanet_.lock()->GetIsSpawn()) return;
 	baseBoard_.Update();
 	baseBoard_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine(), true, sBoardTextureHandle);
 	drawObject_.Update();

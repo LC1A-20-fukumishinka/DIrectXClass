@@ -35,6 +35,9 @@ public:
 	void MainDraw() override;
 	void Finalize() override;
 private:
+
+	void IngameUpdate();
+	void TitleUpdate();
 	//リスタート関数
 	void Restart();
 
@@ -68,6 +71,7 @@ private:
 	std::unique_ptr<MultiRenderTarget> MonoTarget_;
 	std::unique_ptr<MultiRenderTarget> MosaicTarget_;
 	std::unique_ptr<MultiRenderTarget> StartTarget_;
+	std::unique_ptr<MultiRenderTarget> TitleTarget_;
 	std::unique_ptr<GameCamera> cam_;
 	std::unique_ptr<ShadowCamera> shadowCam_;
 	std::unique_ptr<Light> light_;
@@ -89,11 +93,15 @@ private:
 	std::unique_ptr<Sprite> clearText_;
 	PostBasePipeline NormalDrawPipeline_;
 
+
+	std::unique_ptr<Sprite> pressStartText_;
+	Easing pressStartTextAnimationEase_;
+	bool isTitleAnimationFlip = false;
 	std::list<Flag> testFlag_;
 	std::list<Block> testBlock_;
 
 
-	InformationBoard testBoard_;
+	std::list<InformationBoard> testBoards_;
 	Sprite Dark_;
 	//BoxObj3D box;
 	bool isPause_ = false;

@@ -50,6 +50,7 @@ TitlePostEffect::TitlePostEffect()
 	desc.inputLayoutCount = _countof(inputLayout);
 	desc.rootparams = rootparams;
 	desc.rootparamsCount = _countof(rootparams);
+	desc.blendName = GraphicsPipelineTypeName::BlendName::NONE;
 	pipeline = BaseGraphicsPipeline::CreatePipeLine(desc);
 }
 
@@ -72,10 +73,11 @@ MyDirectX *myD = MyDirectX::Instance();
 	);
 	TitleBuffer *constMap = nullptr;
 	result = constBuff2_->Map(0, nullptr, (void **)&constMap);
-	constMap->t = t;//アニメーションの位置
+	constMap->t = 0.0f;//アニメーションの位置
 	constMap->type = Titletype;
 	constBuff2_->Unmap(0, nullptr);
 	animationTimer.Init(300);
+	startTimer_ = 60;
 }
 
 void TitlePostEffect::Update()
@@ -91,16 +93,24 @@ void TitlePostEffect::Update()
 	ImGui::End();
 
 	HRESULT result;
+
 	if (AnimationReset)
 	{
 		animationTimer.Reset();
 	}
+	if(startTimer_ <= 0)
+	{
 	animationTimer.Do(Easing::EaseMove::Out, Easing::Type::Expo);
 	TitleBuffer *constMap = nullptr;
 	result = constBuff2_->Map(0, nullptr, (void **)&constMap);
 	constMap->t = animationTimer.Read();//アニメーションの位置
 	constMap->type = Titletype;
 	constBuff2_->Unmap(0, nullptr);
+	}
+	else
+	{
+		startTimer_--;
+	}
 }
 
 void TitlePostEffect::Draw(int textureHandle)
