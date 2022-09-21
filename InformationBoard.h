@@ -19,6 +19,7 @@ public:
 	void Finalize();
 
 	bool CollisionPlayer(const Vector3 &pos);
+
 private:
 	static std::unique_ptr<Model> sInformationModel;
 	static std::unique_ptr<Model> sBoardModel;
@@ -31,6 +32,8 @@ public:
 	static void SetLightGroup(LightGroup *lightGroup);
 	static void SetCamera(Camera *camera);
 private:
+	void BoardUpdate();
+private:
 	Object3D drawObject_;
 	Object3D baseBoard_;
 	int textureHandle_;
@@ -42,4 +45,8 @@ private:
 	bool isInDrawLength_ = false;
 	float objectScale_ =false;
 	float drawLength_ = 10.0f;
+
+	bool isIdolMotion = false;
+
+	float idolAnimationRate_ = 0.0f;
 };

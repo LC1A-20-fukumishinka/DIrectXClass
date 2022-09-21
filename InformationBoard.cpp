@@ -145,11 +145,13 @@ void InformationBoard::Update()
 
 	drawObject_.SetPosition(pos);
 	drawObject_.SetRotation(bill);
+
+	BoardUpdate();
 }
 
 void InformationBoard::Draw()
 {
-	if(!basePlanet_.lock()->GetIsSpawn()) return;
+	if (!basePlanet_.lock()->GetIsSpawn()) return;
 	baseBoard_.Update();
 	baseBoard_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine(), true, sBoardTextureHandle);
 	drawObject_.Update();
@@ -179,6 +181,40 @@ bool InformationBoard::CollisionPlayer(const Vector3 &pos)
 void InformationBoard::SetCamera(Camera *camera)
 {
 	sCamera = camera;
+}
+
+void InformationBoard::BoardUpdate()
+{
+	Vector3 pos = basePos_;
+	Vector3 boardUp = baseBoard_.GetUpVec();
+
+	float move = 1.0f;
+
+	idolAnimationRate_ += 0.01f;
+	if (idolAnimationRate_ >= 1.0f)
+	{
+		idolAnimationRate_ = 0.0f;
+		isIdolMotion = !isIdolMotion;
+	}
+
+	float rate = Easing::easeInOutQuad(idolAnimationRate_);
+
+	if (isIdolMotion)
+	{
+		move *= rate;
+	}
+	else
+	{
+		move *= (1.0f - rate);
+	}
+
+	pos += (boardUp * move);
+	baseBoard_.SetPosition(pos);
+
+	XMVECTOR rot = baseBoard_.GetRotQuaternion();
+	XMMATRIX addRotMat = XMMatrixRotationAxis(XMLoadFloat3(&boardUp), FukuMath::degree);
+	rot =XMQuaternionMultiply(rot, XMQuaternionRotationMatrix(addRotMat));
+	baseBoard_.SetRotation(rot);
 }
 
 void InformationBoard::SetLightGroup(LightGroup *lightGroup)
