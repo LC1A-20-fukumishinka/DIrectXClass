@@ -7,6 +7,7 @@
 #include "gameConstData.h"
 #include "../ShadowPipeline.h"
 #include "../Collision/Collision.h"
+#include "DirectInput.h"
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -117,7 +118,10 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	}
 #pragma endregion
 
-
+	if (Input::Instance()->KeyTrigger(DIK_Z))
+	{
+		int hoge = 0;
+	}
 
 	Vector3 stickInputVector3(stick.x, 0, stick.y);
 	//スティックの入力をベクターに入れる
@@ -125,7 +129,13 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 	//カメラの行列から入力を画面の向きに合わせて矯正
 	XMVECTOR moveV = XMLoadFloat3(&move);
-	XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboard());
+	//XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboard());
+
+	XMVECTOR moveUp = drawObject.GetUpVec();
+	XMVECTOR moveFront;
+	GetMatRot(XMLoadFloat3(&cam->GetRight()), moveUp, moveFront);
+	XMMATRIX moveMat = GetMatRot( moveUp , moveFront);
+	XMVECTOR camRot = XMQuaternionRotationMatrix(moveMat);
 	moveV = XMVector3Rotate(moveV, camRot);
 	XMStoreFloat3(&move, moveV);
 	move.normalize();

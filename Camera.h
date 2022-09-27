@@ -44,6 +44,7 @@ public:
 	DirectX::XMFLOAT3 GetEye(){return eye;}
 	DirectX::XMFLOAT3 GetTarget(){return target;}
 	DirectX::XMFLOAT3 GetAngle();
+	DirectX::XMFLOAT3 GetRight();
 	void SetEye(const DirectX::XMFLOAT3 &eye){this->eye = eye;}
 	void SetTarget(const DirectX::XMFLOAT3 &target){this->target = target;}
 	void CameraRot(const DirectX::XMVECTOR &rotQ);
@@ -61,6 +62,7 @@ private:
 	DirectX::XMMATRIX matBillBoardY;
 	Projection::ProjectionData projectionData;
 
+	Vector3 right;
 	void MakeMatCamera();
 
 };

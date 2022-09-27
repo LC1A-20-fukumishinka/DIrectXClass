@@ -351,8 +351,10 @@ void GameScene::IngameUpdate()
 		{
 			player_->ReleasePlanet();
 		}
-
-		MovePlanet();
+		if (!isGameClear_)
+		{
+			MovePlanet();
+		}
 		player_->Update();
 	}
 
@@ -411,7 +413,7 @@ void GameScene::IngameUpdate()
 	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
 	SpeedReset = ImGui::Button("Reset");
 	ImGui::End();
-	if (GameInput::Instance()->ATrigger() && isGameClear_ || SpeedReset)
+	if (!isGameClear_ && SpeedReset)
 	{
 		Restart();
 		cam_->ClearToIngme();
@@ -455,6 +457,7 @@ void GameScene::Restart()
 {
 	lightsRestart();
 	ObjectRestart();
+	stageNum = 0;
 	isGameClear_ = false;
 }
 
@@ -505,10 +508,9 @@ void GameScene::MovePlanet()
 		if (isMove)
 		{
 			player_->SetBasePlanet(basePlanet);
-			cam_->IsAnimationOn();
+			cam_->CameraStop();
 		}
-	}
-	else if (cam_->GetIsChangeBasePlanet())
+	}	else if (cam_->GetIsCameraStop())
 	{
 		cam_->StartCameraAnimation(false, 60);
 	}

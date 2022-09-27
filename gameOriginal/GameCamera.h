@@ -14,13 +14,10 @@ public:
 public:
 	Camera *GetCamera();
 	Vector3 GetCameraPos();
-	bool GetIsChangeBasePlanet();
+	bool GetIsCameraStop();
 
+	void CameraStop();
 	void SetBasePlanet(const std::weak_ptr<Planet> planet);
-	/// <summary>
-	/// 惑星を変更した
-	/// </summary>
-	void IsAnimationOn();
 
 	/// <summary>
 	/// 現在のカメラの状態を保存しアニメーションをスタート
@@ -73,22 +70,22 @@ private://状況別更新処理
 private:
 	void camRot(DirectX::XMFLOAT2 rot);
 private:
-	Camera cam;
+	Camera cam_;
 
-	Vector3 nextEyePos = {};
-	Vector3 nextTargetPos = {};
-	DirectX::XMVECTOR nextCamUpRot = {};
-	Vector3 oldEyePos = {};
-	Vector3 oldTargetPos = {};
-	DirectX::XMVECTOR oldCamUpRot = {};
-	std::weak_ptr<Planet> planet;
-	bool isChangeBasePlanet = false;
+	Vector3 nextEyePos_ = {};
+	Vector3 nextTargetPos_ = {};
+	DirectX::XMVECTOR nextCamUpRot_ = {};
+	Vector3 oldEyePos_ = {};
+	Vector3 oldTargetPos_ = {};
+	DirectX::XMVECTOR oldCamUpRot_ = {};
+	std::weak_ptr<Planet> planet_;
+	bool isCameraStop_ = false;
 	//次の惑星の座標
 	Vector3 nextPlanetPos_ = {};
 private://挙動のイージング
-	bool isChangeBasePlanetAnimation;
-	Easing CameraAnimationEase;
-	bool isTargetEase = false;
+	bool isChangeBasePlanetAnimation_;
+	Easing CameraAnimationEase_;
+	bool isTargetEase_ = false;
 
 	bool isClearMode_ = false;
 	bool isTitleMode_ = true;

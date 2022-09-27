@@ -8,18 +8,18 @@ float FukuMath::CosineTheorem(const float a, const float b, const float c)
 	return (bunshi / bunbo);
 }
 
-DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &v1, DirectX::XMVECTOR &v2, DirectX::XMVECTOR &cross)
+DirectX::XMMATRIX FukuMath::GetMatRot(const DirectX::XMVECTOR &v1, const DirectX::XMVECTOR &v2, DirectX::XMVECTOR &cross)
 {
 	XMVECTOR upVector = XMVECTOR{ 0, 1, 0, 0 };
 
 	//(仮の) 上方向
-	if (!XMVector3Equal(v2, XMVectorZero()) && !XMVector3IsInfinite(v2))
+	if (!XMVector3Equal(v1, XMVectorZero()) && !XMVector3IsInfinite(v1))
 	{
-		upVector = v2;
+		upVector = v1;
 	}
 
 	//カメラZ軸
-	XMVECTOR frontAxisZ = v1;
+	XMVECTOR frontAxisZ = v2;
 
 
 	//正面ベクトルが0だった場合
@@ -57,8 +57,6 @@ DirectX::XMMATRIX FukuMath::GetMatRot(DirectX::XMVECTOR &v1, DirectX::XMVECTOR &
 	upAxisY = XMVector3Cross(frontAxisZ, rightAxisX);
 	//ベクトルの正規化
 	upAxisY = XMVector3Normalize(upAxisY);
-	//上方向ベクトルを書き換える
-	v2 = upAxisY;
 	//カメラ回転行列
 	XMMATRIX matRot;
 	//カメラ座標系→ワールド座標系の変換行列

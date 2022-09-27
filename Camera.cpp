@@ -9,6 +9,7 @@ Camera::Camera()
 	this->eye = Vector3(0.0f, 0.0f, -100.0f);
 	this->target = Vector3(0.0f, 0.0f, 0.0f);
 	this->up = Vector3(0.0f, 1.0f, 0.0f);
+	this->right = Vector3(1.0f, 0.0f, 0.0f);
 	this->shift = Vector3(0.0f, 0.0f, 0.0f);
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 	matBillBoard = XMMatrixIdentity();
@@ -108,7 +109,7 @@ void Camera::MakeMatCamera()
 	cameraAxisX = XMVector3Cross(upVector, cameraAxisZ);
 	//ベクトルを正規化
 	cameraAxisX = XMVector3Normalize(cameraAxisX);
-
+	right = cameraAxisX;
 	//カメラのY軸
 	XMVECTOR cameraAxisY;
 	//Y軸はZ軸→X軸の外積で求まる
@@ -176,6 +177,11 @@ DirectX::XMMATRIX Camera::GetMatViewProj()
 DirectX::XMFLOAT3 Camera::GetAngle()
 {
 	return Vector3(target- eye).normalize();
+}
+
+DirectX::XMFLOAT3 Camera::GetRight()
+{
+	return right;
 }
 
 void Camera::CameraRot(const DirectX::XMVECTOR &rotQ)
