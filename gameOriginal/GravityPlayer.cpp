@@ -118,11 +118,6 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	}
 #pragma endregion
 
-	if (Input::Instance()->KeyTrigger(DIK_Z))
-	{
-		int hoge = 0;
-	}
-
 	Vector3 stickInputVector3(stick.x, 0, stick.y);
 	//スティックの入力をベクターに入れる
 	Vector3 move = stickInputVector3;

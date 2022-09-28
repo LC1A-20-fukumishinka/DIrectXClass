@@ -146,7 +146,7 @@ void GameScene::Init()
 	Flag::SetShadowCamera(shadowCam_->GetCamera());
 
 	weak_ptr<Planet> FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(1);
-	cam_->SetNextPlantPos(FlagOnPlanet.lock()->GetPos());
+	cam_->SetNextPlantPos(PlanetManager::Instance()->GetBasePlanet(1)->GetPos());
 
 	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3), 2.0f);
 	MakeFlag(FlagOnPlanet, Vector3(-1, 0, 0), 2.0f);
@@ -458,6 +458,7 @@ void GameScene::Restart()
 	lightsRestart();
 	ObjectRestart();
 	stageNum = 0;
+	cam_->SetNextPlantPos(PlanetManager::Instance()->GetBasePlanet(1)->GetPos());
 	isGameClear_ = false;
 }
 

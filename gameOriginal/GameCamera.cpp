@@ -49,7 +49,9 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 		//次の対象の場所に即移動する
 		cam_.SetEye(nextEyePos_);
 		//基本の上ベクトルを回転させて確認
-		XMStoreFloat3(&cam_.up, XMVector3Rotate(XMLoadFloat3(&playerYVec), nextCamUpRot_));
+		//cam_.up = XMVector3Rotate(XMLoadFloat3(&playerYVec), nextCamUpRot_);
+		cam_.up = XMVector3Rotate(YVec, nextCamUpRot_);
+
 		//次のターゲット座標に移動
 		cam_.SetTarget(nextTargetPos_);
 	}
@@ -268,6 +270,7 @@ void GameCamera::LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVe
 	Vector3 shift(XMVector3Rotate(LockOnShift, cameraAngleRot));
 	nextTargetPos_ += shift;
 	cam_.SetTarget(nextTargetPos_);
+
 	Vector3 camPos = -playerZVec;
 	float length = 3.0f;
 
@@ -277,7 +280,7 @@ void GameCamera::LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVe
 	nextEyePos_ = camPos;
 
 	XMVECTOR frontV = XMLoadFloat3(&(nextTargetPos_ - nextEyePos_));
-	nextCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(frontV, XMLoadFloat3(&playerYVec)));
+	nextCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&playerZVec)));
 }
 
 void GameCamera::GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec)
@@ -335,17 +338,23 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 void GameCamera::camRot(DirectX::XMFLOAT2 rot)
 {
 	XMVECTOR rotQ = XMQuaternionIdentity();
+	XMVECTOR rotX = XMVector3Rotate(XMLoadFloat3(&cam_.GetRight()), XMQuaternionIdentity());
+	XMVECTOR rotY = XMVector3Rotate(XMLoadFloat3(&cam_.up), XMQuaternionIdentity());
+	rotQ = XMQuaternionMultiply(nextCamUpRot_, XMQuaternionRotationAxis(rotX, rot.y * RotRate));
 
-	rotQ = XMQuaternionRotationAxis(XMVector3Rotate(XMLoadFloat3(&cam_.GetRight()), nextCamUpRot_), rot.y * RotRate);
-
-	rotQ = XMQuaternionMultiply(rotQ, XMQuaternionRotationAxis(XMVector3Rotate(XMLoadFloat3(&cam_.up), nextCamUpRot_), rot.x * RotRate));
+	rotQ = XMQuaternionMultiply(rotQ, XMQuaternionRotationAxis(rotY, rot.x * RotRate));
 
 	nextCamUpRot_ = rotQ;
 	//targetからnextPosの視点座標までのベクトルを計算
-	XMVECTOR nextVec = XMLoadFloat3(&(nextEyePos_ - nextTargetPos_));
+	//XMVECTOR nextVec = XMLoadFloat3(&(nextEyePos_ - nextTargetPos_));
+
+	float length = (nextEyePos_ - nextTargetPos_).length();
+	XMVECTOR nextVec = -ZVec;
+
 	//回転させる
 	nextVec = XMVector3Rotate(nextVec, rotQ);
 
+	nextVec *= length;
 	Vector3 camPos;
 	XMStoreFloat3(&camPos, nextVec);
 	//targetの座標＋生成したベクトルを合わせて回転完了
