@@ -31,11 +31,7 @@ protected://メンバ関数
 	DirectX::XMVECTOR GetRotationQ();
 
 	bool GetIsPlanetSpawn();
-	///// <summary>
-	///// 引数で入れた動かす動かす
-	///// </summary>
-	///// <param name="MoveVec">動かすベクトル</param>
-	//void Move(Vector3 MoveVec);
+
 protected://staic変数
 	//ゲームのメインカメラ
 	static Camera *sMainCamera;

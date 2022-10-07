@@ -119,15 +119,18 @@ void Object3D::Update()
 
 void Object3D::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetTexture, int textureNumber)
 {
+	SetDrawBuffers(pipelineSet, isSetTexture, textureNumber);
+	DrawCommand();
+}
+
+void Object3D::SetDrawBuffers(PipeClass::PipelineSet *pipelineSet, bool isSetTexture, int textureNumber)
+{
 	if (model == nullptr)
 	{
 		assert(0);
 	}
 
-	if (lightGroup == nullptr)
-	{
-		assert(0);
-	}
+
 	MyDirectX *myD = MyDirectX::Instance();
 
 	myD->GetCommandList()->SetPipelineState(pipelineSet->pipelineState.Get());
@@ -144,7 +147,10 @@ void Object3D::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetTexture,
 
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model->GetModel()->constBuffB1->GetGPUVirtualAddress());
 
-	lightGroup->Draw(3);
+	if (lightGroup != nullptr)
+	{
+		lightGroup->Draw(3);
+	}
 	if (isSetTexture)
 	{
 		if (!TextureMgr::Instance()->CheckHandle(textureNumber))
@@ -176,13 +182,23 @@ void Object3D::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetTexture,
 		);
 	}
 
+}
+
+void Object3D::DrawCommand()
+{
+	if (model == nullptr)
+	{
+		assert(0);
+	}
+	MyDirectX *myD = MyDirectX::Instance();
+
 #pragma region とりあえず引っ張り出した描画コマンド
 	myD->GetCommandList()->IASetVertexBuffers(0, 1, &model->GetModel()->vbView);
+
 	//インデックスバッファの設定
 	myD->GetCommandList()->IASetIndexBuffer(&model->GetModel()->ibView);
 	myD->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(model->GetModel()->indices.size()), 1, 0, 0, 0);
 #pragma endregion
-
 }
 
 void Object3D::SetParent(Object3D *parent)

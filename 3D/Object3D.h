@@ -37,7 +37,8 @@ public:
 	/// <param name="isSetTexture">別のテクスチャを使用する</param>
 	/// <param name="textureNumber">使用するテクスチャのハンドル</param>
 	virtual void modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetTexture = false, int textureNumber = -1);
-
+	void SetDrawBuffers(PipeClass::PipelineSet *pipelineSet, bool isSetTexture = false, int textureNumber = -1);
+	void DrawCommand();
 	virtual void OnCollision(const CollisionInfo &info) {};
 
 public://セッタ

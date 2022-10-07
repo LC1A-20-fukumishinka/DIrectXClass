@@ -201,10 +201,27 @@ void GameScene::Update()
 		isMosaic_ = !isMosaic_;
 	}
 	//スクショ用停止ポーズ
-	if (Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_START))
+	if (GameInput::Instance()->Pause())
 	{
 		isPause_ = !isPause_;
 	}
+
+	bool SpeedReset = false;
+
+	if (isPause_)
+	{
+		ImGui::Begin("Debug");
+		ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+		SpeedReset = ImGui::Button("Reset");
+		ImGui::End();
+	}
+	if (isPause_ && SpeedReset)
+	{
+	isPause_ = false;
+		Restart();
+		cam_->ClearToIngme();
+	}
+
 	if (isPause_) return;
 
 	GameInput::Instance()->Update();
@@ -407,17 +424,6 @@ void GameScene::IngameUpdate()
 	shadowCam_->Update(player_->GetPos());
 	lightGroup_->Update();
 
-
-	bool SpeedReset = false;
-	ImGui::Begin("Debug");
-	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
-	SpeedReset = ImGui::Button("Reset");
-	ImGui::End();
-	if (!isGameClear_ && SpeedReset)
-	{
-		Restart();
-		cam_->ClearToIngme();
-	}
 	//box.Update();
 	AnimationTestUpdate();
 

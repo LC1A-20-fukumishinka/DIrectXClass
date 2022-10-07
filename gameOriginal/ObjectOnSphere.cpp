@@ -54,7 +54,7 @@ void ObjectOnSphere::Draw()
 	object_.Update();
 	//後でオリジナルのシェーダーを作れ
 
-	if(!basePlanet_.lock()->GetIsSpawn()) return;
+	if (!basePlanet_.lock()->GetIsSpawn()) return;
 	object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 

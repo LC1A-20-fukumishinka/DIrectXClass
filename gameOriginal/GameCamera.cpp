@@ -56,6 +56,7 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 		cam_.SetTarget(nextTargetPos_);
 	}
 
+
 	cam_.Update();
 }
 
@@ -211,6 +212,8 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	//nextCamUpRot_ = XMQuaternionRotationMatrix(camUpMat);
 	nextEyePos_ = camPos;
 
+
+
 	camRot(GameInput::Instance()->RStick());
 }
 
@@ -324,7 +327,13 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 	}
 	else
 	{
+		if (GameInput::Instance()->CameraReflesh())
+		{
+			nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&cam_.GetAngle())));
+			StartCameraAnimation(false, 15);
+		}
 		NormalUpdate(playerPos);
+
 	}
 
 

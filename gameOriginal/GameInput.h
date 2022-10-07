@@ -34,6 +34,7 @@ public:
 	bool LockOnTrigger();
 	bool LockOnRelease();
 
+	bool CameraReflesh();
 	bool Pause();
 
 	/// <summary>

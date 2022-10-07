@@ -82,7 +82,6 @@ void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> baseP
 	textureHandle_ = TextureMgr::Instance()->SpriteLoadTexture(filename);
 	drawObject_.Init();
 	drawObject_.SetCamera(sCamera);
-	drawObject_.SetLightGroup(sLightGroup);
 	drawObject_.SetModel(sInformationModel.get());
 
 	baseBoard_.Init();
