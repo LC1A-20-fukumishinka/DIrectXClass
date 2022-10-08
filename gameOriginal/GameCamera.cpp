@@ -217,7 +217,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	camRot(GameInput::Instance()->RStick());
 }
 
-void GameCamera::SetNextPlantPos(const Vector3 pos)
+void GameCamera::SetNextPlantPos(const Vector3 &pos)
 {
 	nextPlanetPos_ = pos;
 }
@@ -344,7 +344,7 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 	}
 }
 
-void GameCamera::camRot(DirectX::XMFLOAT2 rot)
+void GameCamera::camRot(const DirectX::XMFLOAT2 &rot)
 {
 	XMVECTOR rotQ = XMQuaternionIdentity();
 	XMVECTOR rotX = XMVector3Rotate(XMLoadFloat3(&cam_.GetRight()), XMQuaternionIdentity());

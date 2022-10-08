@@ -11,7 +11,7 @@ class SphereCollider : public BaseCollider, public Sphere
 private:
 	using XMVECTOR = DirectX::XMVECTOR;
 public:
-	SphereCollider(XMVECTOR offset = { 0, 0, 0, 0 }, float radius = 1.0f):
+	SphereCollider(const XMVECTOR &offset = { 0, 0, 0, 0 }, float radius = 1.0f):
 		offset(offset),
 		radius(radius)
 	{

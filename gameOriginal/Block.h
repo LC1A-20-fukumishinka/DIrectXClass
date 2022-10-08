@@ -7,7 +7,7 @@ class Block : public ObjectOnSphere
 public:
 	Block();
 	~Block();
-	void Init(std::weak_ptr<Planet> basePlanet, Vector3 angle, float scale) override;
+	void Init(std::weak_ptr<Planet> basePlanet,const Vector3 &angle, float scale) override;
 	//void Update() override;
 
 	std::vector<Triangle> GetCollisionPlanes();

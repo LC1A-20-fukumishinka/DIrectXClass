@@ -6,8 +6,8 @@ private:
 	SceneMgr();
 	~SceneMgr();
 public:
-	SceneMgr(SceneMgr &obj) = delete;
-	SceneMgr operator=(SceneMgr &obj) = delete;
+	SceneMgr(const SceneMgr &obj) = delete;
+	SceneMgr operator=(const SceneMgr &obj) = delete;
 
 	static SceneMgr *Instance();
 	static void Finalize();

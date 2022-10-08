@@ -7,7 +7,7 @@ class Sprite
 public:
 	Sprite();
 
-	void Init( UINT texnumber, DirectX::XMFLOAT2 anchorpoint = { 0.5f, 0.5f }, bool isFlipX = false, bool isFlipY = false);
+	void Init( UINT texnumber, const DirectX::XMFLOAT2 &anchorpoint = { 0.5f, 0.5f }, bool isFlipX = false, bool isFlipY = false);
 
 	void SpriteTransferVertexBuffer();
 

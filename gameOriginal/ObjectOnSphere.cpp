@@ -14,7 +14,7 @@ ObjectOnSphere::~ObjectOnSphere()
 {
 }
 
-void ObjectOnSphere::Init(std::weak_ptr<Planet> basePlanet, Vector3 angle, float scale)
+void ObjectOnSphere::Init(std::weak_ptr<Planet> basePlanet,const Vector3 &angle, float scale)
 {
 	upVec_ = angle;//オブジェクトの方向を設定
 	worldScale_ = scale;

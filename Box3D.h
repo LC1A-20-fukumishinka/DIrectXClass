@@ -24,7 +24,7 @@ public:
 	BoxObj3D();
 	~BoxObj3D();
 
-	void Init(const Vector3 pos, const Vector3 &front , const Vector3 &up);
+	void Init(const Vector3 &pos, const Vector3 &front , const Vector3 &up);
 	void Update();
 	void Draw();
 	void Finalize();
@@ -34,20 +34,20 @@ public:
 	void SetCamera(Camera *camera);
 
 
-	void SetRotation(DirectX::XMFLOAT3 rot);
+	void SetRotation(const DirectX::XMFLOAT3 &rot);
 
-	void SetRotation(DirectX::XMVECTOR quaternion);
+	void SetRotation(const DirectX::XMVECTOR &quaternion);
 
-	void AddRotation(DirectX::XMFLOAT3 rot);
+	void AddRotation(const DirectX::XMFLOAT3 &rot);
 
-	void AddRotation(DirectX::XMVECTOR rot);
+	void AddRotation(const DirectX::XMVECTOR &rot);
 
 	/// <summary>
 	/// 姿勢を正面と上ベクトルから計算する
 	/// </summary>
 	/// <param name="front"></param>
 	/// <param name="up"></param>
-	void SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up);
+	void SetRotationVector(const DirectX::XMVECTOR &front, const DirectX::XMVECTOR &up);
 
 private://スタティック変数
 	static std::unique_ptr<PipeClass::PipelineSet> pipelineSet_;

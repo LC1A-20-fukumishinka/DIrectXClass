@@ -13,7 +13,7 @@ private:
 	MyDirectX();
 	~MyDirectX();
 public:
-	MyDirectX(MyDirectX &obj) = delete;
+	MyDirectX(const MyDirectX &obj) = delete;
 	MyDirectX &operator=(const MyDirectX &obj) = delete;
 	int winWidth, winHeight;
 

@@ -120,7 +120,7 @@ std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
 	return *planets.begin();
 }
 
-void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn, PlanetType type)
+void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn,const PlanetType &type)
 {
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();

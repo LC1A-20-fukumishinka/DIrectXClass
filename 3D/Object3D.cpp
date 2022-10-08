@@ -241,22 +241,22 @@ void Object3D::SetModel(Model *model)
 	this->model = model;
 }
 
-void Object3D::SetPosition(XMFLOAT3 pos)
+void Object3D::SetPosition(const XMFLOAT3 &pos)
 {
 	position = pos;
 }
 
-void Object3D::SetColor(XMFLOAT4 color)
+void Object3D::SetColor(const XMFLOAT4 &color)
 {
 	this->color = color;
 }
 
-void Object3D::SetScale(XMFLOAT3 scale)
+void Object3D::SetScale(const XMFLOAT3 &scale)
 {
 	this->scale = scale;
 }
 
-void Object3D::SetRotation(XMFLOAT3 rot)
+void Object3D::SetRotation(const XMFLOAT3 &rot)
 {
 	rotation = rot;
 
@@ -264,13 +264,13 @@ void Object3D::SetRotation(XMFLOAT3 rot)
 	UpdateVector();
 }
 
-void Object3D::SetRotation(DirectX::XMVECTOR quaternion)
+void Object3D::SetRotation(const DirectX::XMVECTOR &quaternion)
 {
 	this->quaternion = quaternion;
 	UpdateVector();
 }
 
-void Object3D::AddRotation(DirectX::XMFLOAT3 rot)
+void Object3D::AddRotation(const DirectX::XMFLOAT3 &rot)
 {
 	rotation.x += rot.x;
 	rotation.y += rot.y;
@@ -281,13 +281,13 @@ void Object3D::AddRotation(DirectX::XMFLOAT3 rot)
 	UpdateVector();
 }
 
-void Object3D::AddRotation(DirectX::XMVECTOR rot)
+void Object3D::AddRotation(const DirectX::XMVECTOR &rot)
 {
 	quaternion = XMQuaternionMultiply(quaternion, rot);
 	UpdateVector();
 }
 
-void Object3D::SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up)
+void Object3D::SetRotationVector(const DirectX::XMVECTOR &front, const DirectX::XMVECTOR &up)
 {
 	this->up = up;
 	//正面ベクトルから回転行列を計算

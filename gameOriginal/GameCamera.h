@@ -43,7 +43,7 @@ public:
 	/// <summary>
 	/// クリア時にカメラが向く座標
 	/// </summary>
-	void SetNextPlantPos(const Vector3 pos);
+	void SetNextPlantPos(const Vector3 &pos);
 
 	/// <summary>
 	/// アニメーションが終了したかどうか
@@ -68,7 +68,7 @@ private://状況別更新処理
 	void TitleUpdate();
 
 private:
-	void camRot(DirectX::XMFLOAT2 rot);
+	void camRot(const DirectX::XMFLOAT2 &rot);
 private:
 	Camera cam_;
 

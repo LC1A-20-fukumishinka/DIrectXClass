@@ -9,7 +9,7 @@ private:
 public:
 	~PlanetManager();
 
-	PlanetManager(PlanetManager &obj) = delete;
+	PlanetManager(const PlanetManager &obj) = delete;
 	PlanetManager &operator=(const PlanetManager &obj) = delete;
 
 	static std::unique_ptr<PlanetManager> &Instance();
@@ -31,7 +31,7 @@ public:
 	/// <returns>w’è‚³‚ê‚½˜f¯i‘¶İ‚µ‚È‚¢”Ô†‚Ìê‡‚Íæ“ª‚Ì”Ô†‚ğ•Ô‚·j</returns>
 	std::weak_ptr<Planet> GetPlanet(int getPlanetNum);
 
-	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID,  bool isSpawn = true, PlanetType type = BRIDGE);
+	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID,  bool isSpawn = true, const PlanetType &type = BRIDGE);
 
 	void Reset();
 

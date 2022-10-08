@@ -19,7 +19,7 @@ public:
 	Planet();
 	~Planet();
 
-	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID, bool Spawn = true, PlanetType type = BRIDGE);
+	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID, bool Spawn = true,const PlanetType &type = BRIDGE);
 	void Update();
 	void NormalUpdate();
 	void GrabUpdate();
@@ -49,7 +49,7 @@ public:
 	void ReleaseGrab();
 	void OnPlayer();
 	void ReleaseBase();
-	void SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX);
+	void SetGrabRotateAngle(const DirectX::XMVECTOR &AxisY, const DirectX::XMVECTOR &AxisX);
 	bool GetBase();
 	int GetID();
 	PlanetType GetType();

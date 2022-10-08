@@ -49,26 +49,26 @@ public://セッタ
 	virtual void SetLightGroup(LightGroup *lightGroup);
 	virtual void SetCollider(BaseCollider *collider);
 	virtual void SetModel(Model *model);
-	virtual void SetPosition(DirectX::XMFLOAT3 pos);
-	virtual void SetColor(DirectX::XMFLOAT4 color);
-	virtual void SetScale(DirectX::XMFLOAT3 scale);
+	virtual void SetPosition(const DirectX::XMFLOAT3 &pos);
+	virtual void SetColor(const DirectX::XMFLOAT4 &color);
+	virtual void SetScale(const DirectX::XMFLOAT3 &scale);
 	/// <summary>
 	/// 回転を各軸回転で設定する
 	/// </summary>
 	/// <param name="rot">Z->X->Y軸順での各軸回転</param>
-	virtual void SetRotation(DirectX::XMFLOAT3 rot);
+	virtual void SetRotation(const DirectX::XMFLOAT3 &rot);
 	/// <summary>
 	/// 回転をquaternionで設定する
 	/// </summary>
 	/// <param name="quaternion">回転quaternion</param>
-	virtual void SetRotation(DirectX::XMVECTOR quaternion);
-	virtual void AddRotation(DirectX::XMFLOAT3 rot);
-	virtual void AddRotation(DirectX::XMVECTOR rot);
+	virtual void SetRotation(const DirectX::XMVECTOR &quaternion);
+	virtual void AddRotation(const DirectX::XMFLOAT3 &rot);
+	virtual void AddRotation(const DirectX::XMVECTOR &rot);
 	/// <summary>
 	/// 向きたい方向をベクトルで指定する
 	/// </summary>
 	/// <param name="rot">向く方向</param>
-	virtual void SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up = DirectX::XMVECTOR{ 0.0f, 1.0f, 0.0f , 0.0f });
+	virtual void SetRotationVector(const DirectX::XMVECTOR &front, const DirectX::XMVECTOR &up = DirectX::XMVECTOR{ 0.0f, 1.0f, 0.0f , 0.0f });
 public:
 	const DirectX::XMFLOAT4 &GetColor();
 	const DirectX::XMFLOAT3 &GetPosition();

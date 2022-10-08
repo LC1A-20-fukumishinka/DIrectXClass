@@ -138,8 +138,8 @@ public: // メンバ関数
 	/// <param name="accel">加速ベクトル</param>
 	/// <param name="start_scale">初期サイズ</param>
 	/// <param name="end_scale">終了時サイズ</param>
-	void Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
-		float start_scale, float end_scale, XMFLOAT4 start_color = { 1, 1, 1, 1 }, XMFLOAT4 end_color = { 1, 1, 1,1 });
+	void Add(int life, const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
+		float start_scale, float end_scale, const XMFLOAT4 &start_color = { 1, 1, 1, 1 }, const XMFLOAT4 &end_color = { 1, 1, 1,1 });
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBuff; // 定数バッファ
 

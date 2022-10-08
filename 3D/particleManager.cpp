@@ -408,8 +408,8 @@ void ParticleManager::Draw(int textureNumber)
 		myD->GetCommandList()->DrawInstanced((UINT)std::distance(particles.begin(), particles.end()), 1, 0, 0);
 }
 
-void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
-	float start_scale, float end_scale, XMFLOAT4 start_color, XMFLOAT4 end_color)
+void ParticleManager::Add(int life, const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
+	float start_scale, float end_scale, const XMFLOAT4 &start_color, const XMFLOAT4 &end_color)
 {
 	//リストに要素を追加
 	particles.emplace_front();

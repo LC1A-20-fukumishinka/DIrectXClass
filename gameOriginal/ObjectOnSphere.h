@@ -15,7 +15,7 @@ public://äÓëbä÷êî
 	ObjectOnSphere();
 	~ObjectOnSphere();
 
-	virtual void Init(std::weak_ptr<Planet> basePlanet, Vector3 angle, float scale);
+	virtual void Init(std::weak_ptr<Planet> basePlanet, const Vector3 &angle, float scale);
 	virtual void Update();
 	virtual void Draw();
 	virtual void Finalize();

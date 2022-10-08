@@ -29,7 +29,7 @@ public:
 
 	PointLight *GetPoinntLight() { return pointLight; }
 	SpotLight *GetSpotLight(){return spotLight;}
-	void SetAmbientColor(XMFLOAT3 ambientColor);
+	void SetAmbientColor(const XMFLOAT3 &ambientColor);
 public:
 	LightGroup();
 	void Init();

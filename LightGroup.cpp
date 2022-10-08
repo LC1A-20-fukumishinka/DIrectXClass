@@ -178,7 +178,7 @@ void LightGroup::SetSpotLight(SpotLight *spotLight)
 	this->spotLight = spotLight;
 }
 
-void LightGroup::SetAmbientColor(XMFLOAT3 ambientColor)
+void LightGroup::SetAmbientColor(const XMFLOAT3 &ambientColor)
 {
 	this->ambientColor = ambientColor;
 	dirty = true;

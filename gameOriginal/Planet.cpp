@@ -35,7 +35,7 @@ Planet::~Planet()
 {
 }
 
-void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID , bool Spawn, PlanetType type)
+void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID , bool Spawn,const PlanetType &type)
 {
 	type_ = type;
 	ID_ = stageID;
@@ -207,7 +207,7 @@ void Planet::ReleaseBase()
 	isBase_ = false;
 }
 
-void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR AxisY, const DirectX::XMVECTOR AxisX)
+void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR &AxisY, const DirectX::XMVECTOR &AxisX)
 {
 	GrabRotateAxisY = AxisY;
 	GrabRotateAxisX = AxisX;

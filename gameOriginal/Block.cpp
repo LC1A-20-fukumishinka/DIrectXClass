@@ -18,7 +18,7 @@ Block::~Block()
 {
 }
 
-void Block::Init(std::weak_ptr<Planet> basePlanet, Vector3 angle, float scale)
+void Block::Init(std::weak_ptr<Planet> basePlanet,const Vector3 &angle, float scale)
 {
 	ObjectOnSphere::Init(basePlanet, angle, scale);
 	SetModel(sBlockModel.get());

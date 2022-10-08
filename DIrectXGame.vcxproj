@@ -183,7 +183,6 @@
     <ClCompile Include="Base\Vector3.cpp" />
     <ClCompile Include="Box3D.cpp" />
     <ClCompile Include="gameOriginal\Block.cpp" />
-    <ClCompile Include="CircleShadow.cpp" />
     <ClCompile Include="Collision\Collision.cpp" />
     <ClCompile Include="Collision\CollisionMgr.cpp" />
     <ClCompile Include="Collision\CollisionPrimitive.cpp" />
@@ -273,7 +272,6 @@
     <ClInclude Include="Base\Vector3.h" />
     <ClInclude Include="Box3D.h" />
     <ClInclude Include="gameOriginal\Block.h" />
-    <ClInclude Include="CircleShadow.h" />
     <ClInclude Include="Collision\BaseCollider.h" />
     <ClInclude Include="Collision\Collision.h" />
     <ClInclude Include="Collision\CollisionInfo.h" />

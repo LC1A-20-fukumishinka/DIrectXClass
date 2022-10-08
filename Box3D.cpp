@@ -46,7 +46,7 @@ BoxObj3D::~BoxObj3D()
 	indexBuff.Reset();
 }
 
-void BoxObj3D::Init(const Vector3 pos, const Vector3 &front, const Vector3 &up)
+void BoxObj3D::Init(const Vector3 &pos, const Vector3 &front, const Vector3 &up)
 {
 	HRESULT result = S_FALSE;
 
@@ -259,19 +259,19 @@ void BoxObj3D::UpdateVector()
 	right = XMVector3Rotate(XVec, quaternion);
 }
 
-void BoxObj3D::SetRotation(XMFLOAT3 rot)
+void BoxObj3D::SetRotation(const XMFLOAT3 &rot)
 {
 	quaternion = XMQuaternionRotationRollPitchYaw(rot.x, rot.y, rot.z);
 	UpdateVector();
 }
 
-void BoxObj3D::SetRotation(DirectX::XMVECTOR quaternion)
+void BoxObj3D::SetRotation(const DirectX::XMVECTOR &quaternion)
 {
 	this->quaternion = quaternion;
 	UpdateVector();
 }
 
-void BoxObj3D::AddRotation(DirectX::XMFLOAT3 rot)
+void BoxObj3D::AddRotation(const DirectX::XMFLOAT3 &rot)
 {
 	XMVECTOR AddRot = XMQuaternionRotationRollPitchYaw(rot.x, rot.y, rot.z);
 	//乗算処理すると回転を混ぜることができるよ
@@ -279,13 +279,13 @@ void BoxObj3D::AddRotation(DirectX::XMFLOAT3 rot)
 	UpdateVector();
 }
 
-void BoxObj3D::AddRotation(DirectX::XMVECTOR rot)
+void BoxObj3D::AddRotation(const DirectX::XMVECTOR &rot)
 {
 	quaternion = XMQuaternionMultiply(quaternion, rot);
 	UpdateVector();
 }
 
-void BoxObj3D::SetRotationVector(DirectX::XMVECTOR front, DirectX::XMVECTOR up)
+void BoxObj3D::SetRotationVector(const DirectX::XMVECTOR &front, const DirectX::XMVECTOR &up)
 {
 	this->up = up;
 	//正面ベクトルから回転行列を計算

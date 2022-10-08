@@ -191,7 +191,7 @@ bool Collision::CheckRay2Plane(const Ray &ray, const Plane &plane, float *distan
 	return true;
 }
 
-bool Collision::CheckRay2Triangle(const Ray &ray, const Triangle triangle, float *distance, DirectX::XMVECTOR *inter)
+bool Collision::CheckRay2Triangle(const Ray &ray, const Triangle &triangle, float *distance, DirectX::XMVECTOR *inter)
 {
 	//OŠpŒ`‚ªæ‚Á‚Ä‚¢‚é•½–Ê‚ğZo
 	Plane plane;

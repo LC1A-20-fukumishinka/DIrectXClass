@@ -22,7 +22,7 @@ public:
 	/// <summary>
 	/// レンダーターゲット用のテクスチャバッファの生成を行う
 	/// </summary>
-	/// <param name="texBuff">描画用バッファ</param>
+	/// <param name="texBuff">描画用バッファの配列</param>
 	/// <param name="textureNums">各テクスチャ番号</param>
 	void CreateRenderTarget(std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> &texBuff, std::vector<int> &textureNums, const int renderTargetCount);
 

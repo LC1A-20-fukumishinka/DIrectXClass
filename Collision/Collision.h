@@ -53,7 +53,7 @@ public:
 	/// <param name="distance">距離（出力用）</param>
 	/// <param name="inter">交点（出力用）</param>
 	/// <returns>交差しているか否か</returns>
-	static bool CheckRay2Triangle(const Ray &ray, const Triangle triangle, float *distance = nullptr, DirectX::XMVECTOR *inter = nullptr);
+	static bool CheckRay2Triangle(const Ray &ray, const Triangle &triangle, float *distance = nullptr, DirectX::XMVECTOR *inter = nullptr);
 
 	/// <summary>
 	/// レイと球の当たり判定

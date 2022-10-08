@@ -334,7 +334,7 @@ ModelObject *Model::GetModel()
 	return &model;
 }
 
-void Model::SetModel(ModelObject model)
+void Model::SetModel(const ModelObject &model)
 {
 	this->model = model;
 }

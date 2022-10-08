@@ -77,7 +77,7 @@ public:
 	void LoadTexture(const std::string &directoryPath, const std::string &filename);
 
 	ModelObject *GetModel();
-	void SetModel(ModelObject model);
+	void SetModel(const ModelObject &model);
 
 	inline const std::vector<VertexPosNormalUv> & GetVertices(){return model.vertices;}
 	inline const std::vector<unsigned short> &GetIndices(){return model.indices;}

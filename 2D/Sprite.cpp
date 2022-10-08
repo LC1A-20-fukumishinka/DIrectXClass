@@ -55,7 +55,7 @@ Sprite::Sprite()
 	);
 }
 
-void Sprite::Init(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
+void Sprite::Init(UINT texNumber, const DirectX::XMFLOAT2 &anchorpoint, bool isFlipX, bool isFlipY)
 {
 	HRESULT result = S_FALSE;
 	MyDirectX* myD = MyDirectX::Instance();

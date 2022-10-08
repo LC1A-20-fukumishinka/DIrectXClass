@@ -148,7 +148,7 @@ void GameScene::Init()
 	weak_ptr<Planet> FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(1);
 	cam_->SetNextPlantPos(PlanetManager::Instance()->GetBasePlanet(1)->GetPos());
 
-	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3), 2.0f);
+	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3f), 2.0f);
 	MakeFlag(FlagOnPlanet, Vector3(-1, 0, 0), 2.0f);
 	//MakeFlag(a, Vector3(0, 1, 0), 2.0f);
 	MakeFlag(FlagOnPlanet, Vector3(1, 0, 0), 2.0f);

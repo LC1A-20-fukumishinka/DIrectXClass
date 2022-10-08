@@ -20,7 +20,7 @@ protected:
 	virtual ~IGraphicsPipeline() {};
 public:
 
-	IGraphicsPipeline(IGraphicsPipeline &obj) = delete;
+	IGraphicsPipeline(const IGraphicsPipeline &obj) = delete;
 	IGraphicsPipeline &operator=(const IGraphicsPipeline &obj) = delete;
 
 	virtual PipeClass::PipelineSet *GetPipeLine() = 0;

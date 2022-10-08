@@ -24,8 +24,6 @@ public:
 	/// </summary>
 	void Init();
 
-	void SetDescHeapSRV();
-	void SetTexBuff();
 private:
 	//ç¿ïW
 	DirectX::XMFLOAT2 position;
