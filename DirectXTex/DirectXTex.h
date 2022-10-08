@@ -29,7 +29,7 @@
 #include <d3d11_1.h>
 #endif
 #endif
-#else
+#else // !WIN32
 #include <directx/dxgiformat.h>
 #include <wsl/winadapter.h>
 #endif
@@ -37,13 +37,17 @@
 #include <DirectXMath.h>
 
 #ifdef WIN32
+#ifdef NTDDI_WIN10_FE
+#include <ocidl.h>
+#else
 #include <OCIdl.h>
+#endif
 
 struct IWICImagingFactory;
 struct IWICMetadataQueryReader;
 #endif
 
-#define DIRECTX_TEX_VERSION 192
+#define DIRECTX_TEX_VERSION 194
 
 
 namespace DirectX
@@ -263,7 +267,7 @@ namespace DirectX
         WIC_FLAGS_FILTER_POINT          = 0x100000,
         WIC_FLAGS_FILTER_LINEAR         = 0x200000,
         WIC_FLAGS_FILTER_CUBIC          = 0x300000,
-        WIC_FLAGS_FILTER_FANT           = 0x400000, // Combination of Linear and Box3D filter
+        WIC_FLAGS_FILTER_FANT           = 0x400000, // Combination of Linear and Box filter
             // Filtering mode to use for any required image resizing (only needed when loading arrays of differently sized images; defaults to Fant)
     };
 
@@ -562,7 +566,7 @@ namespace DirectX
         TEX_FILTER_LINEAR           = 0x200000,
         TEX_FILTER_CUBIC            = 0x300000,
         TEX_FILTER_BOX              = 0x400000,
-        TEX_FILTER_FANT             = 0x400000, // Equiv to Box3D filtering for mipmap generation
+        TEX_FILTER_FANT             = 0x400000, // Equiv to Box filtering for mipmap generation
         TEX_FILTER_TRIANGLE         = 0x500000,
             // Filtering mode to use for any required image resizing
 
