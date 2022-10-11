@@ -194,7 +194,7 @@
     <ClCompile Include="gameOriginal\GameInput.cpp" />
     <ClCompile Include="gameOriginal\GravityPlayer.cpp" />
     <ClCompile Include="gameOriginal\LoadPlanet.cpp" />
-    <ClCompile Include="GuidingStar.cpp" />
+    <ClCompile Include="gameOriginal\GuidingStar.cpp" />
     <ClCompile Include="imgui\ImguiManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -203,7 +203,7 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="InformationBoard.cpp" />
+    <ClCompile Include="gameOriginal\InformationBoard.cpp" />
     <ClCompile Include="input\DirectInput.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightGroup.cpp" />
@@ -281,7 +281,7 @@
     <ClInclude Include="gameOriginal\GameInput.h" />
     <ClInclude Include="gameOriginal\GravityPlayer.h" />
     <ClInclude Include="gameOriginal\LoadPlanet.h" />
-    <ClInclude Include="GuidingStar.h" />
+    <ClInclude Include="gameOriginal\GuidingStar.h" />
     <ClInclude Include="imgui\ImguiManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -291,7 +291,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="InformationBoard.h" />
+    <ClInclude Include="gameOriginal\InformationBoard.h" />
     <ClInclude Include="input\DirectInput.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightGroup.h" />

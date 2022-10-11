@@ -24,8 +24,6 @@ using namespace DirectX;
 using namespace std;
 void GameScene::Init()
 {
-
-
 	shadowRenderTarget_ = make_unique<MultiRenderTarget>();
 	shadowRenderTarget_->Init(1);
 
@@ -108,15 +106,6 @@ void GameScene::Init()
 
 	PlanetManager::Instance()->Init();
 
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * i) + 60, 40.0f, 0 }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
-	//}
-
-	//PlanetManager::Instance()->AddPlanet(XMFLOAT3{ static_cast<float>(30 * 6) + 60, 40.0f, 30.0f }, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), 1, false);
-
-	//PlanetManager::Instance()->AddPlanet(XMFLOAT3{ 300, 70.0f, 0 }, 50.0f, DirectX::XMFLOAT4(1.0f, 0.6f, 0.4f, 1.0f), 2, false, PlanetType::BASE);
-
 	int stageCount = 0;
 	while (true)
 	{
@@ -144,6 +133,9 @@ void GameScene::Init()
 	Flag::SetCamera(cam_->GetCamera());
 	Flag::SetLights(lightGroup_.get());
 	Flag::SetShadowCamera(shadowCam_->GetCamera());
+
+	GuidingStar::SetCamera(cam_->GetCamera());
+	GuidingStar::SetLightGroup(lightGroup_.get());
 
 	weak_ptr<Planet> FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(1);
 	cam_->SetNextPlantPos(PlanetManager::Instance()->GetBasePlanet(1)->GetPos());
@@ -181,6 +173,14 @@ void GameScene::Init()
 	testBoards_.emplace_back(AtoJump);
 	testBoards_.emplace_back(LTtoLockOn);
 
+
+	testStar.resize(1);
+
+	for (auto &e : testStar)
+	{
+
+		e.Create();
+	}
 	Restart();
 
 }
@@ -217,7 +217,7 @@ void GameScene::Update()
 	}
 	if (isPause_ && SpeedReset)
 	{
-	isPause_ = false;
+		isPause_ = false;
 		Restart();
 		cam_->ClearToIngme();
 	}
@@ -241,6 +241,13 @@ void GameScene::Update()
 
 	objDome_->SetPosition(cam_->GetCameraPos());
 	objDome_->Update();
+
+	for (auto &e : testStar)
+	{
+		e.Update();
+	}
+
+	makeGuide();
 }
 
 void GameScene::PreDraw()
@@ -255,13 +262,17 @@ void GameScene::PreDraw()
 
 	objDome_->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	StartTarget_->DepthReset();
+	for (auto &e : testStar)
+	{
+		e.Draw();
+	}
+	StartTarget_->DepthReset();
 	PlanetManager::Instance()->Draw();
 	player_->Draw();
 	for (auto &flag : testFlag_)
 	{
 		flag.Draw();
 	}
-
 	//for (auto &e : testBlock_)
 	//{
 	//	e.Draw();
@@ -517,7 +528,8 @@ void GameScene::MovePlanet()
 			player_->SetBasePlanet(basePlanet);
 			cam_->CameraStop();
 		}
-	}	else if (cam_->GetIsCameraStop())
+	}
+	else if (cam_->GetIsCameraStop())
 	{
 		cam_->StartCameraAnimation(false, 60);
 	}
@@ -606,6 +618,30 @@ void GameScene::AnimationTestUpdate()
 		clearStatus_ = STANDBY;
 		GameInput::Instance()->SetIsControll(true);
 		break;
+	}
+}
+
+void GameScene::makeGuide()
+{
+	for (auto &e : testStar)
+	{
+		if (e.GetIsDraw()) continue;
+		//ê≥ñ ï˚å¸Ç…ìKìñÇ…èoÇ∑
+		Vector3 makePos = Vector3(0.0f, (static_cast<float>(rand() % 10)), (rand() % 50 + 30.0f));
+
+		//XMVECTORå^Ç…
+		XMVECTOR makePosV = XMLoadFloat3(&makePos);
+
+		//ÉJÉÅÉâÇÃépê®ÇçáÇÌÇπÇÈ
+		makePosV = XMVector3Transform(makePosV, cam_->GetCamera()->GetMatBillboard());
+
+
+		Vector3 destination = PlanetManager::Instance()->GetBasePlanet(1)->GetPos();
+		Vector3 destinationAngle = destination - player_->GetPos();
+		makePos = makePosV;
+		makePos += player_->GetPos();
+		makePos += (-destinationAngle.normalize() * 100.0f);
+		e.Init(destination, makePos);
 	}
 }
 

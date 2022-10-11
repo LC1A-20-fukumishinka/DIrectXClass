@@ -24,7 +24,8 @@
 #include "../gameOriginal/TitlePostEffect.h"
 #include "Sprite.h"
 #include "../Box3D.h"
-#include "../InformationBoard.h"
+#include "../gameOriginal/InformationBoard.h"
+#include "../gameOriginal/GuidingStar.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -111,7 +112,12 @@ private:
 	int DrawTexture_ = -1;
 	int stageNum = 0;
 	ClearAnimationStatus clearStatus_ = STANDBY;
-private:
+
+private://ÉKÉCÉhó¨ÇÍêØä«óù
+	std::vector<GuidingStar> testStar;
+
+	void makeGuide();
+private://FlagManageróp
 	void MakeFlag(std::weak_ptr<Planet> base, Vector3 angle, float scale);
 
 	int GetFlagCount();

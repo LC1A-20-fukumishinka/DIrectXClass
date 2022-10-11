@@ -1,7 +1,7 @@
 #include "InformationBoard.h"
 #include "TextureMgr.h"
-#include "Collision/Collision.h"
-#include "EaseClass.h"
+#include "../Collision/Collision.h"
+#include "../EaseClass.h"
 #include <algorithm>
 #include "ModelPhongPipeline.h"
 #include "FukuMath.h"

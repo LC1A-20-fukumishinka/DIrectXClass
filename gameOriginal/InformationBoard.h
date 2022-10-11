@@ -2,11 +2,10 @@
 #include "Object3D.h"
 #include "Model.h"
 #include <memory>
-#include "Camera.h"
+#include "../Camera.h"
 #include "../LightGroup.h"
 #include "IGraphicsPipeline.h"
-#include <memory>
-#include "gameOriginal/Planet.h"
+#include "Planet.h"
 class InformationBoard
 {
 public:

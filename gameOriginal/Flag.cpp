@@ -167,7 +167,7 @@ void Flag::Draw()
 		object_.Update();
 		object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	}
-	if ( basePlanet_.lock()->GetIsSpawn())
+	if ( basePlanet_.lock()->GetIsSpawn() && lightRate_ > 0.0f)
 	{
 		LightPillarUpdate();
 		lightPillarObject_.Update();

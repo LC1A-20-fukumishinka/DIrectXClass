@@ -93,9 +93,6 @@
     <ClCompile Include="input\DirectInput.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Base\GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Base\TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -171,9 +168,6 @@
     <ClCompile Include="BaseGraphicsPipeline.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="2D\MultiTexture.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="gameOriginal\Planet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -246,13 +240,19 @@
     <ClCompile Include="gameOriginal\TitlePostEffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="InformationBoard.cpp">
+    <ClCompile Include="gameOriginal\InformationBoard.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="gameOriginal\LoadPlanet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GuidingStar.cpp">
+    <ClCompile Include="gameOriginal\GuidingStar.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="2D\MultiTexture.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -422,9 +422,6 @@
     <ClInclude Include="BaseGraphicsPipeline.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="2D\MultiTexture.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="gameOriginal\Planet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -503,13 +500,16 @@
     <ClInclude Include="gameOriginal\TitlePostEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="InformationBoard.h">
+    <ClInclude Include="gameOriginal\InformationBoard.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="gameOriginal\LoadPlanet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="GuidingStar.h">
+    <ClInclude Include="gameOriginal\GuidingStar.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2D\MultiTexture.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
