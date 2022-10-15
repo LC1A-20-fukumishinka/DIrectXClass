@@ -144,7 +144,7 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	//Šî–{‚Ì˜f¯‚©‚ç‹——£‚ð‘ª‚Á‚Ä
 	dist = dist.normalize() * length;
 	drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
-	Vector3 up = {};
+	Vector3 up = {0.0f, 1.0f, 0.0f};
 
 	//‹…–Êã‚É‚¨‚¯‚éã•ûŒü
 	up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
@@ -168,8 +168,6 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	XMVECTOR frontV = {};
 
 	frontV = XMVector3Cross(rightV, upV);
-	//YŽ²ˆÚ“®‚ðC³
-	//move.y = 0;
 
 	//’ÊíˆÚ“®Žž‚ÌŒü‚«‚Ì•Ï‰»
 	if (move.length() > 0.0f)

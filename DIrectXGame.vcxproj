@@ -125,6 +125,7 @@
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(SolutionDir)3D;$(SolutionDir)2D;$(SolutionDir)Base;$(SolutionDir)input;$(SolutionDir)Texture</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,6 +145,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(SolutionDir)3D;$(SolutionDir)2D;$(SolutionDir)Base;$(SolutionDir)input;$(SolutionDir)Texture;$(SolutionDir)Collision</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

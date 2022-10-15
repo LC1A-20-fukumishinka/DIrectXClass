@@ -167,7 +167,7 @@ void Flag::Draw()
 		object_.Update();
 		object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	}
-	if ( basePlanet_.lock()->GetIsSpawn() && lightRate_ > 0.0f)
+	if (basePlanet_.lock()->GetIsSpawn() && lightRate_ > 0.0f)
 	{
 		LightPillarUpdate();
 		lightPillarObject_.Update();
@@ -226,14 +226,18 @@ void Flag::SetLights(LightGroup *Lights)
 
 void Flag::RotationUpdate()
 {
+	//XMVECTOR‚É•ÏŠ·
 	XMVECTOR frontVecV = XMLoadFloat3(&frontVec_);
 	XMVECTOR upVecV = XMLoadFloat3(&upVec_);
+	
+	//ã‚Æ³–Ê‚ªˆê’v‚µ‚½‚ç
 	if (XMVector3Equal(frontVecV, upVecV))
-	{
+	{//³–Ê‚ÌŒü‚«‚ğC³
 		frontVec_ = Vector3(0.0f, -1.0f, 0.0f);
-
 		frontVecV = XMLoadFloat3(&frontVec_);
 	}
+
+
 	object_.SetRotationVector(frontVecV, upVecV);
 }
 
