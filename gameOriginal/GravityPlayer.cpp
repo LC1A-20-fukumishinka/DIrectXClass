@@ -37,6 +37,11 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 		startPos += YVec * basePlanet.lock()->GetScale();
 		drawObject.SetPosition(startPos);
 	}
+
+	isOneWayGravity = false;
+
+	//下向き
+	oneWayGravityAngle = -YVec;
 }
 
 void GravityPlayer::Update()
@@ -95,61 +100,49 @@ void GravityPlayer::Move(bool isSetAngle)
 
 }
 
-void GravityPlayer::FloorMove(bool isSetAngle)
+void GravityPlayer::PosMove(const Vector3 &move)
 {
-	XMFLOAT2 stick = GameInput::Instance()->LStick();
 
-#pragma region jump
-	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
+	//一方向重力状態かつ跳躍中でない場合球面に即した挙動をする
+	if (status == PlayerStatus::JUMP && isOneWayGravity)
 	{
-		jumpSpeed = jumpPower;
-		status = PlayerStatus::JUMP;
+
 	}
-
-	if (status == PlayerStatus::JUMP)
+	else
 	{
-		localHeight += jumpSpeed;
+		//水平移動後の座標
+		Vector3 nowPos(drawObject.GetPosition());
+
+
+		Vector3 dist = (nowPos + (move * maxMoveSpeed)) - basePlanet.lock()->GetPos();
+		nowPos += (moveVec_ + warkVec_);
+
 		jumpSpeed += gravity;
-		if (localHeight <= 0)
+
+		drawObject.SetPosition(nowPos);
+		float length = basePlanet.lock()->GetScale();
+		if (status == PlayerStatus::JUMP)
 		{
-			localHeight = 0;
-			status = PlayerStatus::STAND;
+			localHeight += jumpSpeed;
+
+			length += localHeight;
+		}
+		else if(status == PlayerStatus::STAND)
+		{
+			//基本の惑星から距離を測って
+			dist = dist.normalize() * length;
+
+			//座標決定
+			drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
 		}
 	}
-#pragma endregion
+}
 
-	Vector3 stickInputVector3(stick.x, 0, stick.y);
-	//スティックの入力をベクターに入れる
-	Vector3 move = stickInputVector3;
-
-	//カメラの行列から入力を画面の向きに合わせて矯正
-	XMVECTOR moveV = XMLoadFloat3(&move);
-	//XMVECTOR camRot = XMQuaternionRotationMatrix(cam->GetMatBillboard());
-
-	XMVECTOR moveUp = drawObject.GetUpVec();
-	XMVECTOR moveFront;
-	GetMatRot(XMLoadFloat3(&cam->GetRight()), moveUp, moveFront);
-	XMMATRIX moveMat = GetMatRot( moveUp , moveFront);
-	XMVECTOR camRot = XMQuaternionRotationMatrix(moveMat);
-	moveV = XMVector3Rotate(moveV, camRot);
-	XMStoreFloat3(&move, moveV);
-	move.normalize();
-
-	move *= maxMoveSpeed;
-	Vector3 nowPos(drawObject.GetPosition());
-
-	Vector3 dist = (nowPos + move) - basePlanet.lock()->GetPos();
-
-	float length = basePlanet.lock()->GetScale() + localHeight;
-	//基本の惑星から距離を測って
-	dist = dist.normalize() * length;
-	drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
-	Vector3 up = {0.0f, 1.0f, 0.0f};
-
+void GravityPlayer::PostureUpdate(const Vector3 &move, bool isSetAngle)
+{
 	//球面上における上方向
-	up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
-
-	//法線方向
+	Vector3 up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+	//ベクター型にする
 	XMVECTOR upV = XMLoadFloat3(&up.normalize());
 
 
@@ -162,18 +155,89 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	}
 	else
 	{
-		rightV = XMVector3Cross(upV, moveV);
+		rightV = XMVector3Cross(upV, XMLoadFloat3(&move));
 	}
 
 	XMVECTOR frontV = {};
 
-	frontV = XMVector3Cross(rightV, upV);
-
-	//通常移動時の向きの変化
 	if (move.length() > 0.0f)
 	{
-		drawObject.SetRotationVector(frontV, upV);
+		frontV = XMVector3Cross(rightV, upV);
 	}
+	else
+	{
+		frontV = XMVector3Cross(drawObject.GetRightVec(), upV);
+	}
+
+	//通常移動時の向きの変化
+		drawObject.SetRotationVector(frontV, upV);
+
+}
+
+void GravityPlayer::FloorMove(bool isSetAngle)
+{
+	XMFLOAT2 stick = GameInput::Instance()->LStick();
+
+#pragma region jump
+	if (status == PlayerStatus::JUMP)
+	{
+		//球面に対して垂直な成分
+		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+		Vector3 JumpAngle = dist.normalize();
+
+		//垂直
+		moveVec_ += JumpAngle *= gravity;
+
+		if (dist.length() <= basePlanet.lock()->GetScale())
+		{
+			localHeight = 0;
+			status = PlayerStatus::STAND;
+		}
+	}
+
+	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
+	{
+		jumpSpeed = jumpPower;
+
+		//球面に対して垂直な成分
+		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+		Vector3 JumpAngle = dist.normalize();
+
+		//垂直方向に加速
+		moveVec_ = JumpAngle *= jumpPower;
+		//球面上における上方向
+
+		status = PlayerStatus::JUMP;
+	}
+
+
+#pragma endregion
+
+	Vector3 stickInputVector3(stick.x, 0, stick.y);
+	//スティックの入力をベクターに入れる
+	Vector3 move = stickInputVector3;
+
+	//カメラの行列から入力を画面の向きに合わせて矯正
+
+	XMVECTOR moveV = XMLoadFloat3(&move);
+
+	//入力の姿勢を作る
+	XMVECTOR moveUp = drawObject.GetUpVec();
+	XMVECTOR moveFront = XMLoadFloat3(&Vector3(cam->GetRight()).cross(moveUp));
+	XMMATRIX moveMat = GetMatRot(moveUp, moveFront);
+
+	//姿勢に合わせてベクトルを配置
+	XMVECTOR moveRot = XMQuaternionRotationMatrix(moveMat);
+	moveV = XMVector3Rotate(moveV, moveRot);
+	XMStoreFloat3(&move, moveV);
+
+	//一応正規化
+	move.normalize();
+
+	warkVec_ = (move * maxMoveSpeed);
+	PosMove(move);
+
+	PostureUpdate(move, isSetAngle);
 }
 
 void GravityPlayer::JumpMove(bool isSetAngle)
@@ -427,7 +491,7 @@ void GravityPlayer::BlockCollision(const std::vector<Triangle> &boxPlanes)
 		//法線方向がプレイヤーの重力方向と内積をとって１に近いかどうかを判定
 		if (XMVector3Dot(downVec, -e.normal).m128_f32[0] >= 0.7f)
 		{
-		//例と足場の接触判定
+			//例と足場の接触判定
 			isOnPlayer = Collision::CheckRay2Triangle(playerDownVec, e, &distance, &onPlayerPos);
 		}
 
@@ -437,7 +501,7 @@ void GravityPlayer::BlockCollision(const std::vector<Triangle> &boxPlanes)
 		}
 		if (isOnPlayer && distance <= 1.1f)
 		{
-			XMVECTOR identity = {2.0f,2.0f ,2.0f ,0.0f };
+			XMVECTOR identity = { 2.0f,2.0f ,2.0f ,0.0f };
 			onPlayerPos += identity * drawObject.GetUpVec();
 			drawObject.SetPosition(Vector3(onPlayerPos));
 			jumpSpeed = 0.0f;

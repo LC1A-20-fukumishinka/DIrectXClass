@@ -33,7 +33,9 @@ private:
 	/// <param name="isSetAngle">“ü—Í‚É‚æ‚éŒü‚«‚Ì•Ï‰»‚ğ‚Â‚¯‚é‚©</param>
 	void Move(bool isSetAngle);
 
+	void PosMove(const Vector3 &move);
 
+	void PostureUpdate(const Vector3 &move, bool isSetAngle);
 	void FloorMove(bool isSetAngle);
 
 	void JumpMove(bool isSetAngle);
@@ -94,6 +96,11 @@ private:
 
 	DirectX::XMVECTOR playerAngle;
 
+	Vector3 warkVec_;
+
+	Vector3 gravityVec_;
+
+	Vector3 moveVec_;
 	//˜f¯‚Æ©•ª‚Ì‹——£
 	float baseLength = 0.0f;
 
@@ -106,5 +113,9 @@ private:
 	const float jumpPower = 1.0f;
 
 	bool oldLockonInput = false;
+
+	bool isOneWayGravity = false;
+
+	Vector3 oneWayGravityAngle;
 };
 
