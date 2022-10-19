@@ -16,8 +16,7 @@ void TitleScene::Update()
 {
 	if (Input::Instance()->KeyTrigger(DIK_RETURN) || Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_START))
 	{
-		IScene *scene = new GameScene();
-		SceneMgr::Instance()->SetNextScene(scene);
+		SceneMgr::Instance()->SetNextScene(std::make_unique<GameScene>());
 	}
 	debug->Print("Granet", 100, 100, 10);
 }

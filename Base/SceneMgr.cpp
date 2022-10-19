@@ -1,6 +1,6 @@
 #include "SceneMgr.h"
 
-SceneMgr *SceneMgr::instance = nullptr;
+std::unique_ptr<SceneMgr> SceneMgr::instance = nullptr;
 SceneMgr::SceneMgr()
 {
 }
@@ -8,24 +8,20 @@ SceneMgr::SceneMgr()
 SceneMgr::~SceneMgr()
 {
 	scene_->Finalize();
-	delete scene_;
 }
 
 SceneMgr *SceneMgr::Instance()
 {
-	//static SceneMgr instance;
-	if (instance == nullptr)
+	if (!instance)
 	{
-		instance = new SceneMgr();
+		instance = std::make_unique<SceneMgr>();
 	}
 
-	return instance;
+	return instance.get();
 }
 
 void SceneMgr::Finalize()
 {
-	delete instance;
-	instance = nullptr;
 }
 
 void SceneMgr::Update()
@@ -36,10 +32,9 @@ void SceneMgr::Update()
 		if (scene_)
 		{
 			scene_->Finalize();
-			delete scene_;
+			scene_.reset();
 		}
-		scene_ = nextScene_;
-		nextScene_ = nullptr;
+		scene_.swap(nextScene_);
 		scene_->Init();
 	}
 	scene_->Update();

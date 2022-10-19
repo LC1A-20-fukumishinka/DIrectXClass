@@ -6,6 +6,11 @@
 #include "SafeDelete.h"
 #include "particleManager.h"
 #include "../imgui/ImguiManager.h"
+
+Framework::~Framework()
+{
+
+}
 void Framework::Run()
 {
 	Init();
@@ -79,5 +84,5 @@ void Framework::Finalize()
 
 void Framework::Draw()
 {
-ImguiManager::Draw();
+	ImguiManager::Draw();
 }

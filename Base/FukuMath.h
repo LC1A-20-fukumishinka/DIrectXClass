@@ -12,12 +12,12 @@ namespace FukuMath
 	float CosineTheorem(const float a, const float b, const float c);
 
 	/// <summary>
-	/// ベクトルからその向きを向く行列を生成する
+	/// 与えられたベクトルから姿勢を作る
 	/// </summary>
-	/// <param name="v1">向く方向</param>
-	/// <param name="up">上方向ベクトル</param>
-	/// <param name="cross">右方向ベクトルを取得する場合入れておく</param>
-	/// <returns></returns>
+	/// <param name="v1">上方向ベクトル</param>
+	/// <param name="v2">向く方向</param>
+	/// <param name="cross">ついでに右方向ベクトルを取得する場合入れておく</param>
+	/// <returns>姿勢行列</returns>
 	DirectX::XMMATRIX GetMatRot(const DirectX::XMVECTOR &v1, const DirectX::XMVECTOR &v2, DirectX::XMVECTOR &cross = DirectX::XMVECTOR{});
 
 	const float PI = 3.14159265f;

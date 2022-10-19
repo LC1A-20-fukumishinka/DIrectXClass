@@ -13,6 +13,10 @@ MultiRenderTarget::MultiRenderTarget()
 	cmdList = MyDirectX::Instance()->GetCommandList();
 }
 
+MultiRenderTarget::~MultiRenderTarget()
+{
+}
+
 void MultiRenderTarget::Init(int targetCount)
 {
 	targetCount_ = targetCount;
@@ -115,6 +119,10 @@ void MultiRenderTarget::DepthReset()
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvH =
 		descHeapDSV->GetCPUDescriptorHandleForHeapStart();
 	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+}
+
+void MultiRenderTarget::Finalize()
+{
 }
 
 

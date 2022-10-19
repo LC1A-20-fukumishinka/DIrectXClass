@@ -10,7 +10,7 @@ public:
 	///コンストラクタ
 	/// </summary>
 	MultiRenderTarget();
-
+	~MultiRenderTarget();
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -29,6 +29,8 @@ public:
 
 	//深度地リセット
 	void DepthReset();
+
+	void Finalize();
 private:
 
 	void MakeRTV();

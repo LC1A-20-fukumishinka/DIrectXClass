@@ -10,6 +10,8 @@
 class Framework
 {
 public:
+	~Framework();
+
 	void Run();
 
 	virtual void Init();

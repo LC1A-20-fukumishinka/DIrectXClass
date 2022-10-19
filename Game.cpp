@@ -3,14 +3,14 @@
 #include "DirectInput.h"
 #include "ModelPipeline.h"
 #include "GameScene.h"
+#include <memory>
 using namespace DirectX;
 void Game::Init()
 {	//WindowsAPI‰Šú‰»ˆ—
 
 	Framework::Init();
 
-	IScene *scene_ = new GameScene();
-	SceneMgr::Instance()->SetNextScene(scene_);
+	SceneMgr::Instance()->SetNextScene(std::make_unique<GameScene>());
 }
 
 void Game::Finalize()
