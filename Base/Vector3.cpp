@@ -67,14 +67,14 @@ float Vector3::length() const
 	return sqrtf(x * x + y * y + z * z);
 }
 
-Vector3 &Vector3::normalize()
+const Vector3 &Vector3::normalize()
 {
 	if (length() == 0.0f)
 	{
 		return*this;
 	}
 	float l = length();
-	return *this /= l;
+	return Vector3(*this / l);
 }
 
 float Vector3::dot(const Vector3 &v) const

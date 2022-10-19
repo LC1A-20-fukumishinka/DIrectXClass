@@ -120,7 +120,7 @@ void GameCamera::ClearAnimationStart(const Vector3 &playerPos)
 	}
 
 	//距離をとる
-	eyeDir.normalize();
+	eyeDir = eyeDir.normalize();
 	eyeDir *= 300.0f;
 
 	//基準点から動かしてワールド座標を作成
@@ -142,7 +142,7 @@ void GameCamera::TitleAnimationStart()
 	Vector3 eyeDir = Vector3{ 0, -0.4f, 1 };
 
 	//正規化
-	eyeDir.normalize();
+	eyeDir = eyeDir.normalize();
 	XMMATRIX rot = GetMatRot(YVec, XMLoadFloat3( &eyeDir));
 
 	//ターゲットの位置を修正
@@ -277,7 +277,7 @@ void GameCamera::LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVe
 	Vector3 camPos = -playerZVec;
 	float length = 3.0f;
 
-	camPos.normalize();
+	camPos = camPos.normalize();
 	camPos *= length;
 	camPos += nextTargetPos_;
 	nextEyePos_ = camPos;

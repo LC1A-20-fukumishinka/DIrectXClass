@@ -102,7 +102,7 @@ void Flag::Init(std::weak_ptr<Planet> basePlanet, const Vector3 &angle, float sc
 {
 	upVec_ = angle;//オブジェクトの方向を設定
 	worldScale_ = scale;
-	upVec_.normalize();//一応正規化
+	upVec_ = upVec_.normalize();//一応正規化
 	frontVec_ = Vector3(upVec_.y, -upVec_.x, 0.0f).cross(upVec_);
 	basePlanet_ = basePlanet;
 	object_.Init();
