@@ -353,8 +353,8 @@ void GameScene::Finalize()
 
 void GameScene::IngameUpdate()
 {
-	//’Í‚Þ
-	if (GameInput::Instance()->LockOnInput())
+	//’Í‚Þ(Žg‚í‚È‚¢‚©‚à)
+	if (false/*GameInput::Instance()->LockOnInput()*/)
 	{
 
 		if (GameInput::Instance()->GrabInput())

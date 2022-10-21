@@ -66,7 +66,6 @@ private:
 
 	std::shared_ptr<Planet> star;
 
-	//ŽÀŒ±“I‚É’Ç‰Á
 	std::unique_ptr<MultiRenderTarget> shadowRenderTarget_;
 	std::unique_ptr<MultiRenderTarget> GBTarget_;
 	std::unique_ptr<MultiRenderTarget> MonoTarget_;

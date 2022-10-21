@@ -38,10 +38,10 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 		drawObject.SetPosition(startPos);
 	}
 
-	isOneWayGravity = false;
+	isOneWayGravity_ = false;
 
 	//下向き
-	oneWayGravityAngle = -YVec;
+	oneWayGravityAngle_ = -YVec;
 }
 
 void GravityPlayer::Update()
@@ -96,6 +96,11 @@ void GravityPlayer::Move(bool isSetAngle)
 	//	break;
 	//}
 
+	if (GameInput::Instance()->GrabTrigger())
+	{
+		isOneWayGravity_ = !isOneWayGravity_;
+		oneWayGravityAngle_ = -drawObject.GetUpVec();
+	}
 	FloorMove(isSetAngle);
 
 }
@@ -103,45 +108,109 @@ void GravityPlayer::Move(bool isSetAngle)
 void GravityPlayer::PosMove(const Vector3 &move)
 {
 
-	//一方向重力状態かつ跳躍中でない場合球面に即した挙動をする
-	if (status == PlayerStatus::JUMP && isOneWayGravity)
-	{
+#pragma region jump
 
+	//ジャンプ中の処理
+	if (status == PlayerStatus::JUMP)
+	{
+		//球面に対して垂直な成分
+		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+
+
+		Vector3 gravityAngle;
+		if (isOneWayGravity_)
+		{
+			gravityAngle = oneWayGravityAngle_;
+		}
+		else
+		{
+			gravityAngle = -(dist.normalize());
+		}
+
+		//垂直
+		moveVec_ += gravityAngle *= gravity;
+
+		if (dist.length() <= basePlanet.lock()->GetScale())
+		{
+			localHeight = 0;
+			status = PlayerStatus::STAND;
+		}
 	}
-	else
+
+	//ジャンプした瞬間
+	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
 	{
-		//水平移動後の座標
-		Vector3 nowPos(drawObject.GetPosition());
+		jumpSpeed = jumpPower;
+
+		//球面に対して垂直な成分
+		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+		Vector3 JumpAngle;
+		if (isOneWayGravity_)
+		{
+			JumpAngle = -oneWayGravityAngle_;
+		}
+		else
+		{
+			JumpAngle = (dist.normalize());
+		}
+		//垂直方向に加速
+		moveVec_ = JumpAngle *= jumpPower;
+		//球面上における上方向
+
+		status = PlayerStatus::JUMP;
+	}
 
 
-		Vector3 dist = (nowPos + (move * maxMoveSpeed)) - basePlanet.lock()->GetPos();
-		nowPos += (moveVec_ + warkVec_);
+#pragma endregion
 
-		jumpSpeed += gravity;
+	bool isPlanetAttracts = !(status == PlayerStatus::JUMP && isOneWayGravity_);
+	////一方向重力状態かつ跳躍中でない場合球面に即した挙動をする
+	//if (status == PlayerStatus::JUMP && isOneWayGravity)
+	//{
 
-		drawObject.SetPosition(nowPos);
+	//}
+
+				//現在位置
+	Vector3 nowPos(drawObject.GetPosition());
+
+	//上陸中の惑星との距離
+	Vector3 dist = (nowPos + (move * maxMoveSpeed)) - basePlanet.lock()->GetPos();
+
+	//移動後の座標を計算（現在位置に跳躍移動と水平移動の速度を加算）
+	nowPos += (moveVec_ + warkVec_);
+
+
+	//地上に立っているとき
+	if (status == PlayerStatus::STAND)
+	{
 		float length = basePlanet.lock()->GetScale();
-		if (status == PlayerStatus::JUMP)
-		{
-			localHeight += jumpSpeed;
 
-			length += localHeight;
-		}
-		else if(status == PlayerStatus::STAND)
-		{
-			//基本の惑星から距離を測って
-			dist = dist.normalize() * length;
+		//基本の惑星から距離を測って球面に沿って移動
+		dist = dist.normalize() * length;
 
-			//座標決定
-			drawObject.SetPosition(basePlanet.lock()->GetPos() + dist);
-		}
+		//座標決定
+		nowPos = (basePlanet.lock()->GetPos() + dist);
 	}
+	drawObject.SetPosition(nowPos);
+
 }
 
 void GravityPlayer::PostureUpdate(const Vector3 &move, bool isSetAngle)
 {
+	Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+
+	Vector3 gravityAngle;
+	if (isOneWayGravity_ && status == PlayerStatus::JUMP)
+	{
+		gravityAngle = oneWayGravityAngle_;
+	}
+	else
+	{
+		gravityAngle = -(dist.normalize());
+	}
+
 	//球面上における上方向
-	Vector3 up = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+	Vector3 up = -gravityAngle;
 	//ベクター型にする
 	XMVECTOR upV = XMLoadFloat3(&up.normalize());
 
@@ -170,48 +239,13 @@ void GravityPlayer::PostureUpdate(const Vector3 &move, bool isSetAngle)
 	}
 
 	//通常移動時の向きの変化
-		drawObject.SetRotationVector(frontV, upV);
+	drawObject.SetRotationVector(frontV, upV);
 
 }
 
 void GravityPlayer::FloorMove(bool isSetAngle)
 {
 	XMFLOAT2 stick = GameInput::Instance()->LStick();
-
-#pragma region jump
-	if (status == PlayerStatus::JUMP)
-	{
-		//球面に対して垂直な成分
-		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
-		Vector3 JumpAngle = dist.normalize();
-
-		//垂直
-		moveVec_ += JumpAngle *= gravity;
-
-		if (dist.length() <= basePlanet.lock()->GetScale())
-		{
-			localHeight = 0;
-			status = PlayerStatus::STAND;
-		}
-	}
-
-	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
-	{
-		jumpSpeed = jumpPower;
-
-		//球面に対して垂直な成分
-		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
-		Vector3 JumpAngle = dist.normalize();
-
-		//垂直方向に加速
-		moveVec_ = JumpAngle *= jumpPower;
-		//球面上における上方向
-
-		status = PlayerStatus::JUMP;
-	}
-
-
-#pragma endregion
 
 	Vector3 stickInputVector3(stick.x, 0, stick.y);
 	//スティックの入力をベクターに入れる
@@ -235,6 +269,8 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	move.normalize();
 
 	warkVec_ = (move * maxMoveSpeed);
+
+
 	PosMove(move);
 
 	PostureUpdate(move, isSetAngle);

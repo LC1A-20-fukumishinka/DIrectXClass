@@ -317,7 +317,7 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 		StartCameraAnimation(true, 15);
 	}
 
-	if (GameInput::Instance()->GrabInput())
+	if (/*GameInput::Instance()->GrabInput()*/ false)
 	{
 		LockonUpdate(playerPos, playerZVec, playerYVec);
 	}

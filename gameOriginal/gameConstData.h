@@ -8,5 +8,5 @@ namespace GameDatas
 	static const float camMinRength = 3.0f;
 	static const float maxMoveSpeed = 0.5f;
 	static const DirectX::XMVECTOR LockOnShift = {2.0f, 2.0f, 0.0f};
-	static const float gravity = -0.05f;
+	static const float gravity = 0.05f;
 }

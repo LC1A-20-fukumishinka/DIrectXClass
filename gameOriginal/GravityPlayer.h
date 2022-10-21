@@ -114,8 +114,8 @@ private:
 
 	bool oldLockonInput = false;
 
-	bool isOneWayGravity = false;
+	bool isOneWayGravity_ = false;
 
-	Vector3 oneWayGravityAngle;
+	Vector3 oneWayGravityAngle_;
 };
 
