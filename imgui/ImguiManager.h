@@ -11,7 +11,7 @@ public:
 	static void Init(ID3D12Device *device, ID3D12GraphicsCommandList *cmdList);
 	static void PreDraw();
 	static void Draw();
-
+	static void Finalize();
 private:
 	static Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeapForImgui(ID3D12Device *device);
 

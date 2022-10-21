@@ -77,6 +77,8 @@ void Framework::Finalize()
 	Sound::SoundUnload();
 
 	FbxLoader::GetInstance()->Finalize();
+
+	ImguiManager::Finalize();
 	myDirectX->Finalize();
 	//myDirectX->CheckAliveObject();
 	Win->end();

@@ -73,3 +73,10 @@ void ImguiManager::Draw()
 		1, heapForImgui_.GetAddressOf());
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList_);
 }
+
+void ImguiManager::Finalize()
+{
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	heapForImgui_.Reset();
+}
