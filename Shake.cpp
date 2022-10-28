@@ -5,7 +5,7 @@ Vector3 Shake::GetShake(float power, bool isX, bool isY, bool isZ)
 
 	float FixRate= RAND_MAX / 2;
 	Vector3 v(((float)rand() - FixRate) * isX, ((float)rand() - FixRate) * isY, ((float)rand() - FixRate) * isZ);
-	v = v.normalaize();
+	v = v.normalize();
 	v *= power;
 	return v;
 }
