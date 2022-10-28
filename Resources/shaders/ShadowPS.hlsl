@@ -4,5 +4,5 @@ SamplerState smp : register(s0); // 0番スロットに設定されたサンプ�
 
 float4 main(VSOutput input) : SV_TARGET
 {
-    return float4(0.8f,0.8f,0.8f,1.0f);
+    return float4(input.svpos.z,input.svpos.z,input.svpos.z,1.0f);
 }

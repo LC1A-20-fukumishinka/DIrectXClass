@@ -1,10 +1,15 @@
 #include "InformationBoard.hlsli"
 
-Texture2D<float4> tex : register(t0); // 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-SamplerState smp : register(s0); // 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒTƒ“ƒvƒ‰[
+Texture2D<float4> tex : register(t0); // 0ï¿½ÔƒXï¿½ï¿½ï¿½bï¿½gï¿½Éİ’è‚³ï¿½ê‚½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½
+SamplerState smp : register(s0); // 0ï¿½ÔƒXï¿½ï¿½ï¿½bï¿½gï¿½Éİ’è‚³ï¿½ê‚½ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½[
 
 float4 main(VSOutput input) : SV_TARGET
 {
     float4 texcolor = tex.Sample(smp, input.uv);
+
+    if(texcolor.a <= 0.1f)
+    {
+    clip(-1);
+    }
     return float4(texcolor * color);
 }

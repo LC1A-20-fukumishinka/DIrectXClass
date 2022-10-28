@@ -98,8 +98,32 @@ float4 main(VSOutput input) : SV_TARGET
      shadowMapUV.y < 1.0f)
      {
         shadowMap = shadowTex.Sample(smp, shadowMapUV);
+
+ 
         shadecolor.rgb -= shadowMap;
      }
 
-    return float4(shadecolor * texcolor * color);
+
+    float planetCos;
+    float animaRate = rate;
+    float wNormal = input.worldpos.xyz - planetPos;
+    wNormal = normalize(wNormal);
+    animaRate *= 2.0f;
+    animaRate -= 1.0f;
+    planetCos = dot(planetToPlayerAngle, wNormal);
+    planetCos *= 0.5f;
+    planetCos += 0.5f;
+    planetCos += animaRate;
+
+    planetCos = saturate(planetCos);
+    
+     float4 PlanetColor = {1.0f,1.0f,1.0f,1.0f};
+
+    if(planetCos <= 0.1f || planetCos >= 0.2f)
+    {
+        float4 grayColor = {0.3f, 0.3f,0.3f,1.0f}; 
+    
+        PlanetColor = ((color * planetCos) + (grayColor * (1.0f - planetCos)));
+    }
+    return float4(shadecolor * texcolor * PlanetColor);
 }
