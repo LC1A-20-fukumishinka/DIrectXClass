@@ -141,10 +141,7 @@ void GameScene::Init()
 	cam_->SetNextPlantPos(PlanetManager::Instance()->GetBasePlanet(1)->GetPos());
 
 	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3f), 2.0f);
-	MakeFlag(FlagOnPlanet, Vector3(-1, 0, 0), 2.0f);
-	//MakeFlag(a, Vector3(0, 1, 0), 2.0f);
-	MakeFlag(FlagOnPlanet, Vector3(1, 0, 0), 2.0f);
-	MakeFlag(FlagOnPlanet, Vector3(0, -1, 0), 2.0f);
+
 
 	for (int i = 1; i < stageCount; i++)
 	{
@@ -383,8 +380,11 @@ void GameScene::IngameUpdate()
 		{
 			MovePlanet();
 		}
+		player_->AddGravity(PlanetManager::Instance()->GetGravity(player_->GetPos()));
 		player_->Update();
 	}
+
+
 
 	for (auto e : testBlock_)
 	{
@@ -517,22 +517,27 @@ void GameScene::ObjectRestart()
 
 void GameScene::MovePlanet()
 {
+Planet::SetPlayerPos(player_->GetPos());
+
+	//空中にいるとき
 	if (player_->GetIsJump())
 	{
+		//現在一番近い惑星を調べる
 		shared_ptr<Planet> basePlanet;
 		bool isMove = false;
 		isMove = PlanetManager::Instance()->MovePlanet(basePlanet, player_->GetPos());
 
+		//一番近い惑星が変更されたらプレイヤーの基準になる惑星を変更する
 		if (isMove)
 		{
 			player_->SetBasePlanet(basePlanet);
-			cam_->CameraStop();
+			//cam_->CameraStop();
 		}
 	}
-	else if (cam_->GetIsCameraStop())
-	{
-		cam_->StartCameraAnimation(false, 60);
-	}
+	//else if (cam_->GetIsCameraStop())
+	//{
+	//	cam_->StartCameraAnimation(false, 60);
+	//}
 }
 
 void GameScene::ImguiUpdate()
