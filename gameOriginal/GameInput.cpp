@@ -24,7 +24,7 @@ void GameInput::Update()
 	{
 		isOldGrab = isGrab;
 		isOldLockOn = isLockOn;
-		isGrab = Input::Instance()->Key(DIK_END) || Input::Instance()->RTrigger();
+		isGrab = Input::Instance()->Key(DIK_RSHIFT) || Input::Instance()->RTrigger();
 		isLockOn = Input::Instance()->Key(DIK_X) || Input::Instance()->LTrigger();
 	}
 }

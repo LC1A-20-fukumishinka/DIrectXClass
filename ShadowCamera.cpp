@@ -7,8 +7,8 @@ ShadowCamera::ShadowCamera()
 {
 	cam_ = make_unique<Camera>();
 	camAngle_ = Vector3{ 1, -1, 1 };
-	dist_ = 5.0f;
-	cam_->Init((Vector3() - (camAngle_ * dist_)), Vector3());
+	dist_ = 30.0f;
+	cam_->Init((Vector3() - (camAngle_ * dist_)), Vector3(),Vector3(0, 1, 0), false);
 }
 
 ShadowCamera::~ShadowCamera()

@@ -89,5 +89,7 @@ private://挙動のイージング
 
 	bool isClearMode_ = false;
 	bool isTitleMode_ = true;
+
+	Vector3 playerGravityAngle_;
 };
 

@@ -18,15 +18,11 @@ void GameCamera::Init()
 
 	nextEyePos_ = cam_.GetEye();
 	nextCamUpRot_ = XMQuaternionIdentity();
+	playerGravityAngle_ = -YVec;
 }
 
 void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
 {
-	if (Input::Instance()->KeyTrigger(DIK_0))
-	{
-		TitleAnimationStart();
-	}
-
 	if (isTitleMode_)
 	{
 		TitleUpdate();
@@ -103,7 +99,7 @@ void GameCamera::StartCameraAnimation(bool isTargetEase, int EaseTimer)
 	oldTargetPos_ = cam_.GetTarget();
 	XMVECTOR frontVec = XMLoadFloat3(&(cam_.GetTarget() - cam_.GetEye()));
 	XMVECTOR upVec = XMLoadFloat3(&cam_.up);
-	oldCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot( upVec, frontVec));
+	oldCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(upVec, frontVec));
 }
 
 void GameCamera::ClearAnimationStart(const Vector3 &playerPos)
@@ -143,7 +139,7 @@ void GameCamera::TitleAnimationStart()
 
 	//正規化
 	eyeDir = eyeDir.normalize();
-	XMMATRIX rot = GetMatRot(YVec, XMLoadFloat3( &eyeDir));
+	XMMATRIX rot = GetMatRot(YVec, XMLoadFloat3(&eyeDir));
 
 	//ターゲットの位置を修正
 	nextTargetPos_ = Vector3(0, 0, 0);
@@ -175,6 +171,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	nextTargetPos_ = playerPos;
 	nextTargetPos_.y += 1.0f;
 	cam_.SetTarget(nextTargetPos_);
+
 	Vector3 camPos = nextEyePos_ - nextTargetPos_;
 	float length = camPos.length();
 
@@ -187,6 +184,13 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos)
 	camPos = camAngle * length;
 	//ターゲットの位置を加算してカメラの座標完成
 	camPos += nextTargetPos_;
+
+	////とれる内積の範囲
+	//float camRange 
+
+	////カメラの座標の内積
+	//float camDot = 
+
 
 	//float camUpLength = 5;
 	//Vector3 basePlanetToCameraAngle = { 0, 1, 0 };
@@ -312,16 +316,14 @@ void GameCamera::ClearCameraUpdate()
 
 void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
 {
+	//中視点状態切り替え
 	if (GameInput::Instance()->LockOnTrigger() || GameInput::Instance()->LockOnRelease())
 	{
 		StartCameraAnimation(true, 15);
 	}
 
-	if (/*GameInput::Instance()->GrabInput()*/ false)
-	{
-		LockonUpdate(playerPos, playerZVec, playerYVec);
-	}
-	else if (GameInput::Instance()->LockOnInput())
+
+	if (GameInput::Instance()->LockOnInput())
 	{
 		LockonUpdate(playerPos, playerZVec, playerYVec);
 	}

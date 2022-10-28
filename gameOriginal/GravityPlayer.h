@@ -33,9 +33,17 @@ private:
 	/// <param name="isSetAngle">入力による向きの変化をつけるか</param>
 	void Move(bool isSetAngle);
 
-	void PosMove(const Vector3 &move);
+	/// <summary>
+	/// 座標の移動
+	/// </summary>
+	/// <param name="move">スティック入力の移動量</param>
+	void PosUpdate(const Vector3 &move);
 
-	void PostureUpdate(const Vector3 &move, bool isSetAngle);
+	/// <summary>
+	/// 姿勢の変形
+	/// </summary>
+	/// <param name="move">スティック入力の移動移動</param>
+	void PostureUpdate(const Vector3 &move);
 	void FloorMove(bool isSetAngle);
 
 	void JumpMove(bool isSetAngle);
@@ -43,10 +51,14 @@ private:
 	/// playerを右スティックで回転できるようにする
 	/// </summary>
 	void PlayerRotation();
-	void NormalUpdate();
 
 	void PostureReset();
-private:
+
+private://状態毎の挙動管理
+
+	//通常時挙動
+	void NormalUpdate();
+
 	void LockOnUpdate();
 public://ゲッタセッタ
 	void SetPos(const DirectX::XMFLOAT3 &pos);
@@ -61,6 +73,7 @@ public://ゲッタセッタ
 	const XMFLOAT3 GetUpVec();
 	const float GetBasePlanetScale();
 	const std::weak_ptr<Planet> &GetBasePlanet();
+	const XMFLOAT3 &GetGravityAngle();
 	const bool GetIsJump();
 public://惑星周りの処理
 	/// <summary>
@@ -80,6 +93,8 @@ public://惑星周りの処理
 	void GrabUpdate();
 
 	void BlockCollision(const std::vector<Triangle> &boxPlanes);
+
+	void AddGravity(Vector3 gravity);
 private:
 	Vector3 pos;
 	Vector3 rotation;
@@ -110,12 +125,19 @@ private:
 	float jumpSpeed = 0.0f;
 
 	//ジャンプ力
-	const float jumpPower = 1.0f;
+	const float jumpPower = 0.5f;
 
 	bool oldLockonInput = false;
 
 	bool isOneWayGravity_ = false;
 
+	//単方向時重力
 	Vector3 oneWayGravityAngle_;
+
+	//世界からの重力
+	Vector3 worldGravity_;
+
+	//プレイヤーに最終的にかかる重力
+	Vector3 gravityAngle_;
 };
 
