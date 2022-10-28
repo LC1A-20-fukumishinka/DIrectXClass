@@ -62,6 +62,7 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	XMFLOAT3 tmp = pos;
 	cameraRay.start = XMLoadFloat3(&tmp);
 	Sphere starCol;
+
 	for (auto &e : planets)
 	{
 		starCol.center = XMLoadFloat3(&e->GetPos());
@@ -87,16 +88,45 @@ bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::X
 	//‘S•”‚Ì˜f¯‚Ì‹ß‚¢˜f¯‚ğ‚Æ‚é
 	for (auto &e : planets)
 	{
-		float tmpDist = (e->GetPos() - pos).length();
+		//‘¶İ‚µ‚È‚¢˜f¯‚ğƒXƒLƒbƒv
+		if (!e->GetIsSpawn()) {continue;}
 
-		tmpDist -= e->GetScale();
-		if (tmpDist <= minDist)
+
+		float tmpLength = (e->GetPos() - pos).length();
+
+		tmpLength -= e->GetScale();
+		if (tmpLength <= minDist)
 		{
 			planet = e;
-			minDist = tmpDist;
+			minDist = tmpLength;
 		}
 	}
 	return !planet->GetBase();
+}
+
+Vector3 PlanetManager::GetGravity(const Vector3 pos)
+{
+	Vector3 gravity;
+	//‘S•”‚Ì˜f¯‚Ì‹ß‚¢˜f¯‚ğ‚Æ‚é
+	for (auto &e : planets)
+	{
+		Vector3 dist = (e->GetPos() - pos);
+
+		//”¼Œa•ª‚Ì‘å‚«‚³‚Ì‹——£‚Ü‚Å‹z‚¢Šñ‚¹‚é
+		if (dist.length() <= (e->GetScale() * 2))
+		{
+			//	ˆø—Í‚Ì‹­‚³ = –Ê‚Æ‚Ì‹——£ / ¯‚Ì”¼Œa
+			float power = (1 - ((dist.length() - e->GetScale()) / e->GetScale()));
+			gravity += (dist.normalize() * power);
+		}
+	}
+
+	if (gravity.length() >= 1.0f)
+	{
+		gravity = gravity.normalize();
+	}
+
+	return gravity;
 }
 
 std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
@@ -120,7 +150,7 @@ std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
 	return *planets.begin();
 }
 
-void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn,const PlanetType &type)
+void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn, const PlanetType &type)
 {
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();
@@ -224,49 +254,9 @@ bool PlanetManager::LoadStage(int stage)
 
 	if (isLoad)
 	{
-		Vector3 newPlanetPos = tmpPlanet->GetPos();
-
-		weak_ptr<Planet> beforePlanet = GetBasePlanet();
-
 		planets.emplace_back(tmpPlanet);
-
-		//˜f¯ŠÔ‚Ì‹——£‚Ì’·‚³‚ğŒvZ
-		Vector3 distance = newPlanetPos - beforePlanet.lock()->GetPos();
-		float length = distance.length();
-
-		//‚»‚ê‚¼‚ê‚Ì˜f¯‚Ì”¼Œa‚ğˆø‚­
-		float beforePlanetScale = beforePlanet.lock()->GetStartScale();
-		length -= beforePlanetScale;
-		length -= tmpPlanet->GetStartScale();
-
-
-		const float bridgeLength = 25.0f;
-		length -= (bridgeLength / 2);
-		//˜f¯“¯m‚ÌŠÔ‚É•K—v‚ÈŒÂ”‚ğŒvZ
-		int bridgeCount = static_cast<int>(length / bridgeLength);
-
-		bridgeCount++;
-		//ŒÂ”‚ÅŠ„‚Á‚ÄŠÔ‚ğ‚Â‚È‚®˜f¯“¯m‚Ì’·‚³‚ğŒvZ
-		length = (length / bridgeCount);
-
-		//‹——£‚ğ³‹K‰»‚µ‚Ä•ûŒü‚ğo‚·
-		Vector3 angle = distance.normalize();
-		for (int i = 0; i < bridgeCount; i++)
-		{
-			//ŠJn’n“_(‚Ğ‚Æ‚Â‘O‚Ì˜f¯)
-			Vector3 pos = beforePlanet.lock()->GetPos();
-
-			//”¼Œa•ªˆÚ“®
-			pos += (angle * (beforePlanetScale + (bridgeLength) / 2));
-
-			pos += (angle * (length * i));
-			shared_ptr<Planet> bridgePlanet;
-			bridgePlanet = make_shared<Planet>();
-			bridgePlanet->Init(pos, 10.0f, DirectX::XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f), stage, false);
-			//ˆê——‚É’Ç‰Á
-			planets.emplace_back(bridgePlanet);
-		}
 	}
+
 	return isLoad;
 }
 
@@ -280,7 +270,7 @@ std::shared_ptr<Planet> PlanetManager::GetBasePlanet(int stageNum)
 
 	for (auto &e : planets)
 	{
-		bool isBase = e->GetType() == PlanetType::BASE;
+		bool isBase = (e->GetType() == PlanetType::BASE);
 
 		if (isBase)
 		{

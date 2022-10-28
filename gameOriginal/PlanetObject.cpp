@@ -36,6 +36,25 @@ void PlanetObject::Init()
 		{
 			assert(0);
 		}
+
+
+		result = myD->GetDevice()->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer((sizeof(PlanetAnimationData) + 0xff) & ~0xff),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&planetAnimationDataBuff)
+		);
+
+		planetAnimationDataBuff->SetName(L"PlanetAnimationDataBuff");
+		if (result)
+		{
+			assert(0);
+		}
+
+		SendPlanetAnimationData(Vector3(1, 0, 0), 0.0f);
+
 		isMakeConstBuffer = true;
 	}
 
@@ -95,6 +114,9 @@ void PlanetObject::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetText
 
 	myD->GetCommandList()->SetGraphicsRootConstantBufferView(1, model->GetModel()->constBuffB1->GetGPUVirtualAddress());
 
+	myD->GetCommandList()->SetGraphicsRootConstantBufferView(3, planetAnimationDataBuff->GetGPUVirtualAddress());
+
+
 	lightGroup->Draw(2);
 
 	//テクスチャの設定
@@ -113,14 +135,14 @@ void PlanetObject::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetText
 		assert(0);
 		return;
 	}
-	myD->GetCommandList()->SetGraphicsRootDescriptorTable(3,
+	myD->GetCommandList()->SetGraphicsRootDescriptorTable(4,
 		CD3DX12_GPU_DESCRIPTOR_HANDLE(
 			descHeap->GetGPUDescriptorHandleForHeapStart(),
 			modelTexture,
 			myD->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		)
 	);
-	myD->GetCommandList()->SetGraphicsRootDescriptorTable(4,
+	myD->GetCommandList()->SetGraphicsRootDescriptorTable(5,
 		CD3DX12_GPU_DESCRIPTOR_HANDLE(
 			descHeap->GetGPUDescriptorHandleForHeapStart(),
 			shadowTexture,
@@ -134,6 +156,17 @@ void PlanetObject::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetText
 	myD->GetCommandList()->IASetIndexBuffer(&model->GetModel()->ibView);
 	myD->GetCommandList()->DrawIndexedInstanced(static_cast<UINT>(model->GetModel()->indices.size()), 1, 0, 0, 0);
 #pragma endregion
+}
+
+void PlanetObject::SendPlanetAnimationData(const Vector3 &PlanetCenterPos, float Rate)
+{
+	PlanetAnimationData *constMap = nullptr;
+
+	HRESULT result = planetAnimationDataBuff->Map(0, nullptr, (void **)&constMap);
+	constMap->planetToPlayerAngle = PlanetCenterPos;
+	constMap->rate = Rate;
+	constMap->planetPos = position;
+	planetAnimationDataBuff->Unmap(0, nullptr);
 }
 
 void PlanetObject::SetShadowCamera(Camera *cam)

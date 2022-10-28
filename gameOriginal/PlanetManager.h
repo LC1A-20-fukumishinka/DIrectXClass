@@ -25,7 +25,14 @@ public:
 	bool MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos);
 
 	/// <summary>
-	/// 指定した番号の惑星を返す関数（とりあえずで作った関数、テスト用）
+	/// 引数に取った座標にかかる重力を返す
+	/// </summary>
+	/// <param name="pos">計算する座標</param>
+	/// <returns></returns>
+	Vector3 GetGravity(const Vector3 pos);
+
+	/// <summary>
+	/// 指定した番号の惑星を返す関数
 	/// </summary>
 	/// <param name="getPlanetNum">番号</param>
 	/// <returns>指定された惑星（存在しない番号の場合は先頭の番号を返す）</returns>

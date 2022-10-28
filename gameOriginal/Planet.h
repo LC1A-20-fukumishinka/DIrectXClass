@@ -45,6 +45,7 @@ public:
 	static void SetCamera(Camera *cam);
 	static void SetShadowCamera(Camera *shadowCam);
 	static void SetShadowTexture(int texHandle);
+	static void SetPlayerPos(Vector3 playerPos);
 	void GrabOn();
 	void ReleaseGrab();
 	void OnPlayer();
@@ -59,6 +60,7 @@ private://静的メンバ変数
 	static Camera *shadowCam;
 	static LightGroup *lights;
 	static int shadowTextureNum;
+	static Vector3 sPlayerPos;
 private://メンバ変数
 
 	Vector3 pos;
@@ -82,5 +84,7 @@ private://メンバ変数
 	int ID_ = -1;
 	DirectX::XMFLOAT4 startColor_;
 	Easing SpawnAnimationEase_;
+
+	float clearRate = 0.0f;
 };
 

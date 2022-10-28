@@ -6,6 +6,7 @@
 #include "FukuMath.h"
 #include "GameInput.h"
 #include "gameConstData.h"
+#include <algorithm>
 using namespace std;
 using namespace FukuMath;
 using namespace DirectX;
@@ -14,6 +15,7 @@ Camera *Planet::cam = nullptr;
 Camera *Planet::shadowCam = nullptr;
 int Planet::shadowTextureNum;
 LightGroup *Planet::lights = nullptr;
+Vector3 Planet::sPlayerPos = Vector3();
 Planet::Planet()
 {
 	model = make_unique<Model>();
@@ -35,7 +37,7 @@ Planet::~Planet()
 {
 }
 
-void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID , bool Spawn,const PlanetType &type)
+void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int stageID, bool Spawn, const PlanetType &type)
 {
 	type_ = type;
 	ID_ = stageID;
@@ -65,6 +67,12 @@ void Planet::Update()
 	else
 	{
 		GrabUpdate();
+	}
+
+	if (isBase_)
+	{
+		clearRate += 0.01f;
+		clearRate = std::clamp(clearRate, 0.0f, 1.0f);
 	}
 }
 
@@ -121,14 +129,15 @@ void Planet::SpawnAnimationStart()
 {
 	//アニメーション開始フラグをオンにする
 	isSpawnAnimation_ = true;
-//アニメーション開始時に設定する必要があるものはここに記述する
-	//イージングの初期化処理(またリセット処理)
+	//アニメーション開始時に設定する必要があるものはここに記述する
+		//イージングの初期化処理(またリセット処理)
 	SpawnAnimationEase_.Reset();
 }
 
 void Planet::Draw()
 {
 	object->Update();
+	object->SendPlanetAnimationData(Vector3(sPlayerPos - pos).normalize(), clearRate);
 	object->modelDraw(ShadowDrawPipeline::Instance()->GetPipeLine());
 }
 
@@ -187,6 +196,11 @@ void Planet::SetShadowTexture(int shadowTextureNum)
 	Planet::shadowTextureNum = shadowTextureNum;
 }
 
+void Planet::SetPlayerPos(Vector3 playerPos)
+{
+	sPlayerPos = playerPos;
+}
+
 void Planet::GrabOn()
 {
 	isGrab_ = true;
@@ -242,6 +256,7 @@ void Planet::Reset()
 		isSpawnAnimation_ = false;
 	}
 	this->pos = startPos_;
+	clearRate = 0.0f;
 	object->SetPosition(startPos_);
 	object->SetColor(startColor_);
 }

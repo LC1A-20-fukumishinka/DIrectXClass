@@ -222,6 +222,7 @@
     <ClCompile Include="ShadowCamera.cpp" />
     <ClCompile Include="ShadowDrawPipeline.cpp" />
     <ClCompile Include="ShadowPipeline.cpp" />
+    <ClCompile Include="Shake.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture\TextureMgr.cpp" />
     <ClCompile Include="Base\IGraphicsPipeline.cpp" />
@@ -309,6 +310,7 @@
     <ClInclude Include="ShadowCamera.h" />
     <ClInclude Include="ShadowDrawPipeline.h" />
     <ClInclude Include="ShadowPipeline.h" />
+    <ClInclude Include="Shake.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Texture\TextureMgr.h" />
     <ClInclude Include="Base\IGraphicsPipeline.h" />
