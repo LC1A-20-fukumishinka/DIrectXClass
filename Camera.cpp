@@ -18,7 +18,7 @@ Camera::Camera()
 
 }
 
-void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up, const Projection::ProjectionData &projectionData)
+void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up, bool isPerspective, const Projection::ProjectionData &projectionData)
 {
 	this->eye = eye;
 	this->target = target;
@@ -38,13 +38,21 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 		this->projectionData.width = static_cast<float>(myD->winWidth);
 	}
 
-
 	//視錐台行列の生成
-	matProjection = DirectX::XMMatrixPerspectiveFovLH(
-		DirectX::XMConvertToRadians(this->projectionData.angle),				//上下画角60度
-		(float)this->projectionData.width / (float)this->projectionData.height,	//アスペクト比(画面横幅/画面縦幅)
-		this->projectionData.screenNear, this->projectionData.screenFar							//前端、奥端
-	);
+
+	if (isPerspective)
+	{
+		matProjection = DirectX::XMMatrixPerspectiveFovLH(
+			DirectX::XMConvertToRadians(this->projectionData.angle),				//上下画角60度
+			(float)this->projectionData.width / (float)this->projectionData.height,	//アスペクト比(画面横幅/画面縦幅)
+			this->projectionData.screenNear, this->projectionData.screenFar							//前端、奥端
+		);
+	}
+	else
+	{
+		matProjection = DirectX::XMMatrixTranslation(0.0f, 0.0f, -this->projectionData.screenNear);
+		matProjection *= DirectX::XMMatrixScaling((float)(1.0f / this->projectionData.width), (float)(1.0f / this->projectionData.height), (1.0f / this->projectionData.screenNear - this->projectionData.screenFar));
+	}
 }
 
 void Camera::Update()
