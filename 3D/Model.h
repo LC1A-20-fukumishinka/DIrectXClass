@@ -4,6 +4,8 @@
 #include <vector>
 #include <wrl.h>
 #include <string>
+#include <unordered_map>
+
 struct VertexPosNormalUv
 {
 	DirectX::XMFLOAT3 pos; // xyz座標
@@ -64,6 +66,9 @@ struct ModelObject
 
 	//テクスチャー用のハンドル
 	int textureHandle;
+
+	//頂点法線スムージング用データ
+	std::unordered_map<unsigned short, std::vector<unsigned short>> smoothData;
 };
 class Model
 {
@@ -71,8 +76,8 @@ public:
 	Model();
 	~Model();
 
-	void CreateModel( const std::string &modelname);
-	void LoadModel(const std::string &directoryPath, const std::string &modelname);
+	void CreateModel( const std::string &modelname, bool isSmoothing = false);
+	void LoadModel(const std::string &directoryPath, const std::string &modelname, bool isSmoothing);
 	void LoadMaterial(const std::string &directoryPath, const std::string &filename);
 	void LoadTexture(const std::string &directoryPath, const std::string &filename);
 
@@ -81,6 +86,17 @@ public:
 
 	inline const std::vector<VertexPosNormalUv> & GetVertices(){return model.vertices;}
 	inline const std::vector<unsigned short> &GetIndices(){return model.indices;}
+private:
+	/// <summary>
+	/// エッジ平滑化データの追加
+	/// </summary>
+	/// <param name="indexPosition">座標インデックス</param>
+	/// <param name="indexVertex">頂点インデックス</param>
+	void AddSmoothData(unsigned short indexPosition, unsigned short indexVertex);
+
+	/// <summary>
+	/// </summary>
+	void CalculateSmoothVertexNormals();
 private:
 	ModelObject model;
 };

@@ -6,7 +6,7 @@
 #include <string>//文字列
 #include <vector>//頂点データを纏める
 #include "TextureMgr.h"
-
+#include "Vector3.h"
 using namespace std;
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -23,11 +23,16 @@ Model::~Model()
 }
 
 
-void Model::CreateModel(const std::string &modelname)
+void Model::CreateModel(const std::string &modelname, bool isSmoothing)
 {
 	const string directoryPath = "Resources/" + modelname + "/";	//”Resouces/triangle_mat/”
 
-	LoadModel(directoryPath, modelname);
+	LoadModel(directoryPath, modelname, isSmoothing);
+
+	if (isSmoothing)
+	{
+		CalculateSmoothVertexNormals();
+	}
 
 	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * model.vertices.size());
 	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * model.indices.size());
@@ -121,7 +126,7 @@ void Model::CreateModel(const std::string &modelname)
 }
 
 
-void Model::LoadModel(const std::string &directoryPath, const std::string &modelname)
+void Model::LoadModel(const std::string &directoryPath, const std::string &modelname, bool isSmoothing)
 {
 
 	//ファイルストリーム
@@ -216,6 +221,10 @@ void Model::LoadModel(const std::string &directoryPath, const std::string &model
 				//頂点インデックスに追加
 				model.indices.emplace_back((unsigned short)model.indices.size());
 
+				if (isSmoothing)
+				{
+					AddSmoothData(indexPosition, static_cast<unsigned short>(model.vertices.size() - 1));
+				}
 				//const int squareSurfaceVerticesCount = 4;
 				////面の頂点数が4
 				//if (vertices.size() >= squareSurfaceVerticesCount)
@@ -337,4 +346,32 @@ ModelObject *Model::GetModel()
 void Model::SetModel(const ModelObject &model)
 {
 	this->model = model;
+}
+
+void Model::AddSmoothData(unsigned short indexPosition, unsigned short indexVertex)
+{
+	model.smoothData[indexPosition].emplace_back(indexVertex);
+}
+
+void Model::CalculateSmoothVertexNormals()
+{
+	auto itr = model.smoothData.begin();
+	for (;itr != model.smoothData.end(); ++itr)
+	{
+		//各面用の共通頂点コレクション
+		std::vector<unsigned short>& v = itr->second;
+		//前兆店の法線を平均する
+		Vector3 normal;
+		for (unsigned short index : v)
+		{
+			normal += model.vertices[index].normal;
+		}
+		normal = (normal.normalize() / static_cast<float>(v.size()));
+
+		//共通法線を使用するすべての頂点データに書き込む
+		for (unsigned short index : v)
+		{
+			model.vertices[index].normal = normal;
+		}
+	}
 }
