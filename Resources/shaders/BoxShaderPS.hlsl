@@ -1,7 +1,7 @@
 #include "BoxShader.hlsli"
 
-Texture2D<float4> tex : register(t0);	// g—p‚·‚éƒeƒNƒXƒ`ƒƒ[
-SamplerState smp : register(s0);		// 0”Ô‚ÌƒTƒ“ƒvƒ‰[
+Texture2D<float4> tex : register(t0);	// ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½[
+SamplerState smp : register(s0);		// 0ï¿½Ô‚ÌƒTï¿½ï¿½ï¿½vï¿½ï¿½ï¿½[
 
 float4 main(GSOutput input) : SV_TARGET
 {

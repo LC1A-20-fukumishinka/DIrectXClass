@@ -126,12 +126,14 @@
       <AdditionalIncludeDirectories>$(SolutionDir)DirectXTex;$(SolutionDir)3D;$(SolutionDir)2D;$(SolutionDir)Base;$(SolutionDir)input;$(SolutionDir)Texture</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,6 +148,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -183,6 +187,7 @@
     <ClCompile Include="Base\SceneMgr.cpp" />
     <ClCompile Include="Base\TitleScene.cpp" />
     <ClCompile Include="Base\Vector3.cpp" />
+    <ClCompile Include="2D\Bloom.cpp" />
     <ClCompile Include="Box3D.cpp" />
     <ClCompile Include="gameOriginal\Block.cpp" />
     <ClCompile Include="Collision\Collision.cpp" />
@@ -268,6 +273,7 @@
     <ClInclude Include="Base\SceneMgr.h" />
     <ClInclude Include="Base\TitleScene.h" />
     <ClInclude Include="Base\Vector3.h" />
+    <ClInclude Include="2D\Bloom.h" />
     <ClInclude Include="Box3D.h" />
     <ClInclude Include="gameOriginal\Block.h" />
     <ClInclude Include="Collision\BaseCollider.h" />

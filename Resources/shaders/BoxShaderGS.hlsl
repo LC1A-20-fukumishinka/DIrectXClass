@@ -95,7 +95,7 @@ void main(
 			element.svpos = input[0].pos + offset;
 
 			//ƒrƒ…[AË‰e•ÏŠ·
-			element.svpos = mul(mat, element.svpos);
+			element.svpos = mul(matViewprj, element.svpos);
 			element.uv = uv_array[v];
 			output.Append(element);
 		}

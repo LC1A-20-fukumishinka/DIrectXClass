@@ -12,7 +12,7 @@ public:
 	InformationBoard();
 	~InformationBoard();
 
-	void Init(const wchar_t *filename, std::weak_ptr<Planet> basePlanet, const Vector3 &angle, const Vector3 &movePos, const Vector3 &scale);
+	void Init(const wchar_t *filename, std::weak_ptr<Planet> basePlanet, const Vector3 &angle, const Vector3 &movePos, const Vector3 &scale, float drawLength);
 	void Update();
 	void Draw();
 	void Finalize();

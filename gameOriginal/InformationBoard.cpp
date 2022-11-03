@@ -77,7 +77,7 @@ InformationBoard::~InformationBoard()
 {
 }
 
-void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> basePlanet, const Vector3 &angle, const Vector3 &movePos, const Vector3 &scale)
+void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> basePlanet, const Vector3 &angle, const Vector3 &movePos, const Vector3 &scale, float drawLength)
 {
 	textureHandle_ = TextureMgr::Instance()->SpriteLoadTexture(filename);
 	drawObject_.Init();
@@ -92,6 +92,7 @@ void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> baseP
 	drawObject_.SetScale(scale);
 	baseBoard_.SetScale(sBoardScale);
 
+	drawLength_ = drawLength;
 	basePlanet_ = basePlanet;
 
 	basePos_ = basePlanet.lock()->GetPos();
@@ -139,7 +140,9 @@ void InformationBoard::Update()
 	baseBoard_.SetScale((sBoardScale * (1.0f - easeScale)));
 
 	XMVECTOR bill = XMQuaternionRotationMatrix(sCamera->GetMatBillboard());
-	Vector3 pos = XMVector3Rotate(XMLoadFloat3(&(movePos_ * easeScale)), bill);
+	//Vector3 pos = XMVector3Rotate(XMLoadFloat3(&(movePos_ * easeScale)), bill);
+	Vector3 pos = (movePos_ * easeScale);
+
 	pos += basePos_;
 
 	drawObject_.SetPosition(pos);
