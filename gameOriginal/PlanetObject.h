@@ -15,8 +15,9 @@ class PlanetObject : public Object3D
 	struct PlanetAnimationData
 	{
 		DirectX::XMFLOAT3 planetToPlayerAngle;
-		float rate;
+		float whiteRate = 0.0f;
 		DirectX::XMFLOAT3 planetPos;
+		float colorRate = 0.0f;
 	};
 public:
 	void Init() override;
@@ -24,7 +25,7 @@ public:
 
 	void modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetTexture = false, int textureNumber = -1) override;
 
-	void SendPlanetAnimationData(const Vector3 &PlanetCenterPos, float Rate);
+	void SendPlanetAnimationData(const Vector3 &PlanetCenterPos, float whiteRate, float colorRate);
 public:
 	void SetShadowCamera(Camera *cam);
 	void SetShadowTextureNum(int shadowTextureNum);

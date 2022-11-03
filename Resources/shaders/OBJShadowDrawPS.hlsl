@@ -105,12 +105,10 @@ float4 main(VSOutput input) : SV_TARGET
 
 
     float planetCos;
-    float animaRate = rate;
-    float wNormal = input.worldpos.xyz - planetPos;
-    wNormal = normalize(wNormal);
+    float animaRate = whiteRate;
     animaRate *= 2.0f;
     animaRate -= 1.0f;
-    planetCos = dot(planetToPlayerAngle, wNormal);
+    planetCos = dot(planetToPlayerAngle, input.normal);
     planetCos *= 0.5f;
     planetCos += 0.5f;
     planetCos += animaRate;
@@ -119,11 +117,14 @@ float4 main(VSOutput input) : SV_TARGET
     
      float4 PlanetColor = {1.0f,1.0f,1.0f,1.0f};
 
-    if(planetCos <= 0.1f || planetCos >= 0.2f)
+    if(planetCos <= 0.0f || planetCos >= 0.01f)
     {
+        planetCos = smoothstep(0.0f, 0.01,planetCos);
         float4 grayColor = {0.3f, 0.3f,0.3f,1.0f}; 
     
-        PlanetColor = ((color * planetCos) + (grayColor * (1.0f - planetCos)));
+        PlanetColor.rgb = ((color.rgb * planetCos) + (grayColor.rgb * (1.0f - (planetCos))));
+
+        PlanetColor.rgb += float3(colorRate, colorRate, colorRate);
     }
     return float4(shadecolor * texcolor * PlanetColor);
 }

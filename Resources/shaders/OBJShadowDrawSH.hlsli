@@ -50,8 +50,9 @@ cbuffer cbuff2 : register(b2)
 cbuffer cbuff3 : register(b3)
 {
     float3 planetToPlayerAngle: packoffset(c0) ;
-    float  rate : packoffset(c0.w);
+    float  whiteRate : packoffset(c0.w);
     float3 planetPos : packoffset(c1) ; 
+    float colorRate : packoffset(c1.w);
 }
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体
 struct VSOutput

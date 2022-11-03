@@ -39,6 +39,11 @@ void PlanetManager::Update()
 	{
 		e->Update();
 	}
+
+	if (stagePlanets.size() > 0)
+	{
+		StageUpdate();
+	}
 }
 
 void PlanetManager::Draw()
@@ -68,7 +73,7 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 		starCol.center = XMLoadFloat3(&e->GetPos());
 		starCol.radius = e->GetScale();
 		float colDist;
-		if (!e->GetBase() && Collision::CheckRay2Sphere(cameraRay, starCol, &colDist))
+		if (!e->GetIsOnPlayer() && Collision::CheckRay2Sphere(cameraRay, starCol, &colDist))
 		{
 			if (colDist <= minDist)
 			{
@@ -89,7 +94,7 @@ bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::X
 	for (auto &e : planets)
 	{
 		//ë∂ç›ÇµÇ»Ç¢òfêØÇÉXÉLÉbÉv
-		if (!e->GetIsSpawn()) {continue;}
+		if (!e->GetIsSpawn()) { continue; }
 
 
 		float tmpLength = (e->GetPos() - pos).length();
@@ -101,7 +106,7 @@ bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::X
 			minDist = tmpLength;
 		}
 	}
-	return !planet->GetBase();
+	return !planet->GetIsOnPlayer();
 }
 
 Vector3 PlanetManager::GetGravity(const Vector3 pos)
@@ -245,16 +250,40 @@ void PlanetManager::SetShadowTexture(int shadowTextureNum)
 	Planet::SetShadowTexture(shadowTextureNum);
 }
 
+void PlanetManager::SetStagePlanets(int stageNum)
+{
+	std::vector<std::weak_ptr<Planet>> tmp;
+	for (auto &e : planets)
+	{
+		if (e->GetID() == stageNum)
+		{
+			tmp.emplace_back(e);
+		}
+	}
+
+	orderCount = 0;
+
+	if (tmp.size() <= 0)
+	{
+		orderCount = 10000;
+	}
+	stagePlanets = tmp;
+}
+
 bool PlanetManager::LoadStage(int stage)
 {
 
-	shared_ptr<Planet> tmpPlanet;
+	std::vector<shared_ptr<Planet>> tmpPlanet;
 
 	bool isLoad = LoadStageFile(stage, tmpPlanet);
 
 	if (isLoad)
 	{
-		planets.emplace_back(tmpPlanet);
+		//ÉçÅ[ÉhÇµÇΩòfêØÇãlÇﬂçûÇﬁ
+		for (auto &e : tmpPlanet)
+		{
+			planets.emplace_back(e);
+		}
 	}
 
 	return isLoad;
@@ -293,4 +322,127 @@ std::shared_ptr<Planet> PlanetManager::GetBasePlanet(int stageNum)
 	}
 
 	return returnPlanet;
+}
+
+bool PlanetManager::StageClear()
+{
+	bool isClear = (orderCount == static_cast<int>(stagePlanets.size()));
+
+	if (isClear)
+	{
+		orderCount++;
+	}
+	return isClear;
+}
+
+void PlanetManager::playerStand(std::weak_ptr<Planet> playerStandPlanet)
+{
+	playerStandPlanet_ = playerStandPlanet;
+}
+
+void PlanetManager::StageUpdate()
+{
+	OrderUpdate();
+}
+
+void PlanetManager::TimeAttackUpdate()
+{
+	int playerOnPlanet = 0;
+	bool check = false;
+	//ëÅä˙ÉäÉ^Å[Éì
+	for (auto &e : stagePlanets)
+	{
+		if (!e.lock()->GetIsColorChange())
+		{
+			return;
+		}
+		if (!check)
+		{
+			if (e.lock()->GetIsOnPlayer())
+			{
+				check = true;
+			}
+			else
+			{
+				playerOnPlanet++;
+			}
+		}
+
+	}
+
+
+	int max = static_cast<int>(stagePlanets.size());
+	int colorOffPlanet = rand() % max;
+	while (true)
+	{
+		if (colorOffPlanet != playerOnPlanet)
+		{
+			break;
+		}
+		colorOffPlanet = rand() % max;
+	}
+
+	int planetCount = 0;
+	for (auto &e : stagePlanets)
+	{
+		if (planetCount == colorOffPlanet)
+		{
+			score++;
+			e.lock()->ColorOff();
+			break;
+		}
+		else
+		{
+			planetCount++;
+		}
+	}
+}
+
+void PlanetManager::OrderUpdate()
+{
+	int stagePlanetCount = static_cast<int>(stagePlanets.size());
+
+	bool isNotFound = true;
+	bool isOut = false;
+	for (auto &e : stagePlanets)
+	{
+		int count = static_cast<int>(&e - &stagePlanets[0]);
+		if (e.lock() == playerStandPlanet_.lock())
+		{
+			if (orderCount == count)
+			{
+				//ê≥ÇµÇ¢òfêØÇì•ÇÒÇæ(éüÇÃòfêØÇ…)
+				e.lock()->ColorChange();
+				e.lock()->SetNextOrder(false);
+				orderCount++;
+			}
+			else if (orderCount < count)
+			{
+				isOut = true;
+			}
+			isNotFound = false;
+		}
+	}
+
+	//éüÇÃòfêØÇ™åıÇ¡ÇƒÇ¢Ç»Ç¢
+	bool isNextPlanetNotShining = (orderCount < static_cast<int>(stagePlanets.size()) && !stagePlanets[orderCount].lock()->GetIsNext());
+	if(isNextPlanetNotShining)
+	{
+		stagePlanets[orderCount].lock()->SetNextOrder(true);
+	}
+
+	if (isOut && orderCount > 0)
+	{
+		for (auto &e : stagePlanets)
+		{
+			e.lock()->ColorOff();
+			e.lock()->SetNextOrder(false);
+		}
+		orderCount = 0;
+	}
+
+	if(isNotFound)
+	{
+		playerStandPlanet_.lock()->ColorChange();
+	}
 }

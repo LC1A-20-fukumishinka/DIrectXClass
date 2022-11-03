@@ -38,6 +38,11 @@ public:
 
 	//出現アニメーションが終了しているかを教える
 	bool GetIsSpawnAnimationEnd();
+
+	void ColorChange();
+	void ColorOff();
+	bool GetIsColorChange();
+
 	std::unique_ptr<PlanetObject> object;
 	std::unique_ptr <Model> model;
 public:
@@ -46,13 +51,16 @@ public:
 	static void SetShadowCamera(Camera *shadowCam);
 	static void SetShadowTexture(int texHandle);
 	static void SetPlayerPos(Vector3 playerPos);
+
 	void GrabOn();
 	void ReleaseGrab();
 	void OnPlayer();
 	void ReleaseBase();
 	void SetGrabRotateAngle(const DirectX::XMVECTOR &AxisY, const DirectX::XMVECTOR &AxisX);
-	bool GetBase();
+	void SetNextOrder(bool isNext);
+	bool GetIsOnPlayer();
 	int GetID();
+	bool GetIsNext();
 	PlanetType GetType();
 	void Reset();
 private://静的メンバ変数
@@ -66,7 +74,7 @@ private://メンバ変数
 	Vector3 pos;
 
 	bool isGrab_ = false;
-	bool isBase_ = false;
+	bool isOnPlayer_ = false;
 	bool isSpawn_ = false;
 	
 	bool isSpawnAnimation_ = false;
@@ -86,5 +94,12 @@ private://メンバ変数
 	Easing SpawnAnimationEase_;
 
 	float clearRate = 0.0f;
+	float colorRate = 0.0f;
+
+	bool isColorChange_ = false;
+
+	bool isNext_ = false;
+	bool isNextLightup_ = true;
+	Vector3 ColorOnAngle;
 };
 

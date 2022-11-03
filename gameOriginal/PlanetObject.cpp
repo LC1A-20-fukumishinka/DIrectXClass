@@ -53,7 +53,7 @@ void PlanetObject::Init()
 			assert(0);
 		}
 
-		SendPlanetAnimationData(Vector3(1, 0, 0), 0.0f);
+		SendPlanetAnimationData(Vector3(1, 0, 0), 0.0f, 0.0f);
 
 		isMakeConstBuffer = true;
 	}
@@ -158,14 +158,15 @@ void PlanetObject::modelDraw(PipeClass::PipelineSet *pipelineSet, bool isSetText
 #pragma endregion
 }
 
-void PlanetObject::SendPlanetAnimationData(const Vector3 &PlanetCenterPos, float Rate)
+void PlanetObject::SendPlanetAnimationData(const Vector3 &PlanetCenterPos, float Rate, float colorRate)
 {
 	PlanetAnimationData *constMap = nullptr;
 
 	HRESULT result = planetAnimationDataBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->planetToPlayerAngle = PlanetCenterPos;
-	constMap->rate = Rate;
+	constMap->whiteRate = Rate;
 	constMap->planetPos = position;
+	constMap->colorRate = colorRate;
 	planetAnimationDataBuff->Unmap(0, nullptr);
 }
 

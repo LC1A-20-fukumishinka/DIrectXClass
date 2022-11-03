@@ -20,7 +20,7 @@ Planet::Planet()
 {
 	model = make_unique<Model>();
 
-	model->CreateModel("sphere");
+	model->CreateModel("sphere", true);
 	//model->CreateModel("chr_sword");//‰ñ“]Šm”F—p
 	object = make_unique<PlanetObject>();
 	object->Init();
@@ -69,10 +69,32 @@ void Planet::Update()
 		GrabUpdate();
 	}
 
-	if (isBase_)
+	if (isColorChange_)
 	{
-		clearRate += 0.01f;
+		float t = 0.25f;
+		t /= (startScale_ * 2);
+		clearRate += t;
+		colorRate = 0.0f;
 		clearRate = std::clamp(clearRate, 0.0f, 1.0f);
+		colorRate = std::clamp(colorRate, 0.0f, 1.0f);
+	}
+	else
+	{
+		if (isNext_)
+		{
+			colorRate += 0.03f;
+			if (colorRate >= 1.0f)
+			{
+				colorRate = 0.0f;
+				isNextLightup_ = !isNextLightup_;
+			}
+		}
+		else
+		{
+			colorRate = 0.0f;
+		}
+
+		ColorOnAngle = Vector3(sPlayerPos - pos).normalize();
 	}
 }
 
@@ -136,8 +158,23 @@ void Planet::SpawnAnimationStart()
 
 void Planet::Draw()
 {
+
 	object->Update();
-	object->SendPlanetAnimationData(Vector3(sPlayerPos - pos).normalize(), clearRate);
+
+	float easeRate = 0.0f;
+	if (!isColorChange_)
+	{
+		if (isNextLightup_)
+		{
+			easeRate = Easing::easeOutCubic(colorRate);
+		}
+		else
+		{
+			easeRate = Easing::easeInCubic(1.0f - colorRate);
+		}
+		easeRate *= 0.3f;
+	}
+	object->SendPlanetAnimationData(ColorOnAngle, clearRate, easeRate);
 	object->modelDraw(ShadowDrawPipeline::Instance()->GetPipeLine());
 }
 
@@ -174,6 +211,22 @@ bool Planet::GetIsSpawn()
 bool Planet::GetIsSpawnAnimationEnd()
 {
 	return SpawnAnimationEase_.IsEnd();
+}
+
+void Planet::ColorChange()
+{
+	isColorChange_ = true;
+}
+
+void Planet::ColorOff()
+{
+	isColorChange_ = false;
+	clearRate = 0.0f;
+}
+
+bool Planet::GetIsColorChange()
+{
+	return isColorChange_;
 }
 
 void Planet::SetLight(LightGroup *lights)
@@ -213,12 +266,12 @@ void Planet::ReleaseGrab()
 
 void Planet::OnPlayer()
 {
-	isBase_ = true;
+	isOnPlayer_ = true;
 }
 
 void Planet::ReleaseBase()
 {
-	isBase_ = false;
+	isOnPlayer_ = false;
 }
 
 void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR &AxisY, const DirectX::XMVECTOR &AxisX)
@@ -227,14 +280,25 @@ void Planet::SetGrabRotateAngle(const DirectX::XMVECTOR &AxisY, const DirectX::X
 	GrabRotateAxisX = AxisX;
 }
 
-bool Planet::GetBase()
+void Planet::SetNextOrder(bool isNext)
 {
-	return isBase_;
+	isNext_ = isNext;
+	isNextLightup_ = true;
+}
+
+bool Planet::GetIsOnPlayer()
+{
+	return isOnPlayer_;
 }
 
 int Planet::GetID()
 {
 	return ID_;
+}
+
+bool Planet::GetIsNext()
+{
+	return isNext_;
 }
 
 PlanetType Planet::GetType()
@@ -257,6 +321,7 @@ void Planet::Reset()
 	}
 	this->pos = startPos_;
 	clearRate = 0.0f;
+	isColorChange_ = false;
 	object->SetPosition(startPos_);
 	object->SetColor(startColor_);
 }

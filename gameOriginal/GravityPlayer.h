@@ -53,7 +53,6 @@ private:
 	void PlayerRotation();
 
 	void PostureReset();
-
 private://ó‘Ô–ˆ‚Ì‹““®ŠÇ—
 
 	//’Êí‹““®
@@ -95,6 +94,8 @@ public://˜f¯ü‚è‚Ìˆ—
 	void BlockCollision(const std::vector<Triangle> &boxPlanes);
 
 	void AddGravity(Vector3 gravity);
+
+	void shakeUpdate(float shakePower);
 private:
 	Vector3 pos;
 	Vector3 rotation;

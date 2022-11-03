@@ -4,6 +4,7 @@
 #include "FukuMath.h"
 #include "../EaseClass.h"
 #include "Planet.h"
+#include "PlanetManager.h"
 #include "gameConstData.h"
 #include "../ShadowPipeline.h"
 #include "../Collision/Collision.h"
@@ -63,6 +64,11 @@ void GravityPlayer::Update()
 		NormalUpdate();
 	}
 
+
+	if (status == PlayerStatus::STAND)
+	{
+		PlanetManager::Instance()->playerStand(basePlanet);
+	}
 	shadowObject.SetPosition(drawObject.GetPosition());
 	shadowObject.SetRotation(drawObject.GetRotQuaternion());
 }
@@ -112,7 +118,7 @@ void GravityPlayer::Move(bool isSetAngle)
 		}
 		else
 		{
-			oneWayGravityAngle_ = -drawObject.GetUpVec();
+			oneWayGravityAngle_ = cam->GetAngle();
 		}
 	}
 	FloorMove(isSetAngle);
@@ -144,7 +150,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 		if (nowSpeed >= shakeSpeed)
 		{
 			float shakePower = (0.1f * (nowSpeed - shakeSpeed));
-			cam->SetShift(Shake::GetShake(shakePower));
+			shakeUpdate(shakePower);
 		}
 
 
@@ -289,7 +295,7 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 		gravityAngle_ = worldGravity_;
 	}
-	else 
+	else
 	{
 		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
 		gravityAngle_ = -(dist.normalize());
@@ -330,7 +336,7 @@ void GravityPlayer::NormalUpdate()
 
 void GravityPlayer::PostureReset()
 {
-	if(status == PlayerStatus::JUMP) return;
+	if (status == PlayerStatus::JUMP) return;
 	Vector3 BasePlanetToPlayer = drawObject.GetPosition() - basePlanet.lock()->GetPos();
 	XMVECTOR BasePlanetToPlayerAngleV = XMLoadFloat3(&BasePlanetToPlayer.normalize());
 	XMVECTOR frontVec = XMVector3Cross(drawObject.GetRightVec(), BasePlanetToPlayerAngleV);
@@ -341,6 +347,11 @@ void GravityPlayer::PostureReset()
 void GravityPlayer::AddGravity(Vector3 gravity)
 {
 	worldGravity_ = gravity;
+}
+
+void GravityPlayer::shakeUpdate(float shakePower)
+{
+	cam->SetShift(Shake::GetShake(shakePower));
 }
 
 void GravityPlayer::LockOnUpdate()

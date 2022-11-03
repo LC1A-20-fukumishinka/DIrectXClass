@@ -38,7 +38,7 @@ public:
 	/// <returns>指定された惑星（存在しない番号の場合は先頭の番号を返す）</returns>
 	std::weak_ptr<Planet> GetPlanet(int getPlanetNum);
 
-	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID,  bool isSpawn = true, const PlanetType &type = BRIDGE);
+	void AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn = true, const PlanetType &type = BRIDGE);
 
 	void Reset();
 
@@ -62,6 +62,7 @@ public:
 	void SetShadowCamera(Camera *cam);
 	void SetShadowTexture(int shadowTextureNum);
 
+	void SetStagePlanets(int stageNum);
 	bool LoadStage(int stage);
 
 	/// <summary>
@@ -70,12 +71,28 @@ public:
 	/// <param name="stageNum">番号の指定（ない場合や範囲外を指定している場合一番後ろの惑星を返す）</param>
 	/// <returns>惑星のポインタ</returns>
 	std::shared_ptr<Planet> GetBasePlanet(int stageNum = -1);
+
+	bool StageClear();
+
+	void playerStand(std::weak_ptr<Planet> playerStandPlanet);
+private:
+	void StageUpdate();
+	void TimeAttackUpdate();
+
+	void OrderUpdate();
 private:
 	std::list<std::shared_ptr<Planet>> planets;
 
+	std::vector<std::weak_ptr<Planet>> stagePlanets;
 	bool isSpawnAnimation_ = false;
 
 	static bool isMakeInstance;
 
+	int score = 0;
+
+	int maxScore = 10;
+
+	int orderCount = 0;
+	std::weak_ptr<Planet>playerStandPlanet_;
 };
 
