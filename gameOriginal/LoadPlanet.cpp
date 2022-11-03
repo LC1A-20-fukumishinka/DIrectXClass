@@ -5,7 +5,15 @@
 #include <algorithm>
 using namespace std;
 using namespace DirectX;
-bool LoadStageFile(int stage, std::shared_ptr<Planet> &planet)
+
+
+struct MakePlanetData
+{
+	Vector3 pos;
+	float scale = 0;
+};
+
+bool LoadStageFile(int stage, std::vector<std::shared_ptr<Planet>> &planets)
 {
 	string baseName = "stage";
 	string count = to_string(stage);
@@ -22,15 +30,18 @@ bool LoadStageFile(int stage, std::shared_ptr<Planet> &planet)
 
 	string line;
 
-	planet = make_shared<Planet>();
 
-	Vector3 pos;
-	float size = 0.0f;
+	std::vector<MakePlanetData> datas;
 	XMFLOAT4 color;
 	int ID = stage;
 	bool isSpawn = false;
 	PlanetType type = PlanetType::BASE;
 
+	int pCount = 0;
+	int sCount = 0;
+	int maxCount = 0;
+
+	Vector3 basePos;
 	while (getline(file, line))
 	{
 		//','‚ð' '‚É•ÏŠ·
@@ -40,19 +51,41 @@ bool LoadStageFile(int stage, std::shared_ptr<Planet> &planet)
 		string key;
 		getline(line_Data, key, ' ');
 
-		//p
-		if (key == "p")
+
+		if (key == "n")
 		{
-			line_Data >> pos.x;
-			line_Data >> pos.y;
-			line_Data >> pos.z;
+		line_Data >> maxCount;
+		planets.resize(maxCount);
+		for (auto &e : planets)
+		{
+			e = make_shared<Planet>();
+		}
+		datas.resize(maxCount);
+		}
+
+		if (key == "b")
+		{
+			line_Data >> basePos.x;
+			line_Data >> basePos.y;
+			line_Data >> basePos.z;
+		}
+
+
+		//p
+		if (key == "p" && pCount < maxCount)
+		{
+			line_Data >> datas[pCount].pos.x;
+			line_Data >> datas[pCount].pos.y;
+			line_Data >> datas[pCount].pos.z;
+			datas[pCount].pos += basePos;
+			pCount++;
 		}
 
 		//s
-		if (key == "s")
+		if (key == "s" && sCount < maxCount)
 		{
-			line_Data >> size;
-
+			line_Data >> datas[sCount].scale;
+			sCount++;
 		}
 
 		//c
@@ -75,7 +108,10 @@ bool LoadStageFile(int stage, std::shared_ptr<Planet> &planet)
 
 		type = PlanetType::BASE;
 	}
-	planet->Init(pos, size, color, ID, isSpawn, type);
+	for (int i = 0; i < maxCount; i++)
+	{
+		planets[i]->Init(datas[i].pos, datas[i].scale, color, ID, isSpawn, type);
+	}
 
 	return true;
 }
