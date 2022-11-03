@@ -67,7 +67,7 @@ float Vector3::length() const
 	return sqrtf(x * x + y * y + z * z);
 }
 
-const Vector3 &Vector3::normalize()
+const Vector3 Vector3::normalize()
 {
 	if (length() == 0.0f)
 	{
