@@ -17,14 +17,15 @@ MultiRenderTarget::~MultiRenderTarget()
 {
 }
 
-void MultiRenderTarget::Init(int targetCount)
+void MultiRenderTarget::Init(int targetCount, Vector3 targetScale)
 {
 	targetCount_ = targetCount;
 	HRESULT result = S_FALSE;
 	MyDirectX *myD = MyDirectX::Instance();
 
+	renderTargetScale_ = targetScale;
 	//テクスチャマネージャ内にレンダーターゲット用のテクスチャバッファを生成
-	TextureMgr::Instance()->CreateRenderTarget(texBuff, textureNums, targetCount_);
+	TextureMgr::Instance()->CreateRenderTarget(texBuff, textureNums, targetCount_, renderTargetScale_);
 	MakeRTV();
 	MakeDepthBuffer();
 	MakeDSV();
@@ -70,11 +71,11 @@ void MultiRenderTarget::PreDrawScene()
 	scissorRects.resize(targetCount_);
 	for (auto &e : viewports)
 	{
-		e = CD3DX12_VIEWPORT(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT);
+		e = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<FLOAT>(renderTargetScale_.x), static_cast<FLOAT>(renderTargetScale_.y));
 	}
 	for (auto &e : scissorRects)
 	{
-		e = CD3DX12_RECT(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		e = CD3DX12_RECT(0, 0, static_cast<int>(renderTargetScale_.x), static_cast<int>(renderTargetScale_.y));
 	}
 
 
@@ -134,7 +135,7 @@ void MultiRenderTarget::MakeRTV()
 	//RTV用デスクリプタヒープ設定
 	D3D12_DESCRIPTOR_HEAP_DESC rtvDescHeapDesc{};
 	rtvDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	rtvDescHeapDesc.NumDescriptors = static_cast<int>(RenderTargetCount::count);
+	rtvDescHeapDesc.NumDescriptors = static_cast<int>(targetCount_);
 	//RTV用デスクリプタヒープを生成
 	result = device->CreateDescriptorHeap(&rtvDescHeapDesc, IID_PPV_ARGS(&descHeapRTV));
 	assert(SUCCEEDED(result));
@@ -158,10 +159,9 @@ void MultiRenderTarget::MakeDepthBuffer()
 	ID3D12Device *device = MyDirectX::Instance()->GetDevice();
 	CD3DX12_RESOURCE_DESC depthResDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		DXGI_FORMAT_D32_FLOAT,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
-		1, 0,
-		1, 0,
+		static_cast<int>(renderTargetScale_.x),
+		static_cast<int>(renderTargetScale_.y),
+		1, 0,		1, 0,
 		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL
 	);
 

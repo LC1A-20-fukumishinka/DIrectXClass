@@ -100,7 +100,7 @@ int TextureMgr::SpriteLoadTexture(const wchar_t *filename)
 	return textureNumber;
 }
 
-void TextureMgr::CreateRenderTarget(std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> &texBuff, std::vector<int> &textureNums, const int renderTargetCount)
+void TextureMgr::CreateRenderTarget(std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> &texBuff, std::vector<int> &textureNums, const int renderTargetCount, Vector3 renderTargetScale)
 {
 	HRESULT result;
 
@@ -111,8 +111,8 @@ void TextureMgr::CreateRenderTarget(std::vector<Microsoft::WRL::ComPtr<ID3D12Res
 		//テクスチャリソース設定
 		CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 			DXGI_FORMAT_R8G8B8A8_UNORM,
-			static_cast<UINT>(WINDOW_WIDTH),
-			static_cast<UINT>(WINDOW_HEIGHT),
+			static_cast<UINT>(renderTargetScale.x),
+			static_cast<UINT>(renderTargetScale.y),
 			1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
 		);
 

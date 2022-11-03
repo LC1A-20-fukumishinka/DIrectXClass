@@ -1,6 +1,7 @@
 #pragma once
 #include "MyDirectX.h"
 #include <DirectXMath.h>
+#include "Vector3.h"
 class TextureMgr
 {
 private:
@@ -24,7 +25,7 @@ public:
 	/// </summary>
 	/// <param name="texBuff">描画用バッファの配列</param>
 	/// <param name="textureNums">各テクスチャ番号</param>
-	void CreateRenderTarget(std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> &texBuff, std::vector<int> &textureNums, const int renderTargetCount);
+	void CreateRenderTarget(std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> &texBuff, std::vector<int> &textureNums, const int renderTargetCount, Vector3 renderTargetScale);
 
 	ID3D12DescriptorHeap *GetDescriptorHeap();
 

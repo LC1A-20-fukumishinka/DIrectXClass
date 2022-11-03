@@ -26,6 +26,7 @@
 #include "../Box3D.h"
 #include "../gameOriginal/InformationBoard.h"
 #include "../gameOriginal/GuidingStar.h"
+#include "Bloom.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -71,6 +72,7 @@ private:
 	std::unique_ptr<MultiRenderTarget> MonoTarget_;
 	std::unique_ptr<MultiRenderTarget> MosaicTarget_;
 	std::unique_ptr<MultiRenderTarget> StartTarget_;
+	std::unique_ptr<MultiRenderTarget> BloomTarget_;
 	std::unique_ptr<MultiRenderTarget> TitleTarget_;
 	std::unique_ptr<GameCamera> cam_;
 	std::unique_ptr<ShadowCamera> shadowCam_;
@@ -92,7 +94,7 @@ private:
 	TitlePostEffect titlePostEffect_;
 	std::unique_ptr<Sprite> clearText_;
 	PostBasePipeline NormalDrawPipeline_;
-
+	Bloom bloom_;
 
 	std::unique_ptr<Sprite> pressStartText_;
 	Easing pressStartTextAnimationEase_;
@@ -108,6 +110,7 @@ private:
 	bool isGB_ = false;
 	bool isMono_ = false;
 	bool isMosaic_ = false;
+	bool isBlur_ = false;
 	int DrawTexture_ = -1;
 	int stageNum = 0;
 	ClearAnimationStatus clearStatus_ = STANDBY;
@@ -123,4 +126,7 @@ private://FlagManager—p
 
 	bool isGameClear_ = false;
 	bool isGameTitle_ = true;
+
+	bool isClear = false;
+	bool isOldClear = false;
 };

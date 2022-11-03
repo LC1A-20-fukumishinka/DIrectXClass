@@ -2,7 +2,7 @@
 #include <DirectXMath.h>
 #include <IGraphicsPipeline.h>
 #include <vector>
-
+#include "Vector3.h"
 class MultiRenderTarget
 {
 public:
@@ -15,7 +15,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="targetCount">生成するターゲットの個数</param>
-	void Init(int targetCount);
+	void Init(int targetCount, Vector3 targetScale = Vector3(1280.0f, 720.0f, 0.0f));
 
 	void PreDrawScene();
 
@@ -66,5 +66,6 @@ private:
 	//画面クリアカラー
 	static const float clearColor[4];
 
+	Vector3 renderTargetScale_;
 };
 

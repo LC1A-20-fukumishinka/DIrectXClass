@@ -39,6 +39,9 @@ void GameScene::Init()
 	StartTarget_ = make_unique<MultiRenderTarget>();
 	StartTarget_->Init(1);
 
+	BloomTarget_ = make_unique<MultiRenderTarget>();
+	BloomTarget_->Init(1);
+
 	TitleTarget_ = make_unique<MultiRenderTarget>();
 	TitleTarget_->Init(1);
 	cam_ = make_unique<GameCamera>();
@@ -80,7 +83,7 @@ void GameScene::Init()
 	groundModel_ = make_unique<Model>();
 	groundModel_->CreateModel("ground");
 	playerModel_ = make_unique<Model>();
-	playerModel_->CreateModel("chr_sword");
+	playerModel_->CreateModel("chr_sword", true);
 	domeModel_ = make_unique<Model>();
 	domeModel_->CreateModel("skydome");
 
@@ -116,6 +119,7 @@ void GameScene::Init()
 		}
 	}
 
+	PlanetManager::Instance()->SetStagePlanets(1);
 
 	player_ = make_unique<GravityPlayer>();
 	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet(0));
@@ -143,11 +147,11 @@ void GameScene::Init()
 	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3f), 2.0f);
 
 
-	for (int i = 1; i < stageCount; i++)
-	{
-		FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(i);
-		MakeFlag(FlagOnPlanet, Vector3(0, 1, 0), 2.0f);
-	}
+	//for (int i = 2; i < stageCount; i++)
+	//{
+	//	FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(i);
+	//	MakeFlag(FlagOnPlanet, Vector3(0, 1, 0), 2.0f);
+	//}
 
 	//Block::SetCamera(cam_->GetCamera());
 	//Block::SetLights(lightGroup_.get());
@@ -163,9 +167,9 @@ void GameScene::Init()
 	InformationBoard::SetCamera(cam_->GetCamera());
 	InformationBoard::SetLightGroup(lightGroup_.get());
 	InformationBoard welcomeBoard, AtoJump, LTtoLockOn;
-	welcomeBoard.Init(L"Resources/welcome.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0));
-	AtoJump.Init(L"Resources/A_To_Jump.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0));
-	LTtoLockOn.Init(L"Resources/LT_To_LockOn.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(-0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0));
+	welcomeBoard.Init(L"Resources/welcome.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 10.0f);
+	AtoJump.Init(L"Resources/A_To_Jump.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 10.0f);
+	LTtoLockOn.Init(L"Resources/LT_To_LockOn.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(-0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 100.0f);
 	testBoards_.emplace_back(welcomeBoard);
 	testBoards_.emplace_back(AtoJump);
 	testBoards_.emplace_back(LTtoLockOn);
@@ -184,19 +188,6 @@ void GameScene::Init()
 
 void GameScene::Update()
 {
-
-	if (Input::Instance()->KeyTrigger(DIK_1))
-	{
-		isGB_ = !isGB_;
-	}
-	if (Input::Instance()->KeyTrigger(DIK_2))
-	{
-		isMono_ = !isMono_;
-	}
-	if (Input::Instance()->KeyTrigger(DIK_3))
-	{
-		isMosaic_ = !isMosaic_;
-	}
 	//スクショ用停止ポーズ
 	if (GameInput::Instance()->Pause())
 	{
@@ -244,7 +235,7 @@ void GameScene::Update()
 		e.Update();
 	}
 
-	makeGuide();
+	//makeGuide();
 }
 
 void GameScene::PreDraw()
@@ -287,8 +278,21 @@ void GameScene::PreDraw()
 	StartTarget_->PostDrawScene();
 
 
-	DrawTexture_ = StartTarget_->GetTextureNum(0);
+	BloomTarget_->PreDrawScene();
+	PlanetManager::Instance()->Draw();
+	BloomTarget_->PostDrawScene();
 
+	DrawTexture_ = StartTarget_->GetTextureNum(0);
+	
+	if(isBlur_)
+	{
+		bloom_.BrightUpdate(BloomTarget_->GetTextureNum(0));
+		MosaicTarget_->PreDrawScene();
+		bloom_.Draw(DrawTexture_);
+		MosaicTarget_->PostDrawScene();
+		DrawTexture_ = MosaicTarget_->GetTextureNum(0);
+	}
+	
 	if (isGameTitle_)
 	{
 		vector<int> textureNum;
@@ -372,6 +376,8 @@ void GameScene::IngameUpdate()
 	//タイトルじゃなかったらプレイヤーを動かせる
 	if (!isGameTitle_)
 	{
+		Planet::SetPlayerPos(player_->GetPos());
+
 		if (!GameInput::Instance()->GrabInput())
 		{
 			player_->ReleasePlanet();
@@ -413,21 +419,23 @@ void GameScene::IngameUpdate()
 	{
 		flag.Update();
 
-		if (flag.CollisionPlayer(1.0f, player_->GetPos()))
-		{
-			isGetNow = true;
-		}
+		flag.CollisionPlayer(1.0f, player_->GetPos());
 	}
 	//for (auto &e : testBlock_)
 	//{
 	//	e.Update();
 	//}
-	if (GetFlagCount() <= 0 && !isGameClear_ && isGetNow)
-	{
-		isGameClear_ = true;
-		stageNum++;
-		cam_->ClearAnimationStart(player_->GetPos());
-	}
+
+	isOldClear = isClear;
+	isClear = (GetFlagCount() <= 0);
+
+	bool clearFlag = ((isClear && isOldClear != isClear) || PlanetManager::Instance()->StageClear());
+		if (clearFlag && !isGameClear_)
+		{
+			isGameClear_ = true;
+			stageNum++;
+			cam_->ClearAnimationStart(player_->GetPos());
+		}
 
 
 	ImguiUpdate();
@@ -517,8 +525,6 @@ void GameScene::ObjectRestart()
 
 void GameScene::MovePlanet()
 {
-Planet::SetPlayerPos(player_->GetPos());
-
 	//空中にいるとき
 	if (player_->GetIsJump())
 	{
@@ -566,6 +572,7 @@ void GameScene::ImguiUpdate()
 	ImGui::Checkbox("GB", &isGB_);
 	ImGui::Checkbox("Monocrome", &isMono_);
 	ImGui::Checkbox("Mosaic", &isMosaic_);
+	ImGui::Checkbox("Blur", &isBlur_);
 	ImGui::End();
 #pragma endregion
 
@@ -616,6 +623,7 @@ void GameScene::AnimationTestUpdate()
 			cam_->SetNextPlantPos(nextPlanet.lock()->GetPos());
 			clearStatus_ = STANDBY;
 			GameInput::Instance()->SetIsControll(true);
+			PlanetManager::Instance()->SetStagePlanets(stageNum);
 		}
 		break;
 	default:
