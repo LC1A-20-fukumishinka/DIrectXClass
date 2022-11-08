@@ -301,6 +301,16 @@ bool Planet::GetIsNext()
 	return isNext_;
 }
 
+void Planet::SetIsBloom(bool isBloom)
+{
+	isBloom_ = isBloom;
+}
+
+bool Planet::GetIsBloom()
+{
+	return isBloom_;
+}
+
 PlanetType Planet::GetType()
 {
 	return type_;

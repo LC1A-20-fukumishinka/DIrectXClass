@@ -31,11 +31,13 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 void PlanetManager::Init()
 {
 	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), 0, true, PlanetType::BASE);
+	planets_.begin()->get()->SetIsBloom(true);
+	planets_.begin()->get()->ColorChange();
 }
 
 void PlanetManager::Update()
 {
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		e->Update();
 	}
@@ -48,7 +50,7 @@ void PlanetManager::Update()
 
 void PlanetManager::Draw()
 {
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		e->Draw();
 	}
@@ -56,6 +58,17 @@ void PlanetManager::Draw()
 
 void PlanetManager::Finalize()
 {
+}
+
+void PlanetManager::BloomDraw()
+{
+	for (auto &e : planets_)
+	{
+		if (e->GetIsBloom())
+		{
+			e->Draw();
+		}
+	}
 }
 
 bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &angle)
@@ -68,7 +81,7 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	cameraRay.start = XMLoadFloat3(&tmp);
 	Sphere starCol;
 
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		starCol.center = XMLoadFloat3(&e->GetPos());
 		starCol.radius = e->GetScale();
@@ -91,7 +104,7 @@ bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::X
 	float minDist = 10000.0f;
 
 	//‘S•”‚Ì˜f¯‚Ì‹ß‚¢˜f¯‚ğ‚Æ‚é
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		//‘¶İ‚µ‚È‚¢˜f¯‚ğƒXƒLƒbƒv
 		if (!e->GetIsSpawn()) { continue; }
@@ -113,7 +126,7 @@ Vector3 PlanetManager::GetGravity(const Vector3 pos)
 {
 	Vector3 gravity;
 	//‘S•”‚Ì˜f¯‚Ì‹ß‚¢˜f¯‚ğ‚Æ‚é
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		Vector3 dist = (e->GetPos() - pos);
 
@@ -136,11 +149,11 @@ Vector3 PlanetManager::GetGravity(const Vector3 pos)
 
 std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
 {
-	if (getPlanetNum < planets.size())
+	if (getPlanetNum < planets_.size())
 	{
 		int planetNum = 0;
 
-		for (auto &e : planets)
+		for (auto &e : planets_)
 		{
 			//˜f¯‚Ì”Ô†‚ªˆê’v‚µ‚½‚ç‚»‚Ì˜f¯‚ğ•Ô‚·
 			if (planetNum == getPlanetNum)
@@ -152,7 +165,7 @@ std::weak_ptr<Planet> PlanetManager::GetPlanet(int getPlanetNum)
 		}
 	}
 	//‘ÎÛ‚ª‚È‚©‚Á‚½‚çæ“ª‚Ì˜f¯‚ğ“n‚·
-	return *planets.begin();
+	return *planets_.begin();
 }
 
 void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int ID, bool isSpawn, const PlanetType &type)
@@ -160,12 +173,12 @@ void PlanetManager::AddPlanet(const DirectX::XMFLOAT3 &pos, float size, const Di
 	std::shared_ptr<Planet> planet;
 	planet = make_shared<Planet>();
 	planet->Init(pos, size, color, ID, isSpawn, type);
-	planets.push_back(planet);
+	planets_.push_back(planet);
 }
 
 void PlanetManager::Reset()
 {
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		e->Reset();
 	}
@@ -176,7 +189,7 @@ void PlanetManager::IDSpawn(int ID)
 	//ƒAƒjƒ[ƒVƒ‡ƒ“’†ƒtƒ‰ƒO‚ğƒIƒ“‚É‚·‚é
 	isSpawnAnimation_ = true;
 
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		int tmpID = e->GetID();
 		//Œ»İ‘¶İ‚µ‚È‚¢˜f¯‚ğ‘I‘ğ
@@ -192,7 +205,7 @@ void PlanetManager::AllSpawn()
 	//ƒAƒjƒ[ƒVƒ‡ƒ“’†ƒtƒ‰ƒO‚ğƒIƒ“‚É‚·‚é
 	isSpawnAnimation_ = true;
 
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		//Œ»İ‘¶İ‚µ‚È‚¢˜f¯‚ğ‘I‘ğ
 		if (!e->GetIsSpawn())
@@ -210,7 +223,7 @@ bool PlanetManager::SpawnAnimationEnd(int ID)
 	//ƒAƒjƒ[ƒVƒ‡ƒ“’†‚©‚Â
 	if (isAnimationEnd)
 	{
-		for (auto &e : planets)
+		for (auto &e : planets_)
 		{
 			if (e->GetID() == ID)
 			{
@@ -253,7 +266,7 @@ void PlanetManager::SetShadowTexture(int shadowTextureNum)
 void PlanetManager::SetStagePlanets(int stageNum)
 {
 	std::vector<std::weak_ptr<Planet>> tmp;
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		if (e->GetID() == stageNum)
 		{
@@ -282,7 +295,7 @@ bool PlanetManager::LoadStage(int stage)
 		//ƒ[ƒh‚µ‚½˜f¯‚ğ‹l‚ß‚Ş
 		for (auto &e : tmpPlanet)
 		{
-			planets.emplace_back(e);
+			planets_.emplace_back(e);
 		}
 	}
 
@@ -297,7 +310,7 @@ std::shared_ptr<Planet> PlanetManager::GetBasePlanet(int stageNum)
 	//ŠY“–—v‘f‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½
 	bool isNotFound = true;
 
-	for (auto &e : planets)
+	for (auto &e : planets_)
 	{
 		bool isBase = (e->GetType() == PlanetType::BASE);
 
@@ -330,6 +343,10 @@ bool PlanetManager::StageClear()
 
 	if (isClear)
 	{
+		for (auto &e : stagePlanets)
+		{
+			e.lock()->SetIsBloom(true);
+		}
 		orderCount++;
 	}
 	return isClear;
@@ -426,7 +443,7 @@ void PlanetManager::OrderUpdate()
 
 	//Ÿ‚Ì˜f¯‚ªŒõ‚Á‚Ä‚¢‚È‚¢
 	bool isNextPlanetNotShining = (orderCount < static_cast<int>(stagePlanets.size()) && !stagePlanets[orderCount].lock()->GetIsNext());
-	if(isNextPlanetNotShining)
+	if (isNextPlanetNotShining)
 	{
 		stagePlanets[orderCount].lock()->SetNextOrder(true);
 	}
@@ -441,7 +458,7 @@ void PlanetManager::OrderUpdate()
 		orderCount = 0;
 	}
 
-	if(isNotFound)
+	if (isNotFound)
 	{
 		playerStandPlanet_.lock()->ColorChange();
 	}

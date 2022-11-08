@@ -61,6 +61,8 @@ public:
 	bool GetIsOnPlayer();
 	int GetID();
 	bool GetIsNext();
+	void SetIsBloom(bool isBloom);
+	bool GetIsBloom();
 	PlanetType GetType();
 	void Reset();
 private://Ã“Iƒƒ“ƒo•Ï”
@@ -101,5 +103,7 @@ private://ƒƒ“ƒo•Ï”
 	bool isNext_ = false;
 	bool isNextLightup_ = true;
 	Vector3 ColorOnAngle;
+
+	bool isBloom_ = false;
 };
 

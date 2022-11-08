@@ -6,7 +6,7 @@ class PlanetManager
 {
 private:
 	PlanetManager();
-public:
+public://äÓëbä÷êî
 	~PlanetManager();
 
 	PlanetManager(const PlanetManager &obj) = delete;
@@ -19,6 +19,8 @@ public:
 	void Draw();
 	void Finalize();
 public:
+
+	void BloomDraw();
 	bool GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &angle);
 
 
@@ -81,7 +83,7 @@ private:
 
 	void OrderUpdate();
 private:
-	std::list<std::shared_ptr<Planet>> planets;
+	std::list<std::shared_ptr<Planet>> planets_;
 
 	std::vector<std::weak_ptr<Planet>> stagePlanets;
 	bool isSpawnAnimation_ = false;

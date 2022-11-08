@@ -279,12 +279,12 @@ void GameScene::PreDraw()
 
 
 	BloomTarget_->PreDrawScene();
-	PlanetManager::Instance()->Draw();
+	PlanetManager::Instance()->BloomDraw();
 	BloomTarget_->PostDrawScene();
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
 	
-	if(isBlur_)
+	if(true/*isBloom_*/)
 	{
 		bloom_.BrightUpdate(BloomTarget_->GetTextureNum(0));
 		MosaicTarget_->PreDrawScene();
@@ -572,7 +572,7 @@ void GameScene::ImguiUpdate()
 	ImGui::Checkbox("GB", &isGB_);
 	ImGui::Checkbox("Monocrome", &isMono_);
 	ImGui::Checkbox("Mosaic", &isMosaic_);
-	ImGui::Checkbox("Blur", &isBlur_);
+	ImGui::Checkbox("Bloom", &isBloom_);
 	ImGui::End();
 #pragma endregion
 

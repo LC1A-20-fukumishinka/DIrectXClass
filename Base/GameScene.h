@@ -110,7 +110,7 @@ private:
 	bool isGB_ = false;
 	bool isMono_ = false;
 	bool isMosaic_ = false;
-	bool isBlur_ = false;
+	bool isBloom_ = false;
 	int DrawTexture_ = -1;
 	int stageNum = 0;
 	ClearAnimationStatus clearStatus_ = STANDBY;
