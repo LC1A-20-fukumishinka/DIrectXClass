@@ -97,7 +97,7 @@ public://惑星周りの処理
 
 	void shakeUpdate(float shakePower);
 private:
-	Vector3 pos;
+	Vector3 pos_;
 	Vector3 rotation;
 	Vector3 scale;
 	Object3D drawObject;
@@ -140,5 +140,8 @@ private:
 
 	//プレイヤーに最終的にかかる重力
 	Vector3 gravityAngle_;
+
+	int shakeTimer_ = 5;
+	int shakeTimerMax_ = 15;
 };
 

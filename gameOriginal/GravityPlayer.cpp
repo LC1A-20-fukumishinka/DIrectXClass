@@ -20,9 +20,12 @@ bool isX = false;
 bool isY = false;
 void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 {
+
+	pos_;
 	drawObject.Init();
 	drawObject.SetModel(model);
-	drawObject.SetPosition(Vector3(YVec));
+	pos_ = Vector3(YVec);
+	drawObject.SetPosition(pos_);
 
 	shadowObject.Init();
 	shadowObject.SetModel(model);
@@ -37,7 +40,8 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 		Vector3 startPos;
 		startPos = basePlanet.lock()->GetPos();
 		startPos += YVec * basePlanet.lock()->GetScale();
-		drawObject.SetPosition(startPos);
+		pos_ = startPos;
+		drawObject.SetPosition(pos_);
 	}
 
 	isOneWayGravity_ = false;
@@ -69,6 +73,8 @@ void GravityPlayer::Update()
 	{
 		PlanetManager::Instance()->playerStand(basePlanet);
 	}
+	drawObject.SetPosition(pos_);
+
 	shadowObject.SetPosition(drawObject.GetPosition());
 	shadowObject.SetRotation(drawObject.GetRotQuaternion());
 }
@@ -134,7 +140,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 	if (status == PlayerStatus::JUMP)
 	{
 		//球とプレイヤーの距離
-		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+		Vector3 dist = pos_ - basePlanet.lock()->GetPos();
 
 
 		//垂直に落下する成分
@@ -160,8 +166,19 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 		}
 		if (dist.length() <= basePlanet.lock()->GetScale())
 		{
+			if (nowSpeed >= shakeSpeed)
+			{
+				shakeTimer_ = 0;
+			}
 			status = PlayerStatus::STAND;
 		}
+	}
+
+	if (shakeTimer_ <= shakeTimerMax_)
+	{
+		float shakePower = 3.0f * (1.0f - (static_cast<float> (shakeTimer_) / shakeTimerMax_)) ;
+		shakeUpdate(shakePower);
+		shakeTimer_++;
 	}
 
 	//ジャンプした瞬間
@@ -171,7 +188,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 		Vector3 JumpAngle;
 
 		//立っている面の垂直方向に跳躍
-		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+		Vector3 dist = pos_ - basePlanet.lock()->GetPos();
 		JumpAngle = (dist.normalize());
 		//垂直方向に加速
 		moveVec_ = (JumpAngle * jumpPower);
@@ -187,7 +204,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 	bool isPlanetAttracts = !(status == PlayerStatus::JUMP && isOneWayGravity_);
 
 	//現在位置
-	Vector3 nowPos(drawObject.GetPosition());
+	Vector3 nowPos(pos_);
 
 	//上陸中の惑星との距離
 	Vector3 dist = (nowPos + (move * maxMoveSpeed)) - basePlanet.lock()->GetPos();
@@ -207,8 +224,8 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 		//座標決定
 		nowPos = (basePlanet.lock()->GetPos() + dist);
 	}
-	drawObject.SetPosition(nowPos);
 
+	pos_ = nowPos;
 }
 
 void GravityPlayer::PostureUpdate(const Vector3 &move)
@@ -220,7 +237,7 @@ void GravityPlayer::PostureUpdate(const Vector3 &move)
 
 	if (status == PlayerStatus::STAND)
 	{
-		up = Vector3(drawObject.GetPosition() - basePlanet.lock()->GetPos()).normalize();
+		up = Vector3(pos_ - basePlanet.lock()->GetPos()).normalize();
 	}
 	else
 	{
@@ -297,7 +314,7 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	}
 	else
 	{
-		Vector3 dist = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+		Vector3 dist = pos_ - basePlanet.lock()->GetPos();
 		gravityAngle_ = -(dist.normalize());
 	}
 	PosUpdate(move);
@@ -337,7 +354,7 @@ void GravityPlayer::NormalUpdate()
 void GravityPlayer::PostureReset()
 {
 	if (status == PlayerStatus::JUMP) return;
-	Vector3 BasePlanetToPlayer = drawObject.GetPosition() - basePlanet.lock()->GetPos();
+	Vector3 BasePlanetToPlayer = pos_ - basePlanet.lock()->GetPos();
 	XMVECTOR BasePlanetToPlayerAngleV = XMLoadFloat3(&BasePlanetToPlayer.normalize());
 	XMVECTOR frontVec = XMVector3Cross(drawObject.GetRightVec(), BasePlanetToPlayerAngleV);
 
@@ -362,7 +379,8 @@ void GravityPlayer::LockOnUpdate()
 
 void GravityPlayer::SetPos(const DirectX::XMFLOAT3 &pos)
 {
-	drawObject.SetPosition(pos);
+	pos_ = pos;
+	drawObject.SetPosition(pos_);
 }
 
 void GravityPlayer::SetRotation(const DirectX::XMFLOAT3 &rot)
@@ -395,7 +413,7 @@ void GravityPlayer::SetLight(LightGroup *lights)
 
 const DirectX::XMFLOAT3 &GravityPlayer::GetPos()
 {
-	return drawObject.GetPosition();
+	return pos_;
 }
 
 const XMFLOAT3 GravityPlayer::GetAngle()
@@ -442,14 +460,14 @@ void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 	if (grabPlanet.expired())
 	{
 		this->grabPlanet = planet;
-		Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
+		Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - pos_;
 		baseLength = planetPlayerDistance.length();
 	}
 
 	if (!grabPlanet.expired())
 	{
 		grabPlanet.lock()->GrabOn();
-		XMFLOAT3 dist = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
+		XMFLOAT3 dist = grabPlanet.lock()->GetPos() - pos_;
 		XMVECTOR vec = XMLoadFloat3(&dist);
 		//惑星に向き直る
 		drawObject.SetRotationVector(vec, drawObject.GetUpVec());
@@ -463,7 +481,7 @@ void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
 	if (!this->basePlanet.expired())
 	{
 		//高さの調整
-		float basePlanetToPlayerLength = (drawObject.GetPosition() - planet->GetPos()).length();
+		float basePlanetToPlayerLength = (pos_ - planet->GetPos()).length();
 
 		//惑星の半径を引いて高さ完成
 		basePlanetToPlayerLength -= planet->GetScale();
@@ -494,7 +512,7 @@ void GravityPlayer::GrabUpdate()
 	//Move(false);
 
 	//星とプレイヤーの二点間の距離を計算
-	Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - drawObject.GetPosition();
+	Vector3 planetPlayerDistance = grabPlanet.lock()->GetPos() - pos_;
 
 
 
@@ -535,7 +553,7 @@ void GravityPlayer::GrabUpdate()
 	vec *= length;
 
 	//それをプレイヤーの位置に加算して
-	XMVECTOR playerPos = XMLoadFloat3(&drawObject.GetPosition());
+	XMVECTOR playerPos = XMLoadFloat3(&pos_);
 	vec += playerPos;
 
 	//惑星の位置完成
@@ -552,7 +570,7 @@ void GravityPlayer::BlockCollision(const std::vector<Triangle> &boxPlanes)
 	XMVECTOR downVec = -drawObject.GetUpVec();
 	Ray playerDownVec;
 	playerDownVec.dir = downVec;
-	playerDownVec.start = XMLoadFloat3(&(drawObject.GetPosition() + (drawObject.GetUpVec() * 0.5f)));
+	playerDownVec.start = XMLoadFloat3(&(pos_ + (drawObject.GetUpVec() * 0.5f)));
 
 	for (auto &e : boxPlanes)
 	{
@@ -575,7 +593,7 @@ void GravityPlayer::BlockCollision(const std::vector<Triangle> &boxPlanes)
 		{
 			XMVECTOR identity = { 2.0f,2.0f ,2.0f ,0.0f };
 			onPlayerPos += identity * drawObject.GetUpVec();
-			drawObject.SetPosition(Vector3(onPlayerPos));
+			pos_ = Vector3(onPlayerPos);
 		}
 		////押し返す判定
 		//Collision::CheckSphere2Triangle();
