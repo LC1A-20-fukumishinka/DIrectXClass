@@ -65,6 +65,8 @@ Bloom::Bloom()
 	desc.rootparams = rootparams;
 	desc.rootparamsCount = _countof(rootparams);
 	desc.blendName = GraphicsPipelineTypeName::BlendName::NONE;
+	desc.loopMode = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+
 	bloomPipeline = BaseGraphicsPipeline::CreatePipeLine(desc);
 
 	PipelineDesc GaussianBlurDesc;
