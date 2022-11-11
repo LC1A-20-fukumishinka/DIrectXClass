@@ -9,6 +9,10 @@ float4 main(VSOutput input) : SV_TARGET
     //色を受け取って
     float4 baseColor = tex.Sample(smp, input.uv) * color;
     
-    baseColor += brightTex.Sample(smp, input.uv);
+    float4 brightColor = brightTex.Sample(smp, input.uv);
+
+    brightColor = clamp(brightColor, 0.0f, 0.2f);
+    baseColor += brightColor;
+    
    return float4(baseColor);
 }

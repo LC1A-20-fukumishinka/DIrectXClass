@@ -164,6 +164,9 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 		{
 			moveVec_ = (moveVec_.normalize() * maxSpeed);
 		}
+
+		moveVec_ += (warkVec_ * 0.02f);
+
 		if (dist.length() <= basePlanet.lock()->GetScale())
 		{
 			if (nowSpeed >= shakeSpeed)
@@ -193,6 +196,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 		//垂直方向に加速
 		moveVec_ = (JumpAngle * jumpPower);
 
+		moveVec_ += warkVec_;
 		//ジャンプ状態に移行
 		status = PlayerStatus::JUMP;
 	}
@@ -210,10 +214,10 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 	Vector3 dist = (nowPos + (move * maxMoveSpeed)) - basePlanet.lock()->GetPos();
 
 	//移動後の座標を計算（現在位置に跳躍移動と水平移動の速度を加算）
-	nowPos += (moveVec_ + warkVec_);
+	nowPos += (moveVec_);
 
 
-	//地上に立っているとき
+	//地上に立っているとき球面に位置を補正する
 	if (status == PlayerStatus::STAND)
 	{
 		float length = basePlanet.lock()->GetScale();

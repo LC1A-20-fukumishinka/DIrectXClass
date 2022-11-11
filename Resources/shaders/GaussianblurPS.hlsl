@@ -12,8 +12,7 @@ float Gaussian(float2 drawUV, float2 pickUV, float sigma)
 float4 main(VSOutput input) : SV_TARGET
 {
     float4 brightColor = BrightTex.Sample(smp, input.uv);
-
-    //    重みの総和       シグマ           段階
+        //    重みの総和       シグマ           段階
     float totalWeight = 0, _sigma = 0.1f, StepWidth = 0.02f;
     float4 blurColor = {0.0f, 0.0f, 0.0f, 0.0f};
 

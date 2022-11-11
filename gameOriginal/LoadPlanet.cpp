@@ -32,6 +32,8 @@ bool LoadStageFile(int stage, std::vector<std::shared_ptr<Planet>> &planets)
 
 
 	std::vector<MakePlanetData> datas;
+
+	Vector3 setColor;
 	XMFLOAT4 color;
 	int ID = stage;
 	bool isSpawn = false;
@@ -91,17 +93,22 @@ bool LoadStageFile(int stage, std::vector<std::shared_ptr<Planet>> &planets)
 		//c
 		if (key == "c")
 		{
-			line_Data >> color.x;
-			line_Data >> color.y;
-			line_Data >> color.z;
-			line_Data >> color.w;
+			line_Data >> setColor.x;
+			line_Data >> setColor.y;
+			line_Data >> setColor.z;
 
+
+			setColor *= (1.0f/255.0f);
+			color.x = setColor.x;
+			color.y = setColor.y;
+			color.z = setColor.z;
+			color.w = 1.0f;
 		}
 
 		ID = stage;
 
 		//b
-		if (key == "b")
+		if (key == "d")
 		{
 			line_Data >> isSpawn;
 		}
