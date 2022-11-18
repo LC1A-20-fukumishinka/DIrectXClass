@@ -1,5 +1,6 @@
 #pragma once
 #include "Planet.h"
+#include "../Collision/Collision.h"
 #include <list>
 #include <memory>
 class PlanetManager
@@ -67,16 +68,26 @@ public:
 	void SetStagePlanets(int stageNum);
 	bool LoadStage(int stage);
 
+	// ToDo
+	// ステージの再読み込み関数
+	//bool ReloadStages(int stage);
+
 	/// <summary>
 	/// 指定の番号のbase属性の惑星のポインタを取得する
 	/// </summary>
 	/// <param name="stageNum">番号の指定（ない場合や範囲外を指定している場合一番後ろの惑星を返す）</param>
 	/// <returns>惑星のポインタ</returns>
 	std::shared_ptr<Planet> GetBasePlanet(int stageNum = -1);
-
+	
+	/// <summary>
+	/// ステージのクリア条件を満たしたのを伝える関数
+	/// </summary>
+	/// <returns></returns>
 	bool StageClear();
 
 	void playerStand(std::weak_ptr<Planet> playerStandPlanet);
+
+	float CameraCollision(Ray cameraRay);
 private:
 	void StageUpdate();
 	void TimeAttackUpdate();

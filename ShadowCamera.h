@@ -1,7 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include <memory>
-class GravityPlayer;
+class Player;
 class ShadowCamera
 {
 public:
@@ -17,7 +17,7 @@ public:
 	void SetAngle(const Vector3 &angle);
 private:
 	std::unique_ptr<Camera> cam_;
-	std::weak_ptr<GravityPlayer> player_;
+	std::weak_ptr<Player> player_;
 
 	Vector3 camAngle_;
 

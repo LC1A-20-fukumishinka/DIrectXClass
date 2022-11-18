@@ -13,7 +13,7 @@
 #include "FbxModel.h"
 #include "FbxObject3D.h"
 #include "../gameOriginal/Planet.h"
-#include "../gameOriginal/GravityPlayer.h"
+#include "../gameOriginal/Player.h"
 #include "../gameOriginal/GameCamera.h"
 #include "../ShadowCamera.h"
 #include "MultiRenderTarget.h"
@@ -73,6 +73,7 @@ private:
 	std::unique_ptr<MultiRenderTarget> MosaicTarget_;
 	std::unique_ptr<MultiRenderTarget> StartTarget_;
 	std::unique_ptr<MultiRenderTarget> BloomTarget_;
+	std::unique_ptr<MultiRenderTarget> BloomDrawTarget_;
 	std::unique_ptr<MultiRenderTarget> TitleTarget_;
 	std::unique_ptr<GameCamera> cam_;
 	std::unique_ptr<ShadowCamera> shadowCam_;
@@ -89,7 +90,7 @@ private:
 	std::unique_ptr<Object3D> objGround_;
 	std::unique_ptr<FbxModel> templeModel_;
 	std::unique_ptr<FbxObject3D> temple_;
-	std::unique_ptr<GravityPlayer> player_;
+	std::unique_ptr<Player> player_;
 	std::unique_ptr<PostEffect> postTest_;
 	TitlePostEffect titlePostEffect_;
 	std::unique_ptr<Sprite> clearText_;
@@ -110,7 +111,6 @@ private:
 	bool isGB_ = false;
 	bool isMono_ = false;
 	bool isMosaic_ = false;
-	bool isBloom_ = false;
 	int DrawTexture_ = -1;
 	int stageNum = 0;
 	ClearAnimationStatus clearStatus_ = STANDBY;

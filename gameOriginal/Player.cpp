@@ -1,11 +1,10 @@
-#include "GravityPlayer.h"
+#include "Player.h"
 #include "ModelPhongPipeline.h"
 #include "GameInput.h"
 #include "FukuMath.h"
 #include "../EaseClass.h"
 #include "Planet.h"
 #include "PlanetManager.h"
-#include "gameConstData.h"
 #include "../ShadowPipeline.h"
 #include "../Collision/Collision.h"
 #include "DirectInput.h"
@@ -18,17 +17,17 @@ static Easing RotX;
 static Easing RotY;
 bool isX = false;
 bool isY = false;
-void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
+void Player::Init(std::shared_ptr<Planet> planet)
 {
 
 	pos_;
 	drawObject.Init();
-	drawObject.SetModel(model);
+	drawObject.SetModel(playerModel_.get());
 	pos_ = Vector3(YVec);
 	drawObject.SetPosition(pos_);
 
 	shadowObject.Init();
-	shadowObject.SetModel(model);
+	shadowObject.SetModel(playerModel_.get());
 	shadowObject.SetPosition(Vector3(YVec));
 	SetBasePlanet(planet);
 
@@ -44,13 +43,13 @@ void GravityPlayer::Init(Model *model, std::shared_ptr<Planet> planet)
 		drawObject.SetPosition(pos_);
 	}
 
-	isOneWayGravity_ = false;
+	gravity_.isOneWayGravity = false;
 
 	//すべてのじゅうりょくを下向きで初期化						   下向き
-	oneWayGravityAngle_ = gravityAngle_ = worldGravity_ = -YVec;
+	oneWayGravityAngle_ = gravity_.angle = worldGravity_ = -YVec;
 }
 
-void GravityPlayer::Update()
+void Player::Update()
 {
 	//惑星を掴んでいないかどうか
 	bool isNotGrab = grabPlanet.expired();
@@ -79,23 +78,23 @@ void GravityPlayer::Update()
 	shadowObject.SetRotation(drawObject.GetRotQuaternion());
 }
 
-void GravityPlayer::Finalize()
+void Player::Finalize()
 {
 }
 
-void GravityPlayer::Draw()
+void Player::Draw()
 {
 	drawObject.Update();
 	drawObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
-void GravityPlayer::ShadowDraw()
+void Player::ShadowDraw()
 {
 	shadowObject.Update();
 	shadowObject.modelDraw(ShadowPipeline::Instance()->GetPipeLine());
 }
 
-void GravityPlayer::Move(bool isSetAngle)
+void Player::Move(bool isSetAngle)
 {
 	//switch (status)
 	//{
@@ -113,11 +112,11 @@ void GravityPlayer::Move(bool isSetAngle)
 	if (GameInput::Instance()->GrabTrigger())
 	{
 		//じゅうりょくを解除する時
-		if (isOneWayGravity_)
+		if (gravity_.isOneWayGravity)
 		{//速度をゼロにする
 			moveVec_ *= 0.3f;
 		}
-		isOneWayGravity_ = !isOneWayGravity_;
+		gravity_.isOneWayGravity = !gravity_.isOneWayGravity;
 		if (GameInput::Instance()->LockOnInput())
 		{
 			oneWayGravityAngle_ = cam->GetAngle();
@@ -131,7 +130,7 @@ void GravityPlayer::Move(bool isSetAngle)
 
 }
 
-void GravityPlayer::PosUpdate(const Vector3 &move)
+void Player::PosUpdate(const Vector3 &move)
 {
 	Vector3 shakeVec;
 
@@ -144,7 +143,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 
 
 		//垂直に落下する成分
-		moveVec_ += (gravityAngle_ * gravity);
+		moveVec_ += (gravity_.angle * baseGravityPower);
 
 		//出せる最高速度
 		const float maxSpeed = 3.0f;
@@ -205,7 +204,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 #pragma endregion
 
 	//惑星に引き寄せられる状態か
-	bool isPlanetAttracts = !(status == PlayerStatus::JUMP && isOneWayGravity_);
+	bool isPlanetAttracts = !(status == PlayerStatus::JUMP && gravity_.isOneWayGravity);
 
 	//現在位置
 	Vector3 nowPos(pos_);
@@ -232,7 +231,7 @@ void GravityPlayer::PosUpdate(const Vector3 &move)
 	pos_ = nowPos;
 }
 
-void GravityPlayer::PostureUpdate(const Vector3 &move)
+void Player::PostureUpdate(const Vector3 &move)
 {
 
 
@@ -245,7 +244,7 @@ void GravityPlayer::PostureUpdate(const Vector3 &move)
 	}
 	else
 	{
-		up = -gravityAngle_;
+		up = -gravity_.angle;
 	}
 	//ベクター型にする
 	XMVECTOR upV = XMLoadFloat3(&up.normalize());
@@ -277,7 +276,7 @@ void GravityPlayer::PostureUpdate(const Vector3 &move)
 
 }
 
-void GravityPlayer::FloorMove(bool isSetAngle)
+void Player::FloorMove(bool isSetAngle)
 {
 	XMFLOAT2 stick = GameInput::Instance()->LStick();
 
@@ -307,19 +306,19 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 
 
 
-	if (isOneWayGravity_)
+	if (gravity_.isOneWayGravity)
 	{
-		gravityAngle_ = oneWayGravityAngle_;
+		gravity_.angle = oneWayGravityAngle_;
 	}
 	else if (worldGravity_.length() > 0.0f)
 	{
 
-		gravityAngle_ = worldGravity_;
+		gravity_.angle = worldGravity_;
 	}
 	else
 	{
 		Vector3 dist = pos_ - basePlanet.lock()->GetPos();
-		gravityAngle_ = -(dist.normalize());
+		gravity_.angle = -(dist.normalize());
 	}
 	PosUpdate(move);
 
@@ -329,12 +328,12 @@ void GravityPlayer::FloorMove(bool isSetAngle)
 	}
 }
 
-void GravityPlayer::JumpMove(bool isSetAngle)
+void Player::JumpMove(bool isSetAngle)
 {
 
 }
 
-void GravityPlayer::PlayerRotation()
+void Player::PlayerRotation()
 {
 	//プレイヤーのローカルのX軸に対して回転
 	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetRightVec(), GameInput::Instance()->RStick().y * RotRate));
@@ -344,7 +343,7 @@ void GravityPlayer::PlayerRotation()
 
 }
 
-void GravityPlayer::NormalUpdate()
+void Player::NormalUpdate()
 {
 	//フィールドが球体になったらそれに合わせて変化
 
@@ -355,7 +354,7 @@ void GravityPlayer::NormalUpdate()
 	Move(true);
 }
 
-void GravityPlayer::PostureReset()
+void Player::PostureReset()
 {
 	if (status == PlayerStatus::JUMP) return;
 	Vector3 BasePlanetToPlayer = pos_ - basePlanet.lock()->GetPos();
@@ -365,76 +364,85 @@ void GravityPlayer::PostureReset()
 	drawObject.SetRotationVector(frontVec, BasePlanetToPlayerAngleV);
 }
 
-void GravityPlayer::AddGravity(Vector3 gravity)
+void Player::AddGravity(Vector3 gravity)
 {
 	worldGravity_ = gravity;
 }
 
-void GravityPlayer::shakeUpdate(float shakePower)
+void Player::shakeUpdate(float shakePower)
 {
 	cam->SetShift(Shake::GetShake(shakePower));
 }
 
-void GravityPlayer::LockOnUpdate()
+void Player::LoadModel()
+{
+	playerModel_ = std::make_unique<Model>();
+	playerModel_->CreateModel("chr_sword", true);
+
+	ArrowModel_ = std::make_unique<Model>();
+	ArrowModel_->CreateModel("chr_sword", true);
+}
+
+void Player::LockOnUpdate()
 {
 	Move(false);
 	PlayerRotation();
 }
 
-void GravityPlayer::SetPos(const DirectX::XMFLOAT3 &pos)
+void Player::SetPos(const DirectX::XMFLOAT3 &pos)
 {
 	pos_ = pos;
 	drawObject.SetPosition(pos_);
 }
 
-void GravityPlayer::SetRotation(const DirectX::XMFLOAT3 &rot)
+void Player::SetRotation(const DirectX::XMFLOAT3 &rot)
 {
 	drawObject.SetRotation(rot);
 }
 
-void GravityPlayer::SetModel(Model *model)
+void Player::SetModel(Model *model)
 {
 	drawObject.SetModel(model);
 	shadowObject.SetModel(model);
 }
 
-void GravityPlayer::SetCamera(Camera *cam)
+void Player::SetCamera(Camera *cam)
 {
 	this->cam = cam;
 	drawObject.SetCamera(cam);
 }
 
-void GravityPlayer::SetShadowCamera(Camera *cam)
+void Player::SetShadowCamera(Camera *cam)
 {
 	shadowObject.SetCamera(cam);
 }
 
-void GravityPlayer::SetLight(LightGroup *lights)
+void Player::SetLight(LightGroup *lights)
 {
 	drawObject.SetLightGroup(lights);
 	shadowObject.SetLightGroup(lights);
 }
 
-const DirectX::XMFLOAT3 &GravityPlayer::GetPos()
+const DirectX::XMFLOAT3 &Player::GetPos()
 {
 	return pos_;
 }
 
-const XMFLOAT3 GravityPlayer::GetAngle()
+const XMFLOAT3 Player::GetAngle()
 {
 	XMFLOAT3 angle;
 	XMStoreFloat3(&angle, drawObject.GetFrontVec());
 	return angle;
 }
 
-const XMFLOAT3 GravityPlayer::GetUpVec()
+const XMFLOAT3 Player::GetUpVec()
 {
 	XMFLOAT3 playerUp;
 	XMStoreFloat3(&playerUp, drawObject.GetUpVec());
 	return playerUp;
 }
 
-const float GravityPlayer::GetBasePlanetScale()
+float Player::GetBasePlanetScale()
 {
 	if (basePlanet.expired())
 	{
@@ -443,23 +451,28 @@ const float GravityPlayer::GetBasePlanetScale()
 	return basePlanet.lock()->GetScale();
 }
 
-const std::weak_ptr<Planet> &GravityPlayer::GetBasePlanet()
+const std::weak_ptr<Planet> &Player::GetBasePlanet()
 {
 	return basePlanet;
 }
 
-const XMFLOAT3 &GravityPlayer::GetGravityAngle()
+GameDatas::GravityData Player::GetGravityData()
 {
-	return gravityAngle_;
+	return gravity_;
 }
 
-const bool GravityPlayer::GetIsJump()
+bool Player::GetIsJump()
 {
 	bool isJump = status == PlayerStatus::JUMP;
 	return isJump;
 }
 
-void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
+bool Player::GetIsOneWayGravity()
+{
+	return gravity_.isOneWayGravity;
+}
+
+void Player::SetGrabPlanet(std::shared_ptr<Planet> planet)
 {
 	if (grabPlanet.expired())
 	{
@@ -479,7 +492,7 @@ void GravityPlayer::SetGrabPlanet(std::shared_ptr<Planet> planet)
 	}
 }
 
-void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
+void Player::SetBasePlanet(std::shared_ptr<Planet> planet)
 {
 	//元の惑星が
 	if (!this->basePlanet.expired())
@@ -502,7 +515,7 @@ void GravityPlayer::SetBasePlanet(std::shared_ptr<Planet> planet)
 
 }
 
-void GravityPlayer::ReleasePlanet()
+void Player::ReleasePlanet()
 {
 	bool isNotGrab = grabPlanet.expired();
 	if (isNotGrab)return;
@@ -510,7 +523,7 @@ void GravityPlayer::ReleasePlanet()
 	grabPlanet.reset();
 }
 
-void GravityPlayer::GrabUpdate()
+void Player::GrabUpdate()
 {
 	//とりあえず動けないようにしますバグるからね
 	//Move(false);
@@ -568,7 +581,7 @@ void GravityPlayer::GrabUpdate()
 
 }
 
-void GravityPlayer::BlockCollision(const std::vector<Triangle> &boxPlanes)
+void Player::BlockCollision(const std::vector<Triangle> &boxPlanes)
 {
 	//プレイヤーの落下のray
 	XMVECTOR downVec = -drawObject.GetUpVec();

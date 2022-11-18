@@ -3,6 +3,7 @@
 #include "Vector3.h"
 #include "Model.h"
 #include <memory>
+#include "gameConstData.h"
 #include "../Collision/CollisionPrimitive.h"
 class Planet;
 
@@ -11,7 +12,7 @@ enum class PlayerStatus
 	STAND,
 	JUMP,
 };
-class GravityPlayer
+class Player
 {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMVECTOR = DirectX::XMVECTOR;
@@ -21,7 +22,7 @@ public://基本関数
 	/// 初期化関数
 	/// </summary>
 	/// <param name="model"></param>
-	void Init(Model *model, std::shared_ptr<Planet> planet);
+	void Init(std::shared_ptr<Planet> planet);
 	void Update();
 	void Finalize();
 	void Draw();
@@ -70,10 +71,11 @@ public://ゲッタセッタ
 	const XMFLOAT3 &GetPos();
 	const XMFLOAT3 GetAngle();
 	const XMFLOAT3 GetUpVec();
-	const float GetBasePlanetScale();
+	float GetBasePlanetScale();
 	const std::weak_ptr<Planet> &GetBasePlanet();
-	const XMFLOAT3 &GetGravityAngle();
-	const bool GetIsJump();
+	GameDatas::GravityData GetGravityData();
+	bool GetIsJump();
+	bool GetIsOneWayGravity();
 public://惑星周りの処理
 	/// <summary>
 	/// 掴む惑星のセットを行う
@@ -96,6 +98,8 @@ public://惑星周りの処理
 	void AddGravity(Vector3 gravity);
 
 	void shakeUpdate(float shakePower);
+
+	void LoadModel();
 private:
 	Vector3 pos_;
 	Vector3 rotation;
@@ -130,8 +134,7 @@ private:
 
 	bool oldLockonInput = false;
 
-	bool isOneWayGravity_ = false;
-
+	GameDatas::GravityData gravity_;
 	//単方向時重力
 	Vector3 oneWayGravityAngle_;
 
@@ -139,9 +142,11 @@ private:
 	Vector3 worldGravity_;
 
 	//プレイヤーに最終的にかかる重力
-	Vector3 gravityAngle_;
 
 	int shakeTimer_ = 5;
 	int shakeTimerMax_ = 15;
+
+	std::unique_ptr<Model> playerModel_;
+	std::unique_ptr<Model> ArrowModel_;
 };
 

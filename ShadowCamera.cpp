@@ -1,6 +1,6 @@
 #include "ShadowCamera.h"
 #include "Camera.h"
-#include "gameOriginal/GravityPlayer.h"
+#include "gameOriginal/Player.h"
 using namespace std;
 using namespace DirectX;
 ShadowCamera::ShadowCamera()

@@ -1,9 +1,10 @@
 #include "PlanetManager.h"
-#include "../Collision/Collision.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 #include "LoadPlanet.h"
+#include "gameConstData.h"
+#include <limits.h>
 using namespace std;
 using namespace DirectX;
 bool PlanetManager::isMakeInstance = false;
@@ -79,14 +80,14 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	cameraRay.dir = XMLoadFloat3(&angle);
 	XMFLOAT3 tmp = pos;
 	cameraRay.start = XMLoadFloat3(&tmp);
-	Sphere starCol;
+	Sphere planetCol;
 
 	for (auto &e : planets_)
 	{
-		starCol.center = XMLoadFloat3(&e->GetPos());
-		starCol.radius = e->GetScale();
+		planetCol.center = XMLoadFloat3(&e->GetPos());
+		planetCol.radius = e->GetScale();
 		float colDist;
-		if (!e->GetIsOnPlayer() && Collision::CheckRay2Sphere(cameraRay, starCol, &colDist))
+		if (!e->GetIsOnPlayer() && Collision::CheckRay2Sphere(cameraRay, planetCol, &colDist))
 		{
 			if (colDist <= minDist)
 			{
@@ -355,6 +356,32 @@ bool PlanetManager::StageClear()
 void PlanetManager::playerStand(std::weak_ptr<Planet> playerStandPlanet)
 {
 	playerStandPlanet_ = playerStandPlanet;
+}
+
+float PlanetManager::CameraCollision(Ray cameraRay)
+{
+	//カメラの距離の最大値より少し大きく
+	float distance = GameDatas::camMaxLength + 1.0f;
+
+	Sphere planetCol;
+	for (auto &e : planets_)
+	{
+	float NearLDistance = (Vector3(cameraRay.start) - e->GetPos()).length();
+		NearLDistance -= e->GetScale();
+		if (distance > NearLDistance)
+		{
+			planetCol.center = XMLoadFloat3(&e->GetPos());
+			planetCol.radius = e->GetScale();
+			Collision::CheckRay2Sphere(cameraRay, planetCol, &distance);
+		}
+	}
+
+	//めり込んだ際などにバグが発生するのでカメラに影響が出ないように初期値に修正する
+	if (distance <= 0.0f)
+	{
+		distance = GameDatas::camMaxLength + 1.0f;
+	}
+	return distance;
 }
 
 void PlanetManager::StageUpdate()

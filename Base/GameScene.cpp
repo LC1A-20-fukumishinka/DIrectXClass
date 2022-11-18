@@ -42,6 +42,10 @@ void GameScene::Init()
 	BloomTarget_ = make_unique<MultiRenderTarget>();
 	BloomTarget_->Init(1);
 
+
+	BloomDrawTarget_ = make_unique<MultiRenderTarget>();
+	BloomDrawTarget_->Init(1);
+
 	TitleTarget_ = make_unique<MultiRenderTarget>();
 	TitleTarget_->Init(1);
 	cam_ = make_unique<GameCamera>();
@@ -121,8 +125,10 @@ void GameScene::Init()
 
 	PlanetManager::Instance()->SetStagePlanets(1);
 
-	player_ = make_unique<GravityPlayer>();
-	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet(0));
+	player_ = make_unique<Player>();
+	player_->LoadModel();
+
+	player_->Init(PlanetManager::Instance()->GetBasePlanet(0));
 	player_->SetCamera(cam_->GetCamera());
 	player_->SetLight(lightGroup_.get());
 
@@ -225,6 +231,7 @@ void GameScene::Update()
 	}
 
 	cam_->SetBasePlanet(player_->GetBasePlanet());
+	cam_->SetGravityData(player_->GetGravityData());
 	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec());
 
 	objDome_->SetPosition(cam_->GetCameraPos());
@@ -287,10 +294,10 @@ void GameScene::PreDraw()
 	if(true/*isBloom_*/)
 	{
 		bloom_.BrightUpdate(BloomTarget_->GetTextureNum(0));
-		MosaicTarget_->PreDrawScene();
+		BloomTarget_->PreDrawScene();
 		bloom_.Draw(DrawTexture_);
-		MosaicTarget_->PostDrawScene();
-		DrawTexture_ = MosaicTarget_->GetTextureNum(0);
+		BloomTarget_->PostDrawScene();
+		DrawTexture_ = BloomTarget_->GetTextureNum(0);
 	}
 	
 	if (isGameTitle_)
@@ -355,22 +362,20 @@ void GameScene::Finalize()
 void GameScene::IngameUpdate()
 {
 	//掴む(使わないかも)
-	if (false/*GameInput::Instance()->LockOnInput()*/)
-	{
-
-		if (GameInput::Instance()->GrabInput())
-		{
-			XMFLOAT3 tmp = cam_->GetCameraPos();
-			bool isCollision;
-			shared_ptr<Planet> grabPlanet;
-
-			isCollision = PlanetManager::Instance()->GetGrabPlanet(grabPlanet, tmp, cam_->GetCamera()->GetAngle());
-			if (isCollision)
-			{
-				player_->SetGrabPlanet(grabPlanet);
-			}
-		}
-	}
+	//if (false/*GameInput::Instance()->LockOnInput()*/)
+	//{
+	//	if (GameInput::Instance()->GrabInput())
+	//	{
+	//		XMFLOAT3 tmp = cam_->GetCameraPos();
+	//		bool isCollision;
+	//		shared_ptr<Planet> grabPlanet;
+	//		isCollision = PlanetManager::Instance()->GetGrabPlanet(grabPlanet, tmp, cam_->GetCamera()->GetAngle());
+	//		if (isCollision)
+	//		{
+	//			player_->SetGrabPlanet(grabPlanet);
+	//		}
+	//	}
+	//}
 	//離す
 
 	//タイトルじゃなかったらプレイヤーを動かせる
@@ -511,7 +516,7 @@ void GameScene::ObjectRestart()
 	clearText_->Update();
 
 	PlanetManager::Instance()->Reset();
-	player_->Init(playerModel_.get(), PlanetManager::Instance()->GetBasePlanet(0));
+	player_->Init(PlanetManager::Instance()->GetBasePlanet(0));
 	for (auto &e : testFlag_)
 	{
 		e.Reset();
@@ -572,7 +577,6 @@ void GameScene::ImguiUpdate()
 	ImGui::Checkbox("GB", &isGB_);
 	ImGui::Checkbox("Monocrome", &isMono_);
 	ImGui::Checkbox("Mosaic", &isMosaic_);
-	ImGui::Checkbox("Bloom", &isBloom_);
 	ImGui::End();
 #pragma endregion
 
