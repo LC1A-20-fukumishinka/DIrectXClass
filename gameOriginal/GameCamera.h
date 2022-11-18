@@ -2,6 +2,7 @@
 #include "../Camera.h"
 #include <memory>
 #include "../EaseClass.h"
+#include "gameConstData.h"
 class Planet;
 class GameCamera
 {
@@ -12,6 +13,8 @@ public:
 	void Finalize();
 
 public:
+
+	void SetGravityData(GameDatas::GravityData isOneWayGravity);
 	Camera *GetCamera();
 	Vector3 GetCameraPos();
 	bool GetIsCameraStop();
@@ -50,16 +53,21 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsAnimationEnd();
-private:
-	static const float sTitleCameraDistance;
-private:
-	void CameraAnimationUpdate();
-	void IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
 private://状況別更新処理
+
+	/// <summary>
+	/// カメラが遷移系アニメーション中の更新処理
+	/// </summary>
+	void CameraAnimationUpdate();
+
+	/// <summary>
+	/// ゲームプレイ中の処理
+	/// </summary>
+	void IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
 	//クリア時カメラ挙動処理
 	void ClearCameraUpdate();
 	//通常時のカメラ挙動
-	void NormalUpdate(const Vector3 &playerPos);
+	void NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVec);
 	//注目状態のカメラ挙動
 	void LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
 	//掴み状態のカメラ挙動
@@ -67,16 +75,24 @@ private://状況別更新処理
 	//タイトル時のカメラ挙動
 	void TitleUpdate();
 
+	//惑星と接触していた際の更新処理
+	void PlanetCollisionUpdate();
 private:
 	void camRot(const DirectX::XMFLOAT2 &rot);
 private:
 	Camera cam_;
 
+	//計算して出す視点座標
 	Vector3 nextEyePos_ = {};
+	//対象座標
 	Vector3 nextTargetPos_ = {};
+	//カメラの姿勢
 	DirectX::XMVECTOR nextCamUpRot_ = {};
+	//アニメーション用に設定する過去の視点
 	Vector3 oldEyePos_ = {};
+	//アニメーション用に設定する過去の対象
 	Vector3 oldTargetPos_ = {};
+	//アニメーション用に設定する過去の姿勢
 	DirectX::XMVECTOR oldCamUpRot_ = {};
 	std::weak_ptr<Planet> planet_;
 	bool isCameraStop_ = false;
@@ -90,6 +106,7 @@ private://挙動のイージング
 	bool isClearMode_ = false;
 	bool isTitleMode_ = true;
 
-	Vector3 playerGravityAngle_;
+	GameDatas::GravityData gravity_;
+	bool oldIsOneWayGravity_ = false;
 };
 

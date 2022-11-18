@@ -17,7 +17,7 @@ public:
 	Vector3(const Vector3 &obj);
 	//ƒƒ“ƒoŠÖ”
 	float length() const;
-	const Vector3 normalize();
+	Vector3 normalize() const;
 	float dot(const Vector3 &v)const;
 	Vector3 cross(const Vector3 &v) const;
 

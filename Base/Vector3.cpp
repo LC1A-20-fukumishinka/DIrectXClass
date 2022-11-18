@@ -67,13 +67,14 @@ float Vector3::length() const
 	return sqrtf(x * x + y * y + z * z);
 }
 
-const Vector3 Vector3::normalize()
+Vector3 Vector3::normalize() const
 {
 	if (length() == 0.0f)
 	{
 		return*this;
 	}
 	float l = length();
+
 	return Vector3(*this / l);
 }
 

@@ -6,11 +6,11 @@
 #include <algorithm>
 #include "Planet.h"
 #include "DirectInput.h"
+#include "PlanetManager.h"
 using namespace FukuMath;
 using namespace GameDatas;
 using namespace DirectX;
 
-const float GameCamera::sTitleCameraDistance = 200.0f;
 void GameCamera::Init()
 {
 	cam_.Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
@@ -18,7 +18,7 @@ void GameCamera::Init()
 
 	nextEyePos_ = cam_.GetEye();
 	nextCamUpRot_ = XMQuaternionIdentity();
-	playerGravityAngle_ = -YVec;
+	gravity_.angle = -YVec;
 }
 
 void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
@@ -34,6 +34,7 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 	else
 	{
 		IngameCameraUpdate(playerPos, playerZVec, playerYVec);
+		PlanetCollisionUpdate();
 	}
 
 	if (isChangeBasePlanetAnimation_ && !isCameraStop_)
@@ -52,6 +53,7 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 		cam_.SetTarget(nextTargetPos_);
 	}
 
+	oldIsOneWayGravity_ = gravity_.isOneWayGravity;
 
 	cam_.Update();
 }
@@ -62,6 +64,11 @@ void GameCamera::Draw()
 
 void GameCamera::Finalize()
 {
+}
+
+void GameCamera::SetGravityData(GameDatas::GravityData gravity)
+{
+	gravity_ = gravity;
 }
 
 Camera *GameCamera::GetCamera()
@@ -149,7 +156,6 @@ void GameCamera::TitleAnimationStart()
 
 	//上ベクトルをしゅせう性
 	nextCamUpRot_ = XMQuaternionRotationMatrix(rot);
-	//nextCamUpRot = XMQuaternionIdentity();
 	StartCameraAnimation(true, 60);
 }
 
@@ -166,57 +172,42 @@ void GameCamera::TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZV
 	StartCameraAnimation(true, 30);
 }
 
-void GameCamera::NormalUpdate(const Vector3 &playerPos)
+void GameCamera::NormalUpdate(const Vector3 &playerPos ,const Vector3 &playerYVec)
 {
+	//注視点をプレイヤの頭に合わせる
 	nextTargetPos_ = playerPos;
-	nextTargetPos_.y += 1.0f;
-	cam_.SetTarget(nextTargetPos_);
+	nextTargetPos_ += playerYVec.normalize();
 
-	Vector3 camPos = nextEyePos_ - nextTargetPos_;
-	float length = camPos.length();
+	//カメラの座標計算（距離を出す）
+	Vector3 camPos;
 
+	//重力解除時
+	if (!gravity_.isOneWayGravity && oldIsOneWayGravity_)
+	{//落下方向にカメラを向かせる
+		Vector3 cameraToPlayerDistance = planet_.lock()->GetPos() - nextTargetPos_;
+		camPos += nextTargetPos_ + (-cameraToPlayerDistance.normalize() * camMaxLength);
+		nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&cam_.up), XMLoadFloat3(&cameraToPlayerDistance.normalize())));
 
-	//プレイヤーとの距離をクランプ
-	length = std::clamp(length, camMinRength, camMaxRength);
-	//プレイヤー->カメラ(向き)
-	Vector3 camAngle = camPos.normalize();
-	//距離を補正
-	camPos = camAngle * length;
-	//ターゲットの位置を加算してカメラの座標完成
-	camPos += nextTargetPos_;
+		StartCameraAnimation(false, 120);
+	}
+	else
+	{
+		//カメラからプレイヤーへの距離計算
+		Vector3 cameraToPlayerDistance = nextEyePos_ - nextTargetPos_;
 
-	////とれる内積の範囲
-	//float camRange 
+		//長さを測ってプレイヤーとの距離をクランプして距離調整
+		float length = camMaxLength;
+		//length = std::clamp(length, camMinLength, camMaxLength);
 
-	////カメラの座標の内積
-	//float camDot = 
+		//向きに直して
+		Vector3 camAngle = cameraToPlayerDistance.normalize();
+		//向き＊距離で相対座標を計算
+		camPos = camAngle * length;
+		//ターゲットの位置を加算してカメラのワールド座標完成
+		camPos += nextTargetPos_;
+	}
 
-
-	//float camUpLength = 5;
-	//Vector3 basePlanetToCameraAngle = { 0, 1, 0 };
-
-	//if (!planet_.expired())
-	//{
-	//	//惑星→カメラ
-	//	basePlanetToCameraAngle = camPos - planet_.lock()->GetPos();
-	//	basePlanetToCameraAngle.normalize();
-
-	//	camUpLength += planet_.lock()->GetScale();
-
-	//	basePlanetToCameraAngle *= camUpLength;
-
-	//	camPos = planet_.lock()->GetPos();
-
-	//	camPos += basePlanetToCameraAngle;
-	//}
-
-	////上記の処理でできたベクトルで回転行列を作成
-	//XMMATRIX camUpMat = FukuMath::GetMatRot(XMLoadFloat3(&camAngle), XMLoadFloat3(&basePlanetToCameraAngle.normalize()));
-	//quaternion化
-	//nextCamUpRot_ = XMQuaternionRotationMatrix(camUpMat);
 	nextEyePos_ = camPos;
-
-
 
 	camRot(GameInput::Instance()->RStick());
 }
@@ -316,25 +307,30 @@ void GameCamera::ClearCameraUpdate()
 
 void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
 {
-	//中視点状態切り替え
+	//注視点状態切り替えアニメーション
 	if (GameInput::Instance()->LockOnTrigger() || GameInput::Instance()->LockOnRelease())
 	{
 		StartCameraAnimation(true, 15);
 	}
 
-
+	//状態毎のカメラのアップデート
 	if (GameInput::Instance()->LockOnInput())
-	{
+	{//ロックオン中
+		//ロックオン時アップデート
 		LockonUpdate(playerPos, playerZVec, playerYVec);
 	}
 	else
-	{
+	{//通常時
+
+		//右スティック押し込みによるカメラの姿勢リフレッシュ
 		if (GameInput::Instance()->CameraReflesh())
 		{
 			nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&cam_.GetAngle())));
 			StartCameraAnimation(false, 15);
 		}
-		NormalUpdate(playerPos);
+
+		//通常時アップデート
+		NormalUpdate(playerPos, playerYVec);
 
 	}
 
@@ -343,6 +339,26 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 	if (GameInput::Instance()->LockOnRelease())
 	{
 		nextEyePos_ = (playerPos - playerZVec * 100);
+	}
+}
+
+void GameCamera::PlanetCollisionUpdate()
+{
+	//カメラの対象座標から視点方向へのレイ
+	Ray cameraRay;
+
+	//カメラレイの情報用意
+	Vector3 cameraDir = Vector3(nextEyePos_ - nextTargetPos_);
+	cameraRay.start = XMLoadFloat3(&nextTargetPos_);
+	cameraRay.dir = XMLoadFloat3(&cameraDir.normalize());
+
+	//惑星と接触した距離を返す(最大値はカメラの距離上限値)
+	float colDistance = PlanetManager::Instance()->CameraCollision(cameraRay);
+
+	//接触した際の距離と現在の距離を比較
+	if (cameraDir.length() > colDistance)
+	{//接触地点の方が短かった場合カメラの視点座標を再計算
+		nextEyePos_ = nextTargetPos_ + (cameraDir.normalize() * colDistance);
 	}
 }
 
