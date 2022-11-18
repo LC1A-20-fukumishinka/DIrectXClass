@@ -108,5 +108,9 @@ private://挙動のイージング
 
 	GameDatas::GravityData gravity_;
 	bool oldIsOneWayGravity_ = false;
+	
+	float nowDistance = GameDatas::camMaxLength;
+	float rateDistance = GameDatas::camMaxLength;
+	float CToPCollAnimationRate = 1.0f;
 };
 

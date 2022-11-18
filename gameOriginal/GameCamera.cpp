@@ -34,7 +34,6 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 	else
 	{
 		IngameCameraUpdate(playerPos, playerZVec, playerYVec);
-		PlanetCollisionUpdate();
 	}
 
 	if (isChangeBasePlanetAnimation_ && !isCameraStop_)
@@ -172,7 +171,7 @@ void GameCamera::TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZV
 	StartCameraAnimation(true, 30);
 }
 
-void GameCamera::NormalUpdate(const Vector3 &playerPos ,const Vector3 &playerYVec)
+void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVec)
 {
 	//注視点をプレイヤの頭に合わせる
 	nextTargetPos_ = playerPos;
@@ -185,7 +184,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos ,const Vector3 &playerYVe
 	if (!gravity_.isOneWayGravity && oldIsOneWayGravity_)
 	{//落下方向にカメラを向かせる
 		Vector3 cameraToPlayerDistance = planet_.lock()->GetPos() - nextTargetPos_;
-		camPos += nextTargetPos_ + (-cameraToPlayerDistance.normalize() * camMaxLength);
+		camPos += nextTargetPos_ + (-cameraToPlayerDistance.normalize() * nowDistance);
 		nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&cam_.up), XMLoadFloat3(&cameraToPlayerDistance.normalize())));
 
 		StartCameraAnimation(false, 120);
@@ -196,8 +195,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos ,const Vector3 &playerYVe
 		Vector3 cameraToPlayerDistance = nextEyePos_ - nextTargetPos_;
 
 		//長さを測ってプレイヤーとの距離をクランプして距離調整
-		float length = camMaxLength;
-		//length = std::clamp(length, camMinLength, camMaxLength);
+		float length = nowDistance;
 
 		//向きに直して
 		Vector3 camAngle = cameraToPlayerDistance.normalize();
@@ -331,7 +329,7 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 
 		//通常時アップデート
 		NormalUpdate(playerPos, playerYVec);
-
+		PlanetCollisionUpdate();
 	}
 
 
@@ -352,14 +350,39 @@ void GameCamera::PlanetCollisionUpdate()
 	cameraRay.start = XMLoadFloat3(&nextTargetPos_);
 	cameraRay.dir = XMLoadFloat3(&cameraDir.normalize());
 
-	//惑星と接触した距離を返す(最大値はカメラの距離上限値)
-	float colDistance = PlanetManager::Instance()->CameraCollision(cameraRay);
+	//カメラの距離の最大値より少し大きく
+	float distance = GameDatas::camMaxLength + 1.0f;
+
+	Sphere planetCol;
+
+	float NearDistance = (Vector3(cameraRay.start) - planet_.lock()->GetPos()).length();
+	NearDistance -= planet_.lock()->GetScale();
+	if (distance > NearDistance)
+	{
+		planetCol.center = XMLoadFloat3(&planet_.lock()->GetPos());
+		planetCol.radius = planet_.lock()->GetScale();
+		Collision::CheckRay2Sphere(cameraRay, planetCol, &distance);
+	}
+
+	//めり込んだ際などに距離がゼロになってバグが発生するので距離がゼロにならないようにする
+	if (distance > 0.0f && distance <= rateDistance)
+	{
+		nowDistance = distance;
+		CToPCollAnimationRate = 0.0f;
+	}
 
 	//接触した際の距離と現在の距離を比較
-	if (cameraDir.length() > colDistance)
-	{//接触地点の方が短かった場合カメラの視点座標を再計算
-		nextEyePos_ = nextTargetPos_ + (cameraDir.normalize() * colDistance);
+	if (nowDistance < distance)
+	{//接触地点の方が長かった場合カメラの視点座標を最大値にする
+		CToPCollAnimationRate += (1.0f / 120.0f);
 	}
+
+	CToPCollAnimationRate = std::clamp(CToPCollAnimationRate, 0.0f, 1.0f);
+
+	float easeRate = Easing::easeInOutQuint(CToPCollAnimationRate);
+	rateDistance = (nowDistance * (1 - easeRate)) + (distance * easeRate);
+
+	nextEyePos_ = nextTargetPos_ + (cameraDir.normalize() * rateDistance);
 }
 
 void GameCamera::camRot(const DirectX::XMFLOAT2 &rot)
