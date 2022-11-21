@@ -7,6 +7,7 @@
 #include "Planet.h"
 #include "DirectInput.h"
 #include "PlanetManager.h"
+#include"../imgui/ImguiManager.h"
 using namespace FukuMath;
 using namespace GameDatas;
 using namespace DirectX;
@@ -55,6 +56,8 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 	oldIsOneWayGravity_ = gravity_.isOneWayGravity;
 
 	cam_.Update();
+
+	ImguiUpdate();
 }
 
 void GameCamera::Draw()
@@ -220,6 +223,19 @@ bool GameCamera::GetIsAnimationEnd()
 	return CameraAnimationEase_.IsEnd();
 }
 
+void GameCamera::CameraReflesh(Vector3 UpVec, int timer)
+{
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&UpVec), XMLoadFloat3(&cam_.GetAngle())));
+	StartCameraAnimation(false, timer);
+}
+
+void GameCamera::LandingCameraReflesh(Vector3 UpVec)
+{
+	if (!imCamLanding_) return;
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&UpVec), XMLoadFloat3(&cam_.GetAngle())));
+	StartCameraAnimation(false, 60);
+}
+
 void GameCamera::CameraAnimationUpdate()
 {
 	//easing
@@ -323,13 +339,16 @@ void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &pla
 		//右スティック押し込みによるカメラの姿勢リフレッシュ
 		if (GameInput::Instance()->CameraReflesh())
 		{
-			nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&cam_.GetAngle())));
-			StartCameraAnimation(false, 15);
+			CameraReflesh(playerYVec, 15);
 		}
 
 		//通常時アップデート
 		NormalUpdate(playerPos, playerYVec);
-		PlanetCollisionUpdate();
+
+		if (imCamCollision_)
+		{
+			PlanetCollisionUpdate();
+		}
 	}
 
 
@@ -380,6 +399,11 @@ void GameCamera::PlanetCollisionUpdate()
 	CToPCollAnimationRate = std::clamp(CToPCollAnimationRate, 0.0f, 1.0f);
 
 	float easeRate = Easing::easeInOutQuint(CToPCollAnimationRate);
+
+	if (!imCamBackFlag_)
+	{
+		easeRate = 1.0f;
+	}
 	rateDistance = (nowDistance * (1 - easeRate)) + (distance * easeRate);
 
 	nextEyePos_ = nextTargetPos_ + (cameraDir.normalize() * rateDistance);
@@ -410,4 +434,14 @@ void GameCamera::camRot(const DirectX::XMFLOAT2 &rot)
 	//targetの座標＋生成したベクトルを合わせて回転完了
 	camPos += nextTargetPos_;
 	nextEyePos_ = camPos;
+}
+
+void GameCamera::ImguiUpdate()
+{
+	ImGui::Begin("Cam");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	ImGui::Checkbox("Back", &imCamBackFlag_);
+	ImGui::Checkbox("Collision", &imCamCollision_);
+	ImGui::Checkbox("Landing", &imCamLanding_);
+	ImGui::End();
 }

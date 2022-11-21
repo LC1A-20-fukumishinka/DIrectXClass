@@ -32,8 +32,8 @@ void Player::Init(std::shared_ptr<Planet> planet)
 	SetBasePlanet(planet);
 
 	localHeight = 0;
-	status = PlayerStatus::STAND;
-
+	status_ = PlayerStatus::STAND;
+	oldStatus_ = status_;
 	if (!basePlanet.expired())
 	{
 		Vector3 startPos;
@@ -54,6 +54,8 @@ void Player::Update()
 	//惑星を掴んでいないかどうか
 	bool isNotGrab = grabPlanet.expired();
 
+	oldStatus_ = status_;
+
 	if (!isNotGrab)
 	{//掴んでいる
 		GrabUpdate();
@@ -68,7 +70,7 @@ void Player::Update()
 	}
 
 
-	if (status == PlayerStatus::STAND)
+	if (status_ == PlayerStatus::STAND)
 	{
 		PlanetManager::Instance()->playerStand(basePlanet);
 	}
@@ -136,7 +138,7 @@ void Player::PosUpdate(const Vector3 &move)
 
 #pragma region jump
 	//ジャンプ中の処理
-	if (status == PlayerStatus::JUMP)
+	if (status_ == PlayerStatus::JUMP)
 	{
 		//球とプレイヤーの距離
 		Vector3 dist = pos_ - basePlanet.lock()->GetPos();
@@ -171,20 +173,22 @@ void Player::PosUpdate(const Vector3 &move)
 			if (nowSpeed >= shakeSpeed)
 			{
 				shakeTimer_ = 0;
+				//重力変更をした
+				isGravityChanged_ = true;
 			}
-			status = PlayerStatus::STAND;
+			status_ = PlayerStatus::STAND;
 		}
 	}
 
 	if (shakeTimer_ <= shakeTimerMax_)
 	{
-		float shakePower = 3.0f * (1.0f - (static_cast<float> (shakeTimer_) / shakeTimerMax_)) ;
+		float shakePower = 3.0f * (1.0f - (static_cast<float> (shakeTimer_) / shakeTimerMax_));
 		shakeUpdate(shakePower);
 		shakeTimer_++;
 	}
 
 	//ジャンプした瞬間
-	if (status == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
+	if (status_ == PlayerStatus::STAND && GameInput::Instance()->ATrigger())
 	{
 		//球面に対しての法線方向
 		Vector3 JumpAngle;
@@ -197,14 +201,14 @@ void Player::PosUpdate(const Vector3 &move)
 
 		moveVec_ += warkVec_;
 		//ジャンプ状態に移行
-		status = PlayerStatus::JUMP;
+		status_ = PlayerStatus::JUMP;
 	}
 
 
 #pragma endregion
 
 	//惑星に引き寄せられる状態か
-	bool isPlanetAttracts = !(status == PlayerStatus::JUMP && gravity_.isOneWayGravity);
+	bool isPlanetAttracts = !(status_ == PlayerStatus::JUMP && gravity_.isOneWayGravity);
 
 	//現在位置
 	Vector3 nowPos(pos_);
@@ -217,7 +221,7 @@ void Player::PosUpdate(const Vector3 &move)
 
 
 	//地上に立っているとき球面に位置を補正する
-	if (status == PlayerStatus::STAND)
+	if (status_ == PlayerStatus::STAND)
 	{
 		float length = basePlanet.lock()->GetScale();
 
@@ -238,7 +242,7 @@ void Player::PostureUpdate(const Vector3 &move)
 	//球面上における上方向
 	Vector3 up;
 
-	if (status == PlayerStatus::STAND)
+	if (status_ == PlayerStatus::STAND)
 	{
 		up = Vector3(pos_ - basePlanet.lock()->GetPos()).normalize();
 	}
@@ -356,7 +360,7 @@ void Player::NormalUpdate()
 
 void Player::PostureReset()
 {
-	if (status == PlayerStatus::JUMP) return;
+	if (status_ == PlayerStatus::JUMP) return;
 	Vector3 BasePlanetToPlayer = pos_ - basePlanet.lock()->GetPos();
 	XMVECTOR BasePlanetToPlayerAngleV = XMLoadFloat3(&BasePlanetToPlayer.normalize());
 	XMVECTOR frontVec = XMVector3Cross(drawObject.GetRightVec(), BasePlanetToPlayerAngleV);
@@ -381,6 +385,17 @@ void Player::LoadModel()
 
 	ArrowModel_ = std::make_unique<Model>();
 	ArrowModel_->CreateModel("chr_sword", true);
+}
+
+bool Player::LandingCamReset()
+{
+	bool isReset = (status_ == PlayerStatus::STAND && oldStatus_ == PlayerStatus::JUMP && isGravityChanged_);
+
+	if (isGravityChanged_)
+	{
+		isGravityChanged_ = false;
+	}
+	return isReset;
 }
 
 void Player::LockOnUpdate()
@@ -463,7 +478,7 @@ GameDatas::GravityData Player::GetGravityData()
 
 bool Player::GetIsJump()
 {
-	bool isJump = status == PlayerStatus::JUMP;
+	bool isJump = status_ == PlayerStatus::JUMP;
 	return isJump;
 }
 

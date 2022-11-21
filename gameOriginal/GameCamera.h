@@ -53,6 +53,10 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsAnimationEnd();
+
+	void CameraReflesh(Vector3 UpVec, int timer);
+
+	void LandingCameraReflesh(Vector3 UpVec);
 private://状況別更新処理
 
 	/// <summary>
@@ -83,21 +87,23 @@ private:
 	Camera cam_;
 
 	//計算して出す視点座標
-	Vector3 nextEyePos_ = {};
+	Vector3 nextEyePos_;
 	//対象座標
-	Vector3 nextTargetPos_ = {};
+	Vector3 nextTargetPos_;
 	//カメラの姿勢
-	DirectX::XMVECTOR nextCamUpRot_ = {};
+	DirectX::XMVECTOR nextCamUpRot_;
 	//アニメーション用に設定する過去の視点
-	Vector3 oldEyePos_ = {};
+	Vector3 oldEyePos_;
 	//アニメーション用に設定する過去の対象
-	Vector3 oldTargetPos_ = {};
+	Vector3 oldTargetPos_;
 	//アニメーション用に設定する過去の姿勢
-	DirectX::XMVECTOR oldCamUpRot_ = {};
+	DirectX::XMVECTOR oldCamUpRot_;
 	std::weak_ptr<Planet> planet_;
 	bool isCameraStop_ = false;
 	//次の惑星の座標
-	Vector3 nextPlanetPos_ = {};
+	Vector3 nextPlanetPos_;
+
+
 private://挙動のイージング
 	bool isChangeBasePlanetAnimation_;
 	Easing CameraAnimationEase_;
@@ -108,9 +114,15 @@ private://挙動のイージング
 
 	GameDatas::GravityData gravity_;
 	bool oldIsOneWayGravity_ = false;
-	
+
 	float nowDistance = GameDatas::camMaxLength;
 	float rateDistance = GameDatas::camMaxLength;
 	float CToPCollAnimationRate = 1.0f;
+
+private://Imgui
+	bool imCamBackFlag_ = true;
+	bool imCamCollision_ = true;
+	bool imCamLanding_ = true;
+	void ImguiUpdate();
 };
 

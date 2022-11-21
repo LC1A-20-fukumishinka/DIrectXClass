@@ -100,6 +100,8 @@ public://惑星周りの処理
 	void shakeUpdate(float shakePower);
 
 	void LoadModel();
+
+	bool LandingCamReset();
 private:
 	Vector3 pos_;
 	Vector3 rotation;
@@ -112,7 +114,12 @@ private:
 
 	std::weak_ptr<Planet> basePlanet;
 
-	PlayerStatus status;
+	//プレイヤーの状態
+	PlayerStatus status_;
+	//位置フレーム前の状態
+	PlayerStatus oldStatus_;
+	//重力を変更したか
+	bool isGravityChanged_ = false;
 
 	DirectX::XMVECTOR playerAngle;
 

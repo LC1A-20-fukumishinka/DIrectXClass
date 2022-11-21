@@ -152,22 +152,6 @@ void GameScene::Init()
 
 	MakeFlag(PlanetManager::Instance()->GetPlanet(0), Vector3(0, 1, -0.3f), 2.0f);
 
-
-	//for (int i = 2; i < stageCount; i++)
-	//{
-	//	FlagOnPlanet = PlanetManager::Instance()->GetBasePlanet(i);
-	//	MakeFlag(FlagOnPlanet, Vector3(0, 1, 0), 2.0f);
-	//}
-
-	//Block::SetCamera(cam_->GetCamera());
-	//Block::SetLights(lightGroup_.get());
-	//Block tmpBlock;
-	//tmpBlock.Init(PlanetManager::Instance()->GetPlanet(0), Vector3(0.0f, 1.0f, 1.0f), 1.0f);
-
-	//testBlock_.emplace_back(tmpBlock);
-
-	//box.Init(player_->GetPos(), ZVec, YVec);
-	//box.SetCamera(cam_->GetCamera());
 	titlePostEffect_.Init();
 
 	InformationBoard::SetCamera(cam_->GetCamera());
@@ -175,7 +159,7 @@ void GameScene::Init()
 	InformationBoard welcomeBoard, AtoJump, LTtoLockOn;
 	welcomeBoard.Init(L"Resources/welcome.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 10.0f);
 	AtoJump.Init(L"Resources/A_To_Jump.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 10.0f);
-	LTtoLockOn.Init(L"Resources/LT_To_LockOn.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(-0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 100.0f);
+	LTtoLockOn.Init(L"Resources/LT_To_LockOn.png", PlanetManager::Instance()->GetBasePlanet(0), Vector3(-0.2f, 1, 0.2f), Vector3(0, 3, 0), Vector3(3, 1, 0), 10.0f);
 	testBoards_.emplace_back(welcomeBoard);
 	testBoards_.emplace_back(AtoJump);
 	testBoards_.emplace_back(LTtoLockOn);
@@ -361,22 +345,6 @@ void GameScene::Finalize()
 
 void GameScene::IngameUpdate()
 {
-	//掴む(使わないかも)
-	//if (false/*GameInput::Instance()->LockOnInput()*/)
-	//{
-	//	if (GameInput::Instance()->GrabInput())
-	//	{
-	//		XMFLOAT3 tmp = cam_->GetCameraPos();
-	//		bool isCollision;
-	//		shared_ptr<Planet> grabPlanet;
-	//		isCollision = PlanetManager::Instance()->GetGrabPlanet(grabPlanet, tmp, cam_->GetCamera()->GetAngle());
-	//		if (isCollision)
-	//		{
-	//			player_->SetGrabPlanet(grabPlanet);
-	//		}
-	//	}
-	//}
-	//離す
 
 	//タイトルじゃなかったらプレイヤーを動かせる
 	if (!isGameTitle_)
@@ -395,7 +363,10 @@ void GameScene::IngameUpdate()
 		player_->Update();
 	}
 
-
+	if (player_->LandingCamReset())
+	{
+		cam_->LandingCameraReflesh(player_->GetUpVec());
+	}
 
 	for (auto e : testBlock_)
 	{
