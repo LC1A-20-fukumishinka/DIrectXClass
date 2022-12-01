@@ -62,7 +62,7 @@ private:
 	/// <summary>
 	/// 惑星群出現アニメーション全体フロー（とりあえずさっさと作れ関数化）
 	/// </summary>
-	void AnimationTestUpdate();
+	void StageClearAnimationUpdate();
 private:
 
 	std::shared_ptr<Planet> star;

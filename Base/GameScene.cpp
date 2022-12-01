@@ -8,7 +8,6 @@
 #include "TouchableObject.h"
 #include "FbxLoader.h"
 #include "FbxObject3D.h"
-#include "SafeDelete.h"
 #include "FukuMath.h"
 #include "../gameOriginal/GameInput.h"
 #include "../Collision/Collision.h"
@@ -19,9 +18,11 @@
 #include "PostMonochromePipeline.h"
 #include "../imgui/ImguiManager.h"
 #include "BaseData.h"
+#include "../gameOriginal/gameConstData.h"
 using namespace FukuMath;
 using namespace DirectX;
 using namespace std;
+using namespace GameDatas;
 void GameScene::Init()
 {
 	shadowRenderTarget_ = make_unique<MultiRenderTarget>();
@@ -216,7 +217,7 @@ void GameScene::Update()
 
 	cam_->SetBasePlanet(player_->GetBasePlanet());
 	cam_->SetGravityData(player_->GetGravityData());
-	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec());
+	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec(), player_->GetPlayerStatus());
 
 	objDome_->SetPosition(cam_->GetCameraPos());
 	objDome_->Update();
@@ -420,7 +421,7 @@ void GameScene::IngameUpdate()
 	lightGroup_->Update();
 
 	//box.Update();
-	AnimationTestUpdate();
+	StageClearAnimationUpdate();
 
 	for (auto &e : testBoards_)
 	{
@@ -502,7 +503,7 @@ void GameScene::ObjectRestart()
 void GameScene::MovePlanet()
 {
 	//‹ó’†‚É‚¢‚é‚Æ‚«
-	if (player_->GetIsJump())
+	if (player_->GetPlayerStatus() == PlayerStatus::JUMP)
 	{
 		//Œ»İˆê”Ô‹ß‚¢˜f¯‚ğ’²‚×‚é
 		shared_ptr<Planet> basePlanet;
@@ -516,10 +517,6 @@ void GameScene::MovePlanet()
 			//cam_->CameraStop();
 		}
 	}
-	//else if (cam_->GetIsCameraStop())
-	//{
-	//	cam_->StartCameraAnimation(false, 60);
-	//}
 }
 
 void GameScene::ImguiUpdate()
@@ -553,7 +550,7 @@ void GameScene::ImguiUpdate()
 
 }
 
-void GameScene::AnimationTestUpdate()
+void GameScene::StageClearAnimationUpdate()
 {
 	//ƒNƒŠƒAó‘Ô‚¶‚á‚È‚©‚Á‚½‚ç”²‚¯‚é
 	if (!isGameClear_) { return; }
