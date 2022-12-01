@@ -1,0 +1,10 @@
+# Blender 3.3.1 MTL File: 'oct.blend'
+# www.blender.org
+
+
+newmtl Material
+Ka 0.400 0.400 0.400
+Kd 1.000 1.000 1.000
+Ks 0.600 0.600 0.600
+illum 2
+map_Kd oct.1001.png
