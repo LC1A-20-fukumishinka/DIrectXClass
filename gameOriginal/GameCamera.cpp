@@ -22,8 +22,10 @@ void GameCamera::Init()
 	gravity_.angle = -YVec;
 }
 
-void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
+void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec, GameDatas::PlayerStatus playerStatus)
 {
+	//playerPos_ = playerPos;
+	playerStatus_ = playerStatus;
 	if (isTitleMode_)
 	{
 		TitleUpdate();
@@ -171,6 +173,7 @@ void GameCamera::TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZV
 {
 	isTitleMode_ = false;
 	nextEyePos_ = playerPos - (playerZVec * 10);
+	nextCamUpRot_ = XMQuaternionIdentity();
 	StartCameraAnimation(true, 30);
 }
 
@@ -210,7 +213,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVe
 
 	nextEyePos_ = camPos;
 
-	camRot(GameInput::Instance()->RStick());
+	camRot(GameInput::Instance()->RStick(), playerYVec);
 }
 
 void GameCamera::SetNextPlantPos(const Vector3 &pos)
@@ -370,28 +373,29 @@ void GameCamera::PlanetCollisionUpdate()
 	cameraRay.dir = XMLoadFloat3(&cameraDir.normalize());
 
 	//ƒJƒƒ‰‚Ì‹——£‚ÌÅ‘å’l‚æ‚è­‚µ‘å‚«‚­
-	float distance = GameDatas::camMaxLength + 1.0f;
+	float colDistance = GameDatas::camMaxLength + 1.0f;
 
 	Sphere planetCol;
 
-	float NearDistance = (Vector3(cameraRay.start) - planet_.lock()->GetPos()).length();
-	NearDistance -= planet_.lock()->GetScale();
-	if (distance > NearDistance)
+	//Õ“Ë”»’è
+	float NearPlanetDistance = (Vector3(cameraRay.start) - planet_.lock()->GetPos()).length();
+	NearPlanetDistance -= planet_.lock()->GetScale();
+	if (colDistance > NearPlanetDistance)
 	{
 		planetCol.center = XMLoadFloat3(&planet_.lock()->GetPos());
 		planetCol.radius = planet_.lock()->GetScale();
-		Collision::CheckRay2Sphere(cameraRay, planetCol, &distance);
+		Collision::CheckRay2Sphere(cameraRay, planetCol, &colDistance);
 	}
 
 	//‚ß‚èž‚ñ‚¾Û‚È‚Ç‚É‹——£‚ªƒ[ƒ‚É‚È‚Á‚ÄƒoƒO‚ª”­¶‚·‚é‚Ì‚Å‹——£‚ªƒ[ƒ‚É‚È‚ç‚È‚¢‚æ‚¤‚É‚·‚é
-	if (distance > 0.0f && distance <= rateDistance)
+	if (colDistance > 0.0f && colDistance <= rateDistance)
 	{
-		nowDistance = distance;
+		nowDistance = colDistance;
 		CToPCollAnimationRate = 0.0f;
 	}
 
 	//ÚG‚µ‚½Û‚Ì‹——£‚ÆŒ»Ý‚Ì‹——£‚ð”äŠr
-	if (nowDistance < distance)
+	if (nowDistance < colDistance)
 	{//ÚG’n“_‚Ì•û‚ª’·‚©‚Á‚½ê‡ƒJƒƒ‰‚ÌŽ‹“_À•W‚ðÅ‘å’l‚É‚·‚é
 		CToPCollAnimationRate += (1.0f / 120.0f);
 	}
@@ -404,16 +408,24 @@ void GameCamera::PlanetCollisionUpdate()
 	{
 		easeRate = 1.0f;
 	}
-	rateDistance = (nowDistance * (1 - easeRate)) + (distance * easeRate);
+	rateDistance = (nowDistance * (1 - easeRate)) + (colDistance * easeRate);
 
 	nextEyePos_ = nextTargetPos_ + (cameraDir.normalize() * rateDistance);
 }
 
-void GameCamera::camRot(const DirectX::XMFLOAT2 &rot)
+void GameCamera::camRot(const DirectX::XMFLOAT2 &rot, Vector3 playerUp)
 {
+	//‰ñ“]Žp¨‚ÌƒNƒH[ƒ^ƒjƒIƒ“
 	XMVECTOR rotQ = XMQuaternionIdentity();
+	//‰ñ“]—pXŽ²
 	XMVECTOR rotX = XMVector3Rotate(XMLoadFloat3(&cam_.GetRight()), XMQuaternionIdentity());
+	//‰ñ“]—pYŽ²
 	XMVECTOR rotY = XMVector3Rotate(XMLoadFloat3(&cam_.up), XMQuaternionIdentity());
+	if (playerStatus_ == PlayerStatus::STAND)
+	{
+		rotY = XMVector3Rotate(XMLoadFloat3(&playerUp), XMQuaternionIdentity());
+	}
+
 	rotQ = XMQuaternionMultiply(nextCamUpRot_, XMQuaternionRotationAxis(rotX, rot.y * RotRate));
 
 	rotQ = XMQuaternionMultiply(rotQ, XMQuaternionRotationAxis(rotY, rot.x * RotRate));

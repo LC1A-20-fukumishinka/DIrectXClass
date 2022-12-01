@@ -7,11 +7,6 @@
 #include "../Collision/CollisionPrimitive.h"
 class Planet;
 
-enum class PlayerStatus
-{
-	STAND,
-	JUMP,
-};
 class Player
 {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
@@ -60,6 +55,7 @@ private://状態毎の挙動管理
 	void NormalUpdate();
 
 	void LockOnUpdate();
+
 public://ゲッタセッタ
 	void SetPos(const DirectX::XMFLOAT3 &pos);
 
@@ -74,7 +70,7 @@ public://ゲッタセッタ
 	float GetBasePlanetScale();
 	const std::weak_ptr<Planet> &GetBasePlanet();
 	GameDatas::GravityData GetGravityData();
-	bool GetIsJump();
+	GameDatas::PlayerStatus GetPlayerStatus();
 	bool GetIsOneWayGravity();
 public://惑星周りの処理
 	/// <summary>
@@ -107,6 +103,9 @@ private:
 	Vector3 rotation;
 	Vector3 scale;
 	Object3D drawObject;
+	Object3D leftTrackObject;
+	Object3D rightTrackObject;
+
 	Object3D shadowObject;
 	Camera *cam;
 	Camera *shadowCamera;
@@ -115,9 +114,9 @@ private:
 	std::weak_ptr<Planet> basePlanet;
 
 	//プレイヤーの状態
-	PlayerStatus status_;
+	GameDatas::PlayerStatus status_;
 	//位置フレーム前の状態
-	PlayerStatus oldStatus_;
+	GameDatas::PlayerStatus oldStatus_;
 	//重力を変更したか
 	bool isGravityChanged_ = false;
 
@@ -154,6 +153,19 @@ private:
 	int shakeTimerMax_ = 15;
 
 	std::unique_ptr<Model> playerModel_;
+	std::unique_ptr<Model> leftTrackModel_;
+	std::unique_ptr<Model> rightTrackModel_;
+
 	std::unique_ptr<Model> ArrowModel_;
+
+private://アニメーション関連
+	//プレイヤーキャラクターの表情テクスチャハンドル
+	std::vector<int> faceTextureHandles_;
+	//現在の表情
+	GameDatas::PlayerFaceTexture face_ = GameDatas::PlayerFaceTexture::NORMAL;
+
+	int blinkTimer_ = 300;
+	void FaceUpdate();
+
 };
 

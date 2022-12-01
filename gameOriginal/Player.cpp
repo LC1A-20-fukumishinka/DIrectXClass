@@ -9,6 +9,7 @@
 #include "../Collision/Collision.h"
 #include "DirectInput.h"
 #include "../Shake.h"
+#include "TextureMgr.h"
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -20,10 +21,9 @@ bool isY = false;
 void Player::Init(std::shared_ptr<Planet> planet)
 {
 
-	pos_;
+	pos_ = Vector3(YVec);
 	drawObject.Init();
 	drawObject.SetModel(playerModel_.get());
-	pos_ = Vector3(YVec);
 	drawObject.SetPosition(pos_);
 
 	shadowObject.Init();
@@ -31,6 +31,13 @@ void Player::Init(std::shared_ptr<Planet> planet)
 	shadowObject.SetPosition(Vector3(YVec));
 	SetBasePlanet(planet);
 
+	leftTrackObject.Init();
+	leftTrackObject.SetModel(leftTrackModel_.get());
+	leftTrackObject.SetPosition(pos_);
+
+	rightTrackObject.Init();
+	rightTrackObject.SetModel(rightTrackModel_.get());
+	rightTrackObject.SetPosition(pos_);
 	localHeight = 0;
 	status_ = PlayerStatus::STAND;
 	oldStatus_ = status_;
@@ -62,6 +69,11 @@ void Player::Update()
 	}
 	else if (GameInput::Instance()->LockOnInput())
 	{//ロックオン用の移動
+
+		if (GameInput::Instance()->LockOnInput())
+		{
+			drawObject.SetRotationVector(XMLoadFloat3(&cam->GetAngle()), drawObject.GetUpVec());
+		}
 		LockOnUpdate();
 	}
 	else
@@ -74,10 +86,18 @@ void Player::Update()
 	{
 		PlanetManager::Instance()->playerStand(basePlanet);
 	}
-	drawObject.SetPosition(pos_);
+	XMVECTOR rot = drawObject.GetRotQuaternion();
+	leftTrackObject.SetRotation(rot);
+	rightTrackObject.SetRotation(rot);
+	shadowObject.SetRotation(rot);
 
-	shadowObject.SetPosition(drawObject.GetPosition());
-	shadowObject.SetRotation(drawObject.GetRotQuaternion());
+	drawObject.SetPosition(pos_);
+	leftTrackObject.SetPosition(pos_);
+	rightTrackObject.SetPosition(pos_);
+	shadowObject.SetPosition(pos_);
+
+
+	FaceUpdate();
 }
 
 void Player::Finalize()
@@ -86,8 +106,13 @@ void Player::Finalize()
 
 void Player::Draw()
 {
+	playerModel_->SetTexture(faceTextureHandles_[static_cast<int>(face_)]);
 	drawObject.Update();
+	leftTrackObject.Update();
+	rightTrackObject.Update();
 	drawObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	leftTrackObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	rightTrackObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
 void Player::ShadowDraw()
@@ -381,10 +406,17 @@ void Player::shakeUpdate(float shakePower)
 void Player::LoadModel()
 {
 	playerModel_ = std::make_unique<Model>();
-	playerModel_->CreateModel("chr_sword", true);
-
+	playerModel_->CreateModel("oct", true, true);
+	faceTextureHandles_.emplace_back(playerModel_->GetTexture());
+	faceTextureHandles_.emplace_back(TextureMgr::Instance()->SpriteLoadTexture(L"Resources/oct/octBlink.1001.png"));
+	faceTextureHandles_.emplace_back(TextureMgr::Instance()->SpriteLoadTexture(L"Resources/oct/octSmile.1001.png"));
+	faceTextureHandles_.emplace_back(TextureMgr::Instance()->SpriteLoadTexture(L"Resources/oct/octStrive.1001.png"));
+	leftTrackModel_ = std::make_unique<Model>();
+	leftTrackModel_->CreateModel("leftTrack", true, true);
+	rightTrackModel_ = std::make_unique<Model>();
+	rightTrackModel_->CreateModel("rightTrack", true, true);
 	ArrowModel_ = std::make_unique<Model>();
-	ArrowModel_->CreateModel("chr_sword", true);
+	ArrowModel_->CreateModel("oct", true, true);
 }
 
 bool Player::LandingCamReset()
@@ -396,6 +428,25 @@ bool Player::LandingCamReset()
 		isGravityChanged_ = false;
 	}
 	return isReset;
+}
+
+void Player::FaceUpdate()
+{
+	blinkTimer_--;
+
+	if (blinkTimer_ <= 0)
+	{
+		if (face_ == PlayerFaceTexture::NORMAL)
+		{
+			face_ = PlayerFaceTexture::BLINK;
+			blinkTimer_ = 20;
+		}
+		else if(face_ == PlayerFaceTexture::BLINK)
+		{
+			face_ = PlayerFaceTexture::NORMAL;
+			blinkTimer_ = 240;
+		}
+	}
 }
 
 void Player::LockOnUpdate()
@@ -425,6 +476,8 @@ void Player::SetCamera(Camera *cam)
 {
 	this->cam = cam;
 	drawObject.SetCamera(cam);
+	leftTrackObject.SetCamera(cam);
+	rightTrackObject.SetCamera(cam);
 }
 
 void Player::SetShadowCamera(Camera *cam)
@@ -435,6 +488,8 @@ void Player::SetShadowCamera(Camera *cam)
 void Player::SetLight(LightGroup *lights)
 {
 	drawObject.SetLightGroup(lights);
+	leftTrackObject.SetLightGroup(lights);
+	rightTrackObject.SetLightGroup(lights);
 	shadowObject.SetLightGroup(lights);
 }
 
@@ -476,10 +531,9 @@ GameDatas::GravityData Player::GetGravityData()
 	return gravity_;
 }
 
-bool Player::GetIsJump()
+GameDatas::PlayerStatus Player::GetPlayerStatus()
 {
-	bool isJump = status_ == PlayerStatus::JUMP;
-	return isJump;
+	return status_;
 }
 
 bool Player::GetIsOneWayGravity()

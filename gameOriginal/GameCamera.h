@@ -8,7 +8,7 @@ class GameCamera
 {
 public:
 	void Init();
-	void Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec);
+	void Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec, GameDatas::PlayerStatus playerStatus);
 	void Draw();
 	void Finalize();
 
@@ -82,8 +82,8 @@ private://状況別更新処理
 	//惑星と接触していた際の更新処理
 	void PlanetCollisionUpdate();
 private:
-	void camRot(const DirectX::XMFLOAT2 &rot);
-private:
+	void camRot(const DirectX::XMFLOAT2 &rot, Vector3 playerUp);
+private://メンバ変数
 	Camera cam_;
 
 	//計算して出す視点座標
@@ -103,7 +103,8 @@ private:
 	//次の惑星の座標
 	Vector3 nextPlanetPos_;
 
-
+	//Vector3 playerPos_;
+	//XMVECTOR playerPosture_;
 private://挙動のイージング
 	bool isChangeBasePlanetAnimation_;
 	Easing CameraAnimationEase_;
@@ -118,11 +119,13 @@ private://挙動のイージング
 	float nowDistance = GameDatas::camMaxLength;
 	float rateDistance = GameDatas::camMaxLength;
 	float CToPCollAnimationRate = 1.0f;
+	GameDatas::PlayerStatus playerStatus_ = GameDatas::PlayerStatus::STAND;
 
 private://Imgui
 	bool imCamBackFlag_ = true;
 	bool imCamCollision_ = true;
 	bool imCamLanding_ = true;
 	void ImguiUpdate();
+
 };
 
