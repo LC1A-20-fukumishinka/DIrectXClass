@@ -20,7 +20,7 @@ Planet::Planet()
 {
 	model = make_unique<Model>();
 
-	model->CreateModel("sphere", true);
+	model->CreateModel("sphere", true, true);
 	//model->CreateModel("chr_sword");//‰ñ“]Šm”F—p
 	object = make_unique<PlanetObject>();
 	object->Init();
