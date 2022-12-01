@@ -23,11 +23,11 @@ Model::~Model()
 }
 
 
-void Model::CreateModel(const std::string &modelname, bool isSmoothing)
+void Model::CreateModel(const std::string &modelname, bool isLoadTexture, bool isSmoothing)
 {
 	const string directoryPath = "Resources/" + modelname + "/";	//”Resouces/triangle_mat/”
 
-	LoadModel(directoryPath, modelname, isSmoothing);
+	LoadModel(directoryPath, modelname, isLoadTexture, isSmoothing);
 
 	if (isSmoothing)
 	{
@@ -126,7 +126,7 @@ void Model::CreateModel(const std::string &modelname, bool isSmoothing)
 }
 
 
-void Model::LoadModel(const std::string &directoryPath, const std::string &modelname, bool isSmoothing)
+void Model::LoadModel(const std::string &directoryPath, const std::string &modelname, bool isLoadTexture, bool isSmoothing)
 {
 
 	//ファイルストリーム
@@ -245,7 +245,7 @@ void Model::LoadModel(const std::string &directoryPath, const std::string &model
 			string filename;
 			line_stream >> filename;
 			//マテリアル読み込み
-			LoadMaterial(directoryPath, filename);
+			LoadMaterial(directoryPath, filename, isLoadTexture);
 		}
 
 
@@ -254,7 +254,7 @@ void Model::LoadModel(const std::string &directoryPath, const std::string &model
 
 }
 
-void Model::LoadMaterial(const std::string &directoryPath, const std::string &filename)
+void Model::LoadMaterial(const std::string &directoryPath, const std::string &filename, bool isLoadTexture)
 {
 	//ファイルストリーム
 	std::ifstream file;
@@ -314,7 +314,7 @@ void Model::LoadMaterial(const std::string &directoryPath, const std::string &fi
 		}
 
 		//先頭文字列がmap_Kdならテクスチャファイル名
-		if (key == "map_Kd")
+		if (isLoadTexture && key == "map_Kd")
 		{
 			//テクスチャのファイル名読み込み
 			line_stream >> model.material.textureFilename;
@@ -346,6 +346,16 @@ ModelObject *Model::GetModel()
 void Model::SetModel(const ModelObject &model)
 {
 	this->model = model;
+}
+
+void Model::SetTexture(int textureHandle)
+{
+	model.textureHandle = textureHandle;
+}
+
+int Model::GetTexture()
+{
+	return model.textureHandle;
 }
 
 void Model::AddSmoothData(unsigned short indexPosition, unsigned short indexVertex)

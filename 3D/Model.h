@@ -76,14 +76,16 @@ public:
 	Model();
 	~Model();
 
-	void CreateModel( const std::string &modelname, bool isSmoothing = false);
-	void LoadModel(const std::string &directoryPath, const std::string &modelname, bool isSmoothing);
-	void LoadMaterial(const std::string &directoryPath, const std::string &filename);
+	void CreateModel( const std::string &modelname, bool isLoadTexture = true, bool isSmoothing = false);
+	void LoadModel(const std::string &directoryPath, const std::string &modelname, bool isLoadTexture, bool isSmoothing);
+	void LoadMaterial(const std::string &directoryPath, const std::string &filename, bool isLoadTexture);
 	void LoadTexture(const std::string &directoryPath, const std::string &filename);
 
 	ModelObject *GetModel();
 	void SetModel(const ModelObject &model);
+	void SetTexture(int textureHandle);
 
+	int GetTexture();
 	inline const std::vector<VertexPosNormalUv> & GetVertices(){return model.vertices;}
 	inline const std::vector<unsigned short> &GetIndices(){return model.indices;}
 private:
