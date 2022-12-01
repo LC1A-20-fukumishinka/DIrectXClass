@@ -168,12 +168,12 @@ void Flag::Draw()
 		object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	}
 	if (basePlanet_.lock()->GetIsSpawn() && lightRate_ > 0.0f)
-	{
+	{/*
 		LightPillarUpdate();
 		lightPillarObject_.Update();
 		lightPillarObject_.SetDrawBuffers(sLightPipeline.get(), true, testTex);
 		MyDirectX::Instance()->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightConstBuff2->GetGPUVirtualAddress());
-		lightPillarObject_.DrawCommand();
+		lightPillarObject_.DrawCommand();*/
 	}
 }
 
