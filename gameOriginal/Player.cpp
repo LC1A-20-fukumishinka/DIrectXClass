@@ -97,6 +97,7 @@ void Player::Update()
 	shadowObject.SetPosition(pos_);
 
 
+	Plane test;
 	FaceUpdate();
 }
 

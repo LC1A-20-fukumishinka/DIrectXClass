@@ -127,3 +127,8 @@ void TitlePostEffect::Draw(int textureHandle)
 void TitlePostEffect::Finalize()
 {
 }
+
+void TitlePostEffect::Reset()
+{
+	animationTimer.Reset();
+}

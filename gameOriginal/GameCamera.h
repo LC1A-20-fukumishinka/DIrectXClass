@@ -57,6 +57,8 @@ public:
 	void CameraReflesh(Vector3 UpVec, int timer);
 
 	void LandingCameraReflesh(Vector3 UpVec);
+
+	void Reset();
 private://ó‹µ•ÊXVˆ—
 
 	/// <summary>

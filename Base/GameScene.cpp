@@ -487,6 +487,9 @@ void GameScene::ObjectRestart()
 	clearText_->position = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
 	clearText_->Update();
 
+	cam_->Reset();
+	isGameTitle_ = true;
+	titlePostEffect_.Reset();
 	PlanetManager::Instance()->Reset();
 	player_->Init(PlanetManager::Instance()->GetBasePlanet(0));
 	for (auto &e : testFlag_)

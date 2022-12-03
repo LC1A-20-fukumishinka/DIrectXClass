@@ -17,6 +17,7 @@ public:
 	void Update();
 	void Draw(int textureHandle);
 	void Finalize();
+	void Reset();
 private:
 
 	std::unique_ptr<PipeClass::PipelineSet> pipeline;

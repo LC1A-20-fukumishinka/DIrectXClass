@@ -329,8 +329,11 @@ void Planet::Reset()
 		isSpawn_ = false;
 		isSpawnAnimation_ = false;
 	}
-	this->pos = startPos_;
+	pos = startPos_;
+	isNextLightup_ = true;
+
 	clearRate = 0.0f;
+	isBloom_ = false;
 	isColorChange_ = false;
 	object->SetPosition(startPos_);
 	object->SetColor(startColor_);

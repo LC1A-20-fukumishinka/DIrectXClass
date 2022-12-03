@@ -444,12 +444,18 @@ void PlanetManager::TimeAttackUpdate()
 
 void PlanetManager::OrderUpdate()
 {
+	//一つのステージの惑星の数
 	int stagePlanetCount = static_cast<int>(stagePlanets.size());
 
+	//対象なし
 	bool isNotFound = true;
-	bool isOut = false;
+	//失敗した
+	bool isFailed = false;
+
+	//すべての惑星を確認
 	for (auto &e : stagePlanets)
 	{
+		
 		int count = static_cast<int>(&e - &stagePlanets[0]);
 		if (e.lock() == playerStandPlanet_.lock())
 		{
@@ -462,7 +468,7 @@ void PlanetManager::OrderUpdate()
 			}
 			else if (orderCount < count)
 			{
-				isOut = true;
+				isFailed = true;
 			}
 			isNotFound = false;
 		}
@@ -475,7 +481,7 @@ void PlanetManager::OrderUpdate()
 		stagePlanets[orderCount].lock()->SetNextOrder(true);
 	}
 
-	if (isOut && orderCount > 0)
+	if (isFailed && orderCount > 0)
 	{
 		for (auto &e : stagePlanets)
 		{

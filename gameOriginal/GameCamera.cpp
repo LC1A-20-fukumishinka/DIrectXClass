@@ -17,9 +17,7 @@ void GameCamera::Init()
 	cam_.Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
 	CameraAnimationEase_.Init(60);
 
-	nextEyePos_ = cam_.GetEye();
-	nextCamUpRot_ = XMQuaternionIdentity();
-	gravity_.angle = -YVec;
+	Reset();
 }
 
 void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec, GameDatas::PlayerStatus playerStatus)
@@ -239,6 +237,15 @@ void GameCamera::LandingCameraReflesh(Vector3 UpVec)
 	StartCameraAnimation(false, 60);
 }
 
+void GameCamera::Reset()
+{
+	nextEyePos_ = Vector3(0, 6, -15);
+	nextTargetPos_ = Vector3(0, 3, 0);
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(YVec, XMLoadFloat3(&(nextTargetPos_ - nextEyePos_))));
+	gravity_.angle = -YVec;
+	isTitleMode_ = true;
+}
+
 void GameCamera::CameraAnimationUpdate()
 {
 	//easing
@@ -306,7 +313,7 @@ void GameCamera::TitleUpdate()
 {
 	XMVECTOR angle = XMVector3Rotate(ZVec, nextCamUpRot_);
 	//追加する回転
-	XMVECTOR addRot = XMQuaternionRotationAxis(YVec, degree / 4);
+	XMVECTOR addRot = XMQuaternionRotationAxis(YVec, degree / 4.0f);
 	angle = XMVector3Rotate(angle, addRot);
 	//基準点から動かしてワールド座標を作成
 	nextEyePos_ = (angle * -sTitleCameraDistance) + nextTargetPos_;
