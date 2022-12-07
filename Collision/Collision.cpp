@@ -29,10 +29,12 @@ bool Collision::CheckSphere2Sphere(const Sphere &sphere1, const Sphere &sphere2,
 
 bool Collision::CheckSphere2Plane(const Sphere &sphere, const Plane &plane, DirectX::XMVECTOR *inter)
 {
+	//面からの相対座標を取得 v1
+	XMVECTOR sphereLocalPos = sphere.center - plane.pos;
 	//座標系の原点から球の中心座標への距離
-	XMVECTOR distV = XMVector3Dot(sphere.center, plane.normal);
-	//平面の原点距離を減産することで、平面と球の中心との距離が出る
-	float dist = distV.m128_f32[0] - plane.distance;
+	XMVECTOR distV = XMVector3Dot(sphereLocalPos, plane.normal);
+	//平面と球の中心との距離が出る
+	float dist = distV.m128_f32[0];
 	//距離の絶対値が半径より大きければ当たっていない
 	if (fabsf(dist) > sphere.radius) return false;
 
@@ -41,6 +43,7 @@ bool Collision::CheckSphere2Plane(const Sphere &sphere, const Plane &plane, Dire
 	{
 		//平面上の最近接点を、疑似交点とする
 		*inter = -dist * plane.normal + sphere.center;
+		*inter += plane.pos;
 	}
 	return true;
 }

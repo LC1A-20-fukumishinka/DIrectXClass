@@ -14,6 +14,8 @@ struct Plane
 {
 	//法線ベクトル
 	DirectX::XMVECTOR normal = { 0.0f,1.0f ,0.0f ,0.0f };
+
+	DirectX::XMVECTOR pos = { 0.0f,0.0f ,0.0f ,0.0f };
 	//原点(0.0f,0.0f,0.0f)からの距離
 	float distance = 0.0f;
 };
