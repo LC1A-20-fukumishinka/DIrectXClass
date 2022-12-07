@@ -100,15 +100,12 @@ public://˜f¯ü‚è‚Ìˆ—
 	bool LandingCamReset();
 private:
 	Vector3 pos_;
-	Vector3 rotation;
-	Vector3 scale;
-	Object3D drawObject;
-	Object3D leftTrackObject;
-	Object3D rightTrackObject;
+	Object3D drawObject_;
+	Object3D leftTrackObject_;
+	Object3D rightTrackObject_;
 
-	Object3D shadowObject;
-	Camera *cam;
-	Camera *shadowCamera;
+	Object3D shadowObject_;
+	Camera *cam_;
 	std::weak_ptr<Planet> grabPlanet;
 
 	std::weak_ptr<Planet> basePlanet;
@@ -124,7 +121,6 @@ private:
 
 	Vector3 warkVec_;
 
-	Vector3 gravityVec_;
 
 	Vector3 moveVec_;
 	//˜f¯‚Æ©•ª‚Ì‹——£

@@ -22,22 +22,22 @@ void Player::Init(std::shared_ptr<Planet> planet)
 {
 
 	pos_ = Vector3(YVec);
-	drawObject.Init();
-	drawObject.SetModel(playerModel_.get());
-	drawObject.SetPosition(pos_);
+	drawObject_.Init();
+	drawObject_.SetModel(playerModel_.get());
+	drawObject_.SetPosition(pos_);
 
-	shadowObject.Init();
-	shadowObject.SetModel(playerModel_.get());
-	shadowObject.SetPosition(Vector3(YVec));
+	shadowObject_.Init();
+	shadowObject_.SetModel(playerModel_.get());
+	shadowObject_.SetPosition(Vector3(YVec));
 	SetBasePlanet(planet);
 
-	leftTrackObject.Init();
-	leftTrackObject.SetModel(leftTrackModel_.get());
-	leftTrackObject.SetPosition(pos_);
+	leftTrackObject_.Init();
+	leftTrackObject_.SetModel(leftTrackModel_.get());
+	leftTrackObject_.SetPosition(pos_);
 
-	rightTrackObject.Init();
-	rightTrackObject.SetModel(rightTrackModel_.get());
-	rightTrackObject.SetPosition(pos_);
+	rightTrackObject_.Init();
+	rightTrackObject_.SetModel(rightTrackModel_.get());
+	rightTrackObject_.SetPosition(pos_);
 	localHeight = 0;
 	status_ = PlayerStatus::STAND;
 	oldStatus_ = status_;
@@ -47,7 +47,7 @@ void Player::Init(std::shared_ptr<Planet> planet)
 		startPos = basePlanet.lock()->GetPos();
 		startPos += YVec * basePlanet.lock()->GetScale();
 		pos_ = startPos;
-		drawObject.SetPosition(pos_);
+		drawObject_.SetPosition(pos_);
 	}
 
 	gravity_.isOneWayGravity = false;
@@ -72,7 +72,7 @@ void Player::Update()
 
 		if (GameInput::Instance()->LockOnInput())
 		{
-			drawObject.SetRotationVector(XMLoadFloat3(&cam->GetAngle()), drawObject.GetUpVec());
+			drawObject_.SetRotationVector(XMLoadFloat3(&cam_->GetAngle()), drawObject_.GetUpVec());
 		}
 		LockOnUpdate();
 	}
@@ -86,18 +86,16 @@ void Player::Update()
 	{
 		PlanetManager::Instance()->playerStand(basePlanet);
 	}
-	XMVECTOR rot = drawObject.GetRotQuaternion();
-	leftTrackObject.SetRotation(rot);
-	rightTrackObject.SetRotation(rot);
-	shadowObject.SetRotation(rot);
+	XMVECTOR rot = drawObject_.GetRotQuaternion();
+	leftTrackObject_.SetRotation(rot);
+	rightTrackObject_.SetRotation(rot);
+	shadowObject_.SetRotation(rot);
 
-	drawObject.SetPosition(pos_);
-	leftTrackObject.SetPosition(pos_);
-	rightTrackObject.SetPosition(pos_);
-	shadowObject.SetPosition(pos_);
+	drawObject_.SetPosition(pos_);
+	leftTrackObject_.SetPosition(pos_);
+	rightTrackObject_.SetPosition(pos_);
+	shadowObject_.SetPosition(pos_);
 
-
-	Plane test;
 	FaceUpdate();
 }
 
@@ -108,18 +106,18 @@ void Player::Finalize()
 void Player::Draw()
 {
 	playerModel_->SetTexture(faceTextureHandles_[static_cast<int>(face_)]);
-	drawObject.Update();
-	leftTrackObject.Update();
-	rightTrackObject.Update();
-	drawObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
-	leftTrackObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
-	rightTrackObject.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	drawObject_.Update();
+	leftTrackObject_.Update();
+	rightTrackObject_.Update();
+	drawObject_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	leftTrackObject_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
+	rightTrackObject_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 }
 
 void Player::ShadowDraw()
 {
-	shadowObject.Update();
-	shadowObject.modelDraw(ShadowPipeline::Instance()->GetPipeLine());
+	shadowObject_.Update();
+	shadowObject_.modelDraw(ShadowPipeline::Instance()->GetPipeLine());
 }
 
 void Player::Move(bool isSetAngle)
@@ -147,11 +145,11 @@ void Player::Move(bool isSetAngle)
 		gravity_.isOneWayGravity = !gravity_.isOneWayGravity;
 		if (GameInput::Instance()->LockOnInput())
 		{
-			oneWayGravityAngle_ = cam->GetAngle();
+			oneWayGravityAngle_ = cam_->GetAngle();
 		}
 		else
 		{
-			oneWayGravityAngle_ = cam->GetAngle();
+			oneWayGravityAngle_ = cam_->GetAngle();
 		}
 	}
 	FloorMove(isSetAngle);
@@ -186,12 +184,19 @@ void Player::PosUpdate(const Vector3 &move)
 			shakeUpdate(shakePower);
 		}
 
-
+		//最高速度を超えていたら速度を調整する
 		if (nowSpeed >= maxSpeed)
 		{
-			moveVec_ = (moveVec_.normalize() * maxSpeed);
+			moveVec_ = (moveVec_.normalize() * ((nowSpeed + maxSpeed) / 2));
 		}
 
+		if (Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_LEFT_SHOULDER))
+		{
+			gravity_.isOneWayGravity = false;
+			Vector3 dist = pos_ - basePlanet.lock()->GetPos();
+
+			moveVec_ = -dist.normalize() * maxSpeed;
+		}
 		moveVec_ += (warkVec_ * 0.02f);
 
 		if (dist.length() <= basePlanet.lock()->GetScale())
@@ -282,7 +287,7 @@ void Player::PostureUpdate(const Vector3 &move)
 	//右
 	XMVECTOR rightV = {};
 
-	rightV = XMVector3Cross(upV, drawObject.GetFrontVec());
+	rightV = XMVector3Cross(upV, drawObject_.GetFrontVec());
 
 	//正面
 	XMVECTOR frontV = {};
@@ -296,13 +301,13 @@ void Player::PostureUpdate(const Vector3 &move)
 	}
 	else
 	{
-		rightV = XMVector3Cross(upV, drawObject.GetFrontVec());
+		rightV = XMVector3Cross(upV, drawObject_.GetFrontVec());
 
-		frontV = XMVector3Cross(drawObject.GetRightVec(), upV);
+		frontV = XMVector3Cross(drawObject_.GetRightVec(), upV);
 	}
 
 	//通常移動時の向きの変化
-	drawObject.SetRotationVector(frontV, upV);
+	drawObject_.SetRotationVector(frontV, upV);
 
 }
 
@@ -319,8 +324,8 @@ void Player::FloorMove(bool isSetAngle)
 	XMVECTOR moveV = XMLoadFloat3(&move);
 
 	//入力の姿勢を作る
-	XMVECTOR moveUp = drawObject.GetUpVec();
-	XMVECTOR moveFront = XMLoadFloat3(&Vector3(cam->GetRight()).cross(moveUp));
+	XMVECTOR moveUp = drawObject_.GetUpVec();
+	XMVECTOR moveFront = XMLoadFloat3(&Vector3(cam_->GetRight()).cross(moveUp));
 	XMMATRIX moveMat = GetMatRot(moveUp, moveFront);
 
 	//姿勢に合わせてベクトルを配置
@@ -366,10 +371,10 @@ void Player::JumpMove(bool isSetAngle)
 void Player::PlayerRotation()
 {
 	//プレイヤーのローカルのX軸に対して回転
-	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetRightVec(), GameInput::Instance()->RStick().y * RotRate));
+	drawObject_.AddRotation(XMQuaternionRotationAxis(drawObject_.GetRightVec(), GameInput::Instance()->RStick().y * RotRate));
 
 	//世界のY軸でなく自分の立っている垂直方向に最終的に変更したいね
-	drawObject.AddRotation(XMQuaternionRotationAxis(drawObject.GetUpVec(), GameInput::Instance()->RStick().x * RotRate));
+	drawObject_.AddRotation(XMQuaternionRotationAxis(drawObject_.GetUpVec(), GameInput::Instance()->RStick().x * RotRate));
 
 }
 
@@ -389,9 +394,9 @@ void Player::PostureReset()
 	if (status_ == PlayerStatus::JUMP) return;
 	Vector3 BasePlanetToPlayer = pos_ - basePlanet.lock()->GetPos();
 	XMVECTOR BasePlanetToPlayerAngleV = XMLoadFloat3(&BasePlanetToPlayer.normalize());
-	XMVECTOR frontVec = XMVector3Cross(drawObject.GetRightVec(), BasePlanetToPlayerAngleV);
+	XMVECTOR frontVec = XMVector3Cross(drawObject_.GetRightVec(), BasePlanetToPlayerAngleV);
 
-	drawObject.SetRotationVector(frontVec, BasePlanetToPlayerAngleV);
+	drawObject_.SetRotationVector(frontVec, BasePlanetToPlayerAngleV);
 }
 
 void Player::AddGravity(Vector3 gravity)
@@ -401,7 +406,7 @@ void Player::AddGravity(Vector3 gravity)
 
 void Player::shakeUpdate(float shakePower)
 {
-	cam->SetShift(Shake::GetShake(shakePower));
+	cam_->SetShift(Shake::GetShake(shakePower));
 }
 
 void Player::LoadModel()
@@ -442,7 +447,7 @@ void Player::FaceUpdate()
 			face_ = PlayerFaceTexture::BLINK;
 			blinkTimer_ = 20;
 		}
-		else if(face_ == PlayerFaceTexture::BLINK)
+		else if (face_ == PlayerFaceTexture::BLINK)
 		{
 			face_ = PlayerFaceTexture::NORMAL;
 			blinkTimer_ = 240;
@@ -459,39 +464,39 @@ void Player::LockOnUpdate()
 void Player::SetPos(const DirectX::XMFLOAT3 &pos)
 {
 	pos_ = pos;
-	drawObject.SetPosition(pos_);
+	drawObject_.SetPosition(pos_);
 }
 
 void Player::SetRotation(const DirectX::XMFLOAT3 &rot)
 {
-	drawObject.SetRotation(rot);
+	drawObject_.SetRotation(rot);
 }
 
 void Player::SetModel(Model *model)
 {
-	drawObject.SetModel(model);
-	shadowObject.SetModel(model);
+	drawObject_.SetModel(model);
+	shadowObject_.SetModel(model);
 }
 
 void Player::SetCamera(Camera *cam)
 {
-	this->cam = cam;
-	drawObject.SetCamera(cam);
-	leftTrackObject.SetCamera(cam);
-	rightTrackObject.SetCamera(cam);
+	this->cam_ = cam;
+	drawObject_.SetCamera(cam);
+	leftTrackObject_.SetCamera(cam);
+	rightTrackObject_.SetCamera(cam);
 }
 
 void Player::SetShadowCamera(Camera *cam)
 {
-	shadowObject.SetCamera(cam);
+	shadowObject_.SetCamera(cam);
 }
 
 void Player::SetLight(LightGroup *lights)
 {
-	drawObject.SetLightGroup(lights);
-	leftTrackObject.SetLightGroup(lights);
-	rightTrackObject.SetLightGroup(lights);
-	shadowObject.SetLightGroup(lights);
+	drawObject_.SetLightGroup(lights);
+	leftTrackObject_.SetLightGroup(lights);
+	rightTrackObject_.SetLightGroup(lights);
+	shadowObject_.SetLightGroup(lights);
 }
 
 const DirectX::XMFLOAT3 &Player::GetPos()
@@ -502,14 +507,14 @@ const DirectX::XMFLOAT3 &Player::GetPos()
 const XMFLOAT3 Player::GetAngle()
 {
 	XMFLOAT3 angle;
-	XMStoreFloat3(&angle, drawObject.GetFrontVec());
+	XMStoreFloat3(&angle, drawObject_.GetFrontVec());
 	return angle;
 }
 
 const XMFLOAT3 Player::GetUpVec()
 {
 	XMFLOAT3 playerUp;
-	XMStoreFloat3(&playerUp, drawObject.GetUpVec());
+	XMStoreFloat3(&playerUp, drawObject_.GetUpVec());
 	return playerUp;
 }
 
@@ -557,8 +562,8 @@ void Player::SetGrabPlanet(std::shared_ptr<Planet> planet)
 		XMFLOAT3 dist = grabPlanet.lock()->GetPos() - pos_;
 		XMVECTOR vec = XMLoadFloat3(&dist);
 		//惑星に向き直る
-		drawObject.SetRotationVector(vec, drawObject.GetUpVec());
-		grabPlanet.lock()->SetGrabRotateAngle(drawObject.GetUpVec(), drawObject.GetRightVec());
+		drawObject_.SetRotationVector(vec, drawObject_.GetUpVec());
+		grabPlanet.lock()->SetGrabRotateAngle(drawObject_.GetUpVec(), drawObject_.GetRightVec());
 	}
 }
 
@@ -622,7 +627,7 @@ void Player::GrabUpdate()
 		//二点間の距離が掴んだ瞬間より短いか
 		if (length <= baseLength)
 		{//短い場合
-			drawObject.SetRotationVector(XMLoadFloat3(&planetPlayerDistance));
+			drawObject_.SetRotationVector(XMLoadFloat3(&planetPlayerDistance));
 		}
 		else
 		{
@@ -634,7 +639,7 @@ void Player::GrabUpdate()
 	PlayerRotation();
 
 	//プレイヤーの正面方向に
-	XMVECTOR vec = drawObject.GetFrontVec();
+	XMVECTOR vec = drawObject_.GetFrontVec();
 
 	//移動量を乗算する
 	vec *= length;
@@ -647,17 +652,17 @@ void Player::GrabUpdate()
 	XMFLOAT3 planetPos = {};
 	XMStoreFloat3(&planetPos, vec);
 	grabPlanet.lock()->SetPos(planetPos);
-	grabPlanet.lock()->SetGrabRotateAngle(drawObject.GetUpVec(), drawObject.GetRightVec());
+	grabPlanet.lock()->SetGrabRotateAngle(drawObject_.GetUpVec(), drawObject_.GetRightVec());
 
 }
 
 void Player::BlockCollision(const std::vector<Triangle> &boxPlanes)
 {
 	//プレイヤーの落下のray
-	XMVECTOR downVec = -drawObject.GetUpVec();
+	XMVECTOR downVec = -drawObject_.GetUpVec();
 	Ray playerDownVec;
 	playerDownVec.dir = downVec;
-	playerDownVec.start = XMLoadFloat3(&(pos_ + (drawObject.GetUpVec() * 0.5f)));
+	playerDownVec.start = XMLoadFloat3(&(pos_ + (drawObject_.GetUpVec() * 0.5f)));
 
 	for (auto &e : boxPlanes)
 	{
@@ -679,7 +684,7 @@ void Player::BlockCollision(const std::vector<Triangle> &boxPlanes)
 		if (isOnPlayer && distance <= 1.1f)
 		{
 			XMVECTOR identity = { 2.0f,2.0f ,2.0f ,0.0f };
-			onPlayerPos += identity * drawObject.GetUpVec();
+			onPlayerPos += identity * drawObject_.GetUpVec();
 			pos_ = Vector3(onPlayerPos);
 		}
 		////押し返す判定
