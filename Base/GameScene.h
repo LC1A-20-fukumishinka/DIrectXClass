@@ -1,7 +1,6 @@
 #pragma once
 #include "Sprite.h"
 #include "Object3D.h"
-#include "Model.h"
 #include "IScene.h"
 #include "../Light.h"
 #include "SphereCollider.h"
@@ -27,6 +26,8 @@
 #include "../gameOriginal/InformationBoard.h"
 #include "../gameOriginal/GuidingStar.h"
 #include "Bloom.h"
+#include "ModelManager.h"
+#include "../gameOriginal/Gate.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -114,7 +115,9 @@ private:
 	int DrawTexture_ = -1;
 	int stageNum = 0;
 	ClearAnimationStatus clearStatus_ = STANDBY;
+	ModelManager models_;
 
+	std::vector<Gate> gates_;
 private://ÉKÉCÉhó¨ÇÍêØä«óù
 	std::vector<GuidingStar> testStar;
 

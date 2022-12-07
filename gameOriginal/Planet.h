@@ -1,6 +1,7 @@
 #pragma once
 #include "PlanetObject.h"
 #include "Model.h"
+#include "ModelManager.h"
 #include "Vector3.h"
 #include <memory>
 #include "../EaseClass.h"
@@ -44,7 +45,7 @@ public:
 	bool GetIsColorChange();
 
 	std::unique_ptr<PlanetObject> object;
-	std::unique_ptr <Model> model;
+	std::unique_ptr <Model> model_;
 public:
 	static void SetLight(LightGroup *lights);
 	static void SetCamera(Camera *cam);
@@ -105,5 +106,7 @@ private://ƒƒ“ƒo•Ï”
 	Vector3 ColorOnAngle;
 
 	bool isBloom_ = false;
+
+	ModelManager models;
 };
 

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include "LoadPlanet.h"
+#include "LoadObject.h"
 #include "gameConstData.h"
 #include <limits.h>
 using namespace std;
@@ -31,6 +31,7 @@ std::unique_ptr<PlanetManager> &PlanetManager::Instance()
 
 void PlanetManager::Init()
 {
+	//一つ以上ないとバグるので生成
 	AddPlanet(XMFLOAT3(0, 0, 0), 50, DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), 0, true, PlanetType::BASE);
 	planets_.begin()->get()->SetIsBloom(true);
 	planets_.begin()->get()->ColorChange();
@@ -289,8 +290,10 @@ bool PlanetManager::LoadStage(int stage)
 
 	std::vector<shared_ptr<Planet>> tmpPlanet;
 
+	//テキストからロード
 	bool isLoad = LoadStageFile(stage, tmpPlanet);
 
+	//ロードに成功したら
 	if (isLoad)
 	{
 		//ロードした惑星を詰め込む

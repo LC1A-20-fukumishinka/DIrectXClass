@@ -25,6 +25,7 @@ using namespace std;
 using namespace GameDatas;
 void GameScene::Init()
 {
+
 	shadowRenderTarget_ = make_unique<MultiRenderTarget>();
 	shadowRenderTarget_->Init(1);
 
@@ -85,10 +86,9 @@ void GameScene::Init()
 
 	pressStartText_->Update();
 	pressStartTextAnimationEase_.Init(120);
-	groundModel_ = make_unique<Model>();
-	groundModel_->CreateModel("ground");
-	playerModel_ = make_unique<Model>();
-	playerModel_->CreateModel("chr_sword", true);
+
+	models_.LoadModel("ground");
+	models_.LoadModel("sphere", true);
 	domeModel_ = make_unique<Model>();
 	domeModel_->CreateModel("skydome");
 
@@ -101,7 +101,7 @@ void GameScene::Init()
 
 	objGround_ = make_unique<Object3D>();
 	objGround_->Init();
-	objGround_->SetModel(groundModel_.get());
+	objGround_->SetModel(models_.GetModel("ground"));
 	objGround_->SetCamera(cam_->GetCamera());
 	objGround_->SetLight(light_.get());
 	objGround_->SetLightGroup(lightGroup_.get());
@@ -173,6 +173,23 @@ void GameScene::Init()
 
 		e.Create();
 	}
+
+	Gate::SetCamera(cam_->GetCamera());
+	Gate::SetLightGroup(lightGroup_.get());
+	Gate::SetModel(models_.GetModel("sphere"));
+
+	for (int i = 0; i < 5; i++)
+	{
+	float height =50;
+			Gate gate;
+			gate.Init(Vector3(-80 + i * 30.0f, height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
+			gates_.push_back(gate);
+
+			Gate gateD;
+			gateD.Init(Vector3(-50 + i *  30.0f, -height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
+			gates_.push_back(gateD);
+
+	}
 	Restart();
 
 }
@@ -227,6 +244,14 @@ void GameScene::Update()
 		e.Update();
 	}
 
+	//Šm”FI—¹ŽŸ‘æÁ‚·TODO
+	Sphere playerS;
+	playerS.center = XMLoadFloat3(&player_->GetPos());
+	playerS.radius = 3.0f;
+	for (auto &e : gates_)
+	{
+		e.Collision(playerS);
+	}
 	//makeGuide();
 }
 
@@ -247,12 +272,20 @@ void GameScene::PreDraw()
 		e.Draw();
 	}
 	StartTarget_->DepthReset();
+
+	for (auto &e : gates_)
+	{
+		e.Draw();
+	}
+
 	PlanetManager::Instance()->Draw();
 	player_->Draw();
+
 	for (auto &flag : testFlag_)
 	{
 		flag.Draw();
 	}
+
 	//for (auto &e : testBlock_)
 	//{
 	//	e.Draw();
@@ -275,8 +308,8 @@ void GameScene::PreDraw()
 	BloomTarget_->PostDrawScene();
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
-	
-	if(true/*isBloom_*/)
+
+	if (true/*isBloom_*/)
 	{
 		bloom_.BrightUpdate(BloomTarget_->GetTextureNum(0));
 		BloomTarget_->PreDrawScene();
@@ -284,7 +317,7 @@ void GameScene::PreDraw()
 		BloomTarget_->PostDrawScene();
 		DrawTexture_ = BloomTarget_->GetTextureNum(0);
 	}
-	
+
 	if (isGameTitle_)
 	{
 		vector<int> textureNum;
@@ -407,12 +440,12 @@ void GameScene::IngameUpdate()
 	isClear = (GetFlagCount() <= 0);
 
 	bool clearFlag = ((isClear && isOldClear != isClear) || PlanetManager::Instance()->StageClear());
-		if (clearFlag && !isGameClear_)
-		{
-			isGameClear_ = true;
-			stageNum++;
-			cam_->ClearAnimationStart(player_->GetPos());
-		}
+	if (clearFlag && !isGameClear_)
+	{
+		isGameClear_ = true;
+		stageNum++;
+		cam_->ClearAnimationStart(player_->GetPos());
+	}
 
 
 	ImguiUpdate();
@@ -497,6 +530,10 @@ void GameScene::ObjectRestart()
 		e.Reset();
 	}
 
+	for (auto &e : gates_)
+	{
+		e.Reset();
+	}
 	//for (auto &e : testBlock_)
 	//{
 	//	e.Update();

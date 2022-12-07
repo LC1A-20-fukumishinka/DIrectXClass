@@ -18,13 +18,14 @@ LightGroup *Planet::lights = nullptr;
 Vector3 Planet::sPlayerPos = Vector3();
 Planet::Planet()
 {
-	model = make_unique<Model>();
+	//model_ = make_unique<Model>();
 
-	model->CreateModel("sphere", true, true);
+	models.LoadModel("sphere", true, true);
+	//model_->CreateModel("sphere", true, true);
 	//model->CreateModel("chr_sword");//‰ñ“]Šm”F—p
 	object = make_unique<PlanetObject>();
 	object->Init();
-	object->SetModel(model.get());
+	object->SetModel(models.GetModel("sphere"));
 	object->SetCamera(Planet::cam);
 	object->SetScale(XMFLOAT3(scale, scale, scale));
 	object->SetShadowCamera(Planet::shadowCam);
