@@ -211,6 +211,19 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVe
 
 	nextEyePos_ = camPos;
 
+	if (playerStatus_ == PlayerStatus::STAND)
+	{
+		//Œ»Ý‚Ì‰ñ“]
+		nextCamUpRot_;
+
+		//—§‚¿Žp¨‚É‚¨‚¯‚é‰ñ“]
+		XMVECTOR playerStandRot;
+		playerStandRot = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&cam_.GetAngle())));
+
+		//ã‹L“ñ‚Â‚Ì‰ñ“]‚ðSlerp
+		nextCamUpRot_ = XMQuaternionSlerp(nextCamUpRot_, playerStandRot, 0.03f);
+	}
+
 	camRot(GameInput::Instance()->RStick(), playerYVec);
 }
 
@@ -239,7 +252,7 @@ void GameCamera::LandingCameraReflesh(Vector3 UpVec)
 
 void GameCamera::Reset()
 {
-	nextEyePos_ = Vector3(0, 6, -15);
+	nextEyePos_ = Vector3(0, 10, -15);
 	nextTargetPos_ = Vector3(0, 3, 0);
 	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(YVec, XMLoadFloat3(&(nextTargetPos_ - nextEyePos_))));
 	gravity_.angle = -YVec;
@@ -323,10 +336,7 @@ void GameCamera::TitleUpdate()
 
 void GameCamera::ClearCameraUpdate()
 {
-	//float t = (1.0f - CameraAnimationEase.Read());
 
-	//float rotRate = 0.15f + (t * 4.0f);
-	//camRot(XMFLOAT2(-rotRate, 0));
 }
 
 void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
