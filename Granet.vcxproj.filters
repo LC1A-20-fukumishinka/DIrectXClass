@@ -240,7 +240,7 @@
     <ClCompile Include="gameOriginal\InformationBoard.cpp">
       <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
-    <ClCompile Include="gameOriginal\LoadPlanet.cpp">
+    <ClCompile Include="gameOriginal\LoadObject.cpp">
       <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
     <ClCompile Include="gameOriginal\ObjectOnSphere.cpp">
@@ -290,6 +290,15 @@
     </ClCompile>
     <ClCompile Include="2D\PostMosaicPipeline.cpp">
       <Filter>ヘッダー ファイル\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="gameOriginal\Gate.cpp">
+      <Filter>ソース ファイル\GameOriginal</Filter>
+    </ClCompile>
+    <ClCompile Include="3D\ModelManager.cpp">
+      <Filter>ソース ファイル\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="gameOriginal\GateManager.cpp">
+      <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -539,10 +548,19 @@
     <ClInclude Include="Base\WinAPI.h">
       <Filter>ヘッダー ファイル\Base</Filter>
     </ClInclude>
-    <ClInclude Include="gameOriginal\LoadPlanet.h">
+    <ClInclude Include="gameOriginal\LoadObject.h">
       <Filter>ヘッダー ファイル\GameOriginal</Filter>
     </ClInclude>
     <ClInclude Include="gameOriginal\ObjectOnSphere.h">
+      <Filter>ヘッダー ファイル\GameOriginal</Filter>
+    </ClInclude>
+    <ClInclude Include="gameOriginal\Gate.h">
+      <Filter>ヘッダー ファイル\GameOriginal</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\ModelManager.h">
+      <Filter>ヘッダー ファイル\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="gameOriginal\GateManager.h">
       <Filter>ヘッダー ファイル\GameOriginal</Filter>
     </ClInclude>
   </ItemGroup>

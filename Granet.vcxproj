@@ -137,8 +137,10 @@
     <ClCompile Include="gameOriginal\GameCamera.cpp" />
     <ClCompile Include="gameOriginal\GameInput.cpp" />
     <ClCompile Include="gameOriginal\Player.cpp" />
-    <ClCompile Include="gameOriginal\LoadPlanet.cpp" />
+    <ClCompile Include="gameOriginal\LoadObject.cpp" />
     <ClCompile Include="gameOriginal\GuidingStar.cpp" />
+    <ClCompile Include="gameOriginal\Gate.cpp" />
+    <ClCompile Include="gameOriginal\GateManager.cpp" />
     <ClCompile Include="imgui\ImguiManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -156,6 +158,7 @@
     <ClCompile Include="Base\MultiRenderTarget.cpp" />
     <ClCompile Include="gameOriginal\ObjectOnSphere.cpp" />
     <ClCompile Include="gameOriginal\PlanetObject.cpp" />
+    <ClCompile Include="3D\ModelManager.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="2D\PostEffect.cpp" />
     <ClCompile Include="2D\PostEffectTestPipeline.cpp" />
@@ -223,8 +226,10 @@
     <ClInclude Include="gameOriginal\gameConstData.h" />
     <ClInclude Include="gameOriginal\GameInput.h" />
     <ClInclude Include="gameOriginal\Player.h" />
-    <ClInclude Include="gameOriginal\LoadPlanet.h" />
+    <ClInclude Include="gameOriginal\LoadObject.h" />
     <ClInclude Include="gameOriginal\GuidingStar.h" />
+    <ClInclude Include="gameOriginal\Gate.h" />
+    <ClInclude Include="gameOriginal\GateManager.h" />
     <ClInclude Include="imgui\ImguiManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -243,6 +248,7 @@
     <ClInclude Include="Base\MultiRenderTarget.h" />
     <ClInclude Include="gameOriginal\ObjectOnSphere.h" />
     <ClInclude Include="gameOriginal\PlanetObject.h" />
+    <ClInclude Include="3D\ModelManager.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="2D\PostEffect.h" />
     <ClInclude Include="2D\PostBasePipeline.h" />
