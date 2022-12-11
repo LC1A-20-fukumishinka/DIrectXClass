@@ -90,7 +90,6 @@ public:
 	float CameraCollision(Ray cameraRay);
 private:
 	void StageUpdate();
-	void TimeAttackUpdate();
 
 	void OrderUpdate();
 private:

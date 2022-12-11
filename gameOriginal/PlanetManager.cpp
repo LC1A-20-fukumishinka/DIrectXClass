@@ -392,59 +392,6 @@ void PlanetManager::StageUpdate()
 	OrderUpdate();
 }
 
-void PlanetManager::TimeAttackUpdate()
-{
-	int playerOnPlanet = 0;
-	bool check = false;
-	//早期リターン
-	for (auto &e : stagePlanets)
-	{
-		if (!e.lock()->GetIsColorChange())
-		{
-			return;
-		}
-		if (!check)
-		{
-			if (e.lock()->GetIsOnPlayer())
-			{
-				check = true;
-			}
-			else
-			{
-				playerOnPlanet++;
-			}
-		}
-
-	}
-
-
-	int max = static_cast<int>(stagePlanets.size());
-	int colorOffPlanet = rand() % max;
-	while (true)
-	{
-		if (colorOffPlanet != playerOnPlanet)
-		{
-			break;
-		}
-		colorOffPlanet = rand() % max;
-	}
-
-	int planetCount = 0;
-	for (auto &e : stagePlanets)
-	{
-		if (planetCount == colorOffPlanet)
-		{
-			score++;
-			e.lock()->ColorOff();
-			break;
-		}
-		else
-		{
-			planetCount++;
-		}
-	}
-}
-
 void PlanetManager::OrderUpdate()
 {
 	//一つのステージの惑星の数
