@@ -7,6 +7,9 @@
 #include <d3dx12.h>
 #include <forward_list>
 #include "../Camera.h"
+#include "Vector3.h"
+#include "IGraphicsPipeline.h"
+#include <memory>
 /// <summary>
 /// 3Dオブジェクト
 /// </summary>
@@ -19,11 +22,12 @@ private: // エイリアス
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
-
+	using XMVECTOR = DirectX::XMVECTOR;
 public: // サブクラス
 	struct VertexPos
 	{
 		XMFLOAT3 pos; // xyz座標
+		XMFLOAT4 color;
 		float scale; //スケール
 
 	};
@@ -32,7 +36,6 @@ public: // サブクラス
 	{
 		XMMATRIX mat;	// ３Ｄ変換行列
 		XMMATRIX matBillboard;	// ３Ｄ変換行列
-		XMFLOAT4 color;	// 色 (RGBA)
 	};
 
 	struct Particle
@@ -41,15 +44,15 @@ public: // サブクラス
 		using XMFLOAT3 = DirectX::XMFLOAT3;
 
 		//座標
-		XMFLOAT3 position = {};
+		Vector3 position = {};
 		//速度
-		XMFLOAT3 velocity = {};
+		Vector3 velocity = {};
 		//加速度
-		XMFLOAT3 accel = {};
+		Vector3 accel = {};
 		//現在のフレーム
 		int frame = 0;
 		//終了フレーム
-		int num_frame = 0;
+		int dead_frame = 0;
 		//スケール
 		float scale = 1.0f;
 		//初期値
@@ -57,18 +60,13 @@ public: // サブクラス
 		//最終値
 		float e_scale = 0.0f;
 
-		XMFLOAT4 s_color = { 1, 1, 1, 1 };
+		XMVECTOR s_color = { 1, 1, 1, 0 };
 
-		XMFLOAT4 e_color = { 1, 1, 1, 1 };
+		XMVECTOR e_color = { 1, 1, 1, 1 };
+		XMFLOAT4 draw_color = { 1, 1, 1, 1 };
 	};
 private: // 定数
-	static const int division = 50;					// 分割数
-	static const float radius;				// 底面の半径
-	static const float prizmHeight;			// 柱の高さ
-	static const int planeCount = division * 2 + division * 2;		// 面の数
-	//static const int vertexCount = planeCount * 3;		// 頂点数
 	static const int vertexCount = 256;		// 頂点数
-	//static const int indexCount = 3 * 2;
 public: // 静的メンバ関数
 
 	/// <summary>
@@ -90,19 +88,8 @@ public: // 静的メンバ関数
 private: // 静的メンバ変数
 	// デバイス
 	static ID3D12Device *device;
-	// ルートシグネチャ
-	static ComPtr<ID3D12RootSignature> rootsignature;
-	// パイプラインステートオブジェクト
-	static ComPtr<ID3D12PipelineState> pipelinestate;
-
 
 private:// 静的メンバ関数
-
-	/// <summary>
-	/// グラフィックパイプライン生成
-	/// </summary>
-	/// <returns>成否</returns>
-	static bool InitializeGraphicsPipeline();
 
 	///// <summary>
 	///// テクスチャ読み込み
@@ -112,6 +99,9 @@ private:// 静的メンバ関数
 
 
 public: // メンバ関数
+	ParticleManager();
+
+	void Init();
 
 	/// <summary>
 	/// 使用するカメラの設定
@@ -121,13 +111,13 @@ public: // メンバ関数
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
+	virtual void Update();
 
 	/// <summary>
 	/// 描画
 	/// </summary>
 	/// <param name="textureNumber">描画するテクスチャのインデックス</param>
-	void Draw(int textureNumber);
+	void Draw();
 
 	/// <summary>
 	/// パーティクル生成
@@ -140,13 +130,19 @@ public: // メンバ関数
 	/// <param name="end_scale">終了時サイズ</param>
 	void Add(int life, const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
 		float start_scale, float end_scale, const XMFLOAT4 &start_color = { 1, 1, 1, 1 }, const XMFLOAT4 &end_color = { 1, 1, 1,1 });
+
+	void SetTexture(int textureHandle);
+
+	void SendBuffers(std::forward_list<Particle> &particles);
+
+protected:
+	std::forward_list<Particle> particles_;
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBuff; // 定数バッファ
 
 	// ローカルスケール
-	XMFLOAT3 scale = { 1,1,1 };
+	Vector3 scale = { 1,1,1 };
 
-	std::forward_list<Particle> particles;
 
 	// 頂点バッファ
 	ComPtr<ID3D12Resource> vertBuff;
@@ -158,15 +154,26 @@ private: // メンバ変数
 	Camera *camera;
 
 	bool isBillboard_ = true;
+
+	int textureHandle_ = -1;
+	//// ルートシグネチャ
+	//ComPtr<ID3D12RootSignature> rootsignature;
+	//// パイプラインステートオブジェクト
+	//ComPtr<ID3D12PipelineState> pipelinestate;
+
+	std::unique_ptr<PipeClass::GSPipelineSet> pipelineSet;
 private:
-	ParticleManager();
-	void Init();
 
 	/// <summary>
 /// モデル作成
 /// </summary>
 	void CreateModel();
 
+	/// <summary>
+/// グラフィックパイプライン生成
+/// </summary>
+/// <returns>成否</returns>
+	bool InitializeGraphicsPipeline();
 };
 
 const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3 &lhs, const DirectX::XMFLOAT3 &rhs);

@@ -158,7 +158,7 @@ bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
 
 
 	std::vector<MakeGateData> datas;
-
+	std::vector<std::unique_ptr<Gate>>tmpGates;
 	Vector3 setColor;
 	int ID = stage;
 	bool isSpawn = false;
@@ -184,8 +184,8 @@ bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
 			//惑星の上限個数を設定する
 			lineData >> maxCount;
 			//上限個数分生成
-			gates.resize(maxCount);
-			for (auto &e : gates)
+			tmpGates.resize(maxCount);
+			for (auto &e : tmpGates)
 			{
 				e = make_unique<Gate>();
 			}
@@ -239,7 +239,9 @@ bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
 	}
 	for (int i = 0; i < maxCount; i++)
 	{
-		gates[i]->Init(datas[i].pos, datas[i].angle, ID, isSpawn);
+		tmpGates[i]->Init(datas[i].pos, datas[i].angle, ID, isSpawn);
+		gates.emplace_back(tmpGates[i].get());
+		tmpGates[i].release();
 	}
 
 	//ファイルの読み込みが終わったので閉じる

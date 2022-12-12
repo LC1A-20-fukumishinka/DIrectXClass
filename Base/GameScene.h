@@ -6,6 +6,7 @@
 #include "SphereCollider.h"
 #include "../Collision/CollisionMgr.h"
 #include "particleManager.h"
+#include "../gameOriginal/FieldParticle.h"
 #include "../LightGroup.h"
 #include "../PointLight.h"
 #include "../SpotLight.h"
@@ -27,7 +28,7 @@
 #include "../gameOriginal/GuidingStar.h"
 #include "Bloom.h"
 #include "ModelManager.h"
-#include "../gameOriginal/Gate.h"
+#include "../gameOriginal/GateManager.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -117,7 +118,7 @@ private:
 	ClearAnimationStatus clearStatus_ = STANDBY;
 	ModelManager models_;
 
-	std::vector<Gate> gates_;
+	GateManager gates_;
 private://ÉKÉCÉhó¨ÇÍêØä«óù
 	std::vector<GuidingStar> testStar;
 
@@ -132,4 +133,7 @@ private://FlagManageróp
 
 	bool isClear = false;
 	bool isOldClear = false;
+
+	FieldParticle testPart;
+	int white;
 };

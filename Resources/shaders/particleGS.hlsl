@@ -1,15 +1,15 @@
 #include "particle.hlsli"
 
-//lŠpŒ`‚Ì’¸“_”
+//å¿…è¦ãªé ‚ç‚¹æ•°
 static const uint vnum = 4;
 
-//ƒZƒ“ƒ^[‚©‚ç‚ÌƒIƒtƒZƒbƒg
+//ã‚ªãƒ•ã‚»ãƒƒãƒˆä½ç½®ã®é…åˆ—
 static const float4 offset_array[vnum] =
 {
-	float4(-0.5f, -0.5f, 0, 0),	//¶ã
-	float4(-0.5f, +0.5f, 0, 0),	//¶‰º
-	float4(+0.5f, -0.5f, 0, 0),	//‰E‰º
-	float4(+0.5f, +0.5f, 0, 0),	//‰Eã
+	float4(-0.5f, -0.5f, 0, 0),	//????
+	float4(-0.5f, +0.5f, 0, 0),	//????
+	float4(+0.5f, -0.5f, 0, 0),	//?E??
+	float4(+0.5f, +0.5f, 0, 0),	//?E??
 };
 
 static const float2 uv_array[vnum] =
@@ -19,7 +19,7 @@ static const float2 uv_array[vnum] =
 	float2(1, 1),
 	float2(1, 0),
 };
-//OŠpŒ`‚Ì“ü—Í‚©‚çAü•ª‚ğ3‚Âo—Í‚·‚éƒTƒ“ƒvƒ‹
+//ç‚¹ã®å…¥åŠ›ã‹ã‚‰ã€é¢ã‚’2ã¤å‡ºåŠ›ã™ã‚‹ã‚µãƒ³ãƒ—ãƒ«
 [maxvertexcount(vnum)]
 void main(
 	point VSOutput input[1] : SV_POSITION,
@@ -27,20 +27,21 @@ void main(
 )
 {
 	GSOutput element;
-	//4“_•ª‰ñ‚·
+	//4ç‚¹åˆ†å›ã™
 	for (uint i = 0; i < vnum; i++)
 	{
 		float4 offset;
 		//float4 offset = mul(matBillboard, offset_array[i]);
-		//’†S‚©‚ç‚ÌƒIƒtƒZƒbƒg‚ğƒXƒP[ƒŠƒ“ƒO
+		//ã‚ªãƒ•ã‚»ãƒƒãƒˆã®å€¤ã«ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã‚’ä¹—ç®—
 		offset = offset_array[i] * input[0].scale;
-		//’†S‚©‚ç‚ÌƒIƒtƒZƒbƒg‚ğƒrƒ‹ƒ{[ƒh‰ñ“](ƒ‚ƒfƒ‹À•W)
+		//ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰è¡Œåˆ—ã‚’ä¹—ç®—
 		offset = mul(matBillboard, offset);
-		//ƒ[ƒ‹ƒhÀ•Wƒx[ƒX‚ÅA‚¸‚ç‚·
+		//é ‚ç‚¹ã®ä½ç½®ã«å¹³è¡Œç§»å‹•
 		element.svpos = input[0].pos + offset;
-		//ƒrƒ…[AË‰e•ÏŠ·
+		//ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’ä¹—ç®—
 		element.svpos = mul(mat, element.svpos);
 		element.uv = uv_array[i];
+		element.color = input[0].color;
 		output.Append(element);
 	}
 

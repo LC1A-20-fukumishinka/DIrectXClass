@@ -77,6 +77,8 @@ void GameScene::Init()
 
 
 	int AToStartTextHandle = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/A_To_Start_2.png");
+
+	white = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/effect.png");
 	pressStartText_ = make_unique<Sprite>();
 	pressStartText_->Init(AToStartTextHandle);
 	pressStartText_->position = { WINDOW_WIDTH / 2, WINDOW_HEIGHT * (3.0f / 4.0f) };
@@ -177,19 +179,25 @@ void GameScene::Init()
 	Gate::SetCamera(cam_->GetCamera());
 	Gate::SetLightGroup(lightGroup_.get());
 	Gate::SetModel(models_.GetModel("sphere"));
+	gates_.Init();
 
-	for (int i = 0; i < 5; i++)
-	{
-	float height =50;
-			Gate gate;
-			gate.Init(Vector3(-80 + i * 30.0f, height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
-			gates_.push_back(gate);
+	//for (int i = 0; i < 5; i++)
+	//{
+	//float height =50;
+	//		Gate gate;
+	//		gate.Init(Vector3(-80 + i * 30.0f, height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
+	//		gates_.push_back(gate);
 
-			Gate gateD;
-			gateD.Init(Vector3(-50 + i *  30.0f, -height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
-			gates_.push_back(gateD);
+	//		Gate gateD;
+	//		gateD.Init(Vector3(-50 + i *  30.0f, -height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
+	//		gates_.push_back(gateD);
 
-	}
+	//}
+
+	testPart.Init();
+	testPart.SetCamera(cam_->GetCamera());
+	testPart.SetTexture(white);
+
 	Restart();
 
 }
@@ -244,15 +252,17 @@ void GameScene::Update()
 		e.Update();
 	}
 
-	//Šm”FI—¹ŽŸ‘æÁ‚·TODO
-	Sphere playerS;
-	playerS.center = XMLoadFloat3(&player_->GetPos());
-	playerS.radius = 3.0f;
-	for (auto &e : gates_)
+
+	if (gates_.Collision(player_->GetPos(), 3.0f))
 	{
-		e.Collision(playerS);
+		player_->Boost();
 	}
-	//makeGuide();
+
+	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
+	//testPart.Add(60, player_->GetPos(), Vector3(0, 0.3f, 0), Vector3(), 1.0f, 0.0f);
+	testPart.SetPlayerDatas(player_->GetPos(), XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard()), player_->GetGravityData());
+	testPart.Update();
+
 }
 
 void GameScene::PreDraw()
@@ -273,14 +283,13 @@ void GameScene::PreDraw()
 	}
 	StartTarget_->DepthReset();
 
-	for (auto &e : gates_)
-	{
-		e.Draw();
-	}
-
+	//for (auto &e : gates_)
+	//{
+	//	e.Draw();
+	//}
+	gates_.Draw();
 	PlanetManager::Instance()->Draw();
 	player_->Draw();
-
 	for (auto &flag : testFlag_)
 	{
 		flag.Draw();
@@ -299,12 +308,15 @@ void GameScene::PreDraw()
 	{
 		pressStartText_->Draw();
 	}
+	testPart.Draw();
+
 	//box.Draw();
 	StartTarget_->PostDrawScene();
 
 
 	BloomTarget_->PreDrawScene();
 	PlanetManager::Instance()->BloomDraw();
+	testPart.Draw();
 	BloomTarget_->PostDrawScene();
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
@@ -530,10 +542,11 @@ void GameScene::ObjectRestart()
 		e.Reset();
 	}
 
-	for (auto &e : gates_)
-	{
-		e.Reset();
-	}
+	//for (auto &e : gates_)
+	//{
+	//	e.Reset();
+	//}
+	gates_.Reset();
 	//for (auto &e : testBlock_)
 	//{
 	//	e.Update();

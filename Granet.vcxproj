@@ -126,6 +126,7 @@
     <ClCompile Include="Base\Vector3.cpp" />
     <ClCompile Include="2D\Bloom.cpp" />
     <ClCompile Include="Box3D.cpp" />
+    <ClCompile Include="gameOriginal\FieldParticle.cpp" />
     <ClCompile Include="gameOriginal\Block.cpp" />
     <ClCompile Include="Collision\Collision.cpp" />
     <ClCompile Include="Collision\CollisionMgr.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="Base\Vector3.h" />
     <ClInclude Include="2D\Bloom.h" />
     <ClInclude Include="Box3D.h" />
+    <ClInclude Include="gameOriginal\FieldParticle.h" />
     <ClInclude Include="gameOriginal\Block.h" />
     <ClInclude Include="Collision\BaseCollider.h" />
     <ClInclude Include="Collision\Collision.h" />
