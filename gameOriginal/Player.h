@@ -22,6 +22,10 @@ public://基本関数
 	void Finalize();
 	void Draw();
 	void ShadowDraw();
+
+	void ImguiDraw();
+public://固有関数
+	void Boost();
 private:
 	/// <summary>
 	/// スティックによる移動関数
@@ -67,6 +71,7 @@ public://ゲッタセッタ
 	const XMFLOAT3 &GetPos();
 	const XMFLOAT3 GetAngle();
 	const XMFLOAT3 GetUpVec();
+	const XMVECTOR GetPosture();
 	float GetBasePlanetScale();
 	const std::weak_ptr<Planet> &GetBasePlanet();
 	GameDatas::GravityData GetGravityData();
@@ -98,6 +103,15 @@ public://惑星周りの処理
 	void LoadModel();
 
 	bool LandingCamReset();
+
+private://アニメーション関連
+	//プレイヤーキャラクターの表情テクスチャハンドル
+	std::vector<int> faceTextureHandles_;
+	//現在の表情
+	GameDatas::PlayerFaceTexture face_ = GameDatas::PlayerFaceTexture::NORMAL;
+
+	int blinkTimer_ = 300;
+	void FaceUpdate();
 private:
 	Vector3 pos_;
 	Object3D drawObject_;
@@ -153,15 +167,5 @@ private:
 	std::unique_ptr<Model> rightTrackModel_;
 
 	std::unique_ptr<Model> ArrowModel_;
-
-private://アニメーション関連
-	//プレイヤーキャラクターの表情テクスチャハンドル
-	std::vector<int> faceTextureHandles_;
-	//現在の表情
-	GameDatas::PlayerFaceTexture face_ = GameDatas::PlayerFaceTexture::NORMAL;
-
-	int blinkTimer_ = 300;
-	void FaceUpdate();
-
 };
 

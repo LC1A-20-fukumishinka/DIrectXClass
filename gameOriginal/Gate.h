@@ -12,14 +12,14 @@ public:
 	~Gate();
 
 
-	void Init(Vector3 pos, Vector3 angle, int index, bool isDraw);
+	void Init(const Vector3 &pos, const Vector3 &angle, int index, bool isDraw);
 	void Update();
 	void Draw();
 	void Finalize();
 
 	void Reset();
 
-	bool Collision(Sphere player);
+	bool Collision(const Sphere &player);
 
 public:
 	static void SetModel(Model *model);

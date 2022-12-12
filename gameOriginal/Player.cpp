@@ -10,6 +10,7 @@
 #include "DirectInput.h"
 #include "../Shake.h"
 #include "TextureMgr.h"
+#include "../imgui/ImguiManager.h"
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -105,6 +106,7 @@ void Player::Finalize()
 
 void Player::Draw()
 {
+	ImguiDraw();
 	playerModel_->SetTexture(faceTextureHandles_[static_cast<int>(face_)]);
 	drawObject_.Update();
 	leftTrackObject_.Update();
@@ -118,6 +120,27 @@ void Player::ShadowDraw()
 {
 	shadowObject_.Update();
 	shadowObject_.modelDraw(ShadowPipeline::Instance()->GetPipeLine());
+}
+
+void Player::ImguiDraw()
+{
+	ImGui::Begin("PlayerStatus");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	ImGui::Text("speed : %f", moveVec_.length());
+	if (gravity_.isOneWayGravity)
+	{
+		ImGui::Text("GravityPower : ON");
+	}
+	else
+	{
+		ImGui::Text("GravityPower : OFF");
+	}
+	ImGui::End();
+}
+
+void Player::Boost()
+{
+	moveVec_ += (moveVec_.normalize() * 2);
 }
 
 void Player::Move(bool isSetAngle)
@@ -139,7 +162,7 @@ void Player::Move(bool isSetAngle)
 	{
 		//じゅうりょくを解除する時
 		if (gravity_.isOneWayGravity)
-		{//速度をゼロにする
+		{//速度を遅くする
 			moveVec_ *= 0.3f;
 		}
 		gravity_.isOneWayGravity = !gravity_.isOneWayGravity;
@@ -186,8 +209,8 @@ void Player::PosUpdate(const Vector3 &move)
 
 		//最高速度を超えていたら速度を調整する
 		if (nowSpeed >= maxSpeed)
-		{
-			moveVec_ = (moveVec_.normalize() * ((nowSpeed + maxSpeed) / 2));
+		{//加速システム
+			moveVec_ = (moveVec_.normalize() * (maxSpeed + (nowSpeed - maxSpeed) * 0.95f));
 		}
 
 		if (Input::Instance()->ButtonTrigger(XINPUT_GAMEPAD_LEFT_SHOULDER))
@@ -516,6 +539,11 @@ const XMFLOAT3 Player::GetUpVec()
 	XMFLOAT3 playerUp;
 	XMStoreFloat3(&playerUp, drawObject_.GetUpVec());
 	return playerUp;
+}
+
+const XMVECTOR Player::GetPosture()
+{
+	return drawObject_.GetRotQuaternion();
 }
 
 float Player::GetBasePlanetScale()

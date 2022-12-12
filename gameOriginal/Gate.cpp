@@ -13,7 +13,7 @@ Gate::~Gate()
 {
 }
 
-void Gate::Init(Vector3 pos, Vector3 angle, int index, bool isDraw)
+void Gate::Init(const Vector3 &pos, const Vector3 &angle, int index, bool isDraw)
 {
 	pos_ = pos;
 	angle_ = angle;
@@ -66,7 +66,7 @@ void Gate::SetLightGroup(LightGroup *lights)
 	sLights = lights;
 }
 
-bool Gate::Collision(Sphere player)
+bool Gate::Collision(const Sphere &player)
 {
 	if (!isAlive_)
 	{
