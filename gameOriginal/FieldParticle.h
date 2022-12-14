@@ -1,7 +1,6 @@
 #pragma once
 #include "particleManager.h"
 #include "gameConstData.h"
-#include <random>
 class FieldParticle : public ParticleManager
 {
 public:

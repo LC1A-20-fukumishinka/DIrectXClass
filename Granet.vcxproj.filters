@@ -303,6 +303,9 @@
     <ClCompile Include="gameOriginal\FieldParticle.cpp">
       <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
+    <ClCompile Include="gameOriginal\PlanetParticle.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2D\Bloom.h">
@@ -568,6 +571,9 @@
     </ClInclude>
     <ClInclude Include="gameOriginal\FieldParticle.h">
       <Filter>ヘッダー ファイル\GameOriginal</Filter>
+    </ClInclude>
+    <ClInclude Include="gameOriginal\PlanetParticle.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

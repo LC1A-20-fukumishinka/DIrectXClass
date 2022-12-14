@@ -20,20 +20,19 @@ public:
 	Planet();
 	~Planet();
 
-	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color,int stageID, bool Spawn = true,const PlanetType &type = BRIDGE);
+	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int stageID, bool Spawn = true, const PlanetType &type = BRIDGE);
 	void Update();
-	void NormalUpdate();
-	void GrabUpdate();
 	void SpawnAnimationUpdate();
 	void SpawnAnimationStart();
 	void Draw();
 	void Finalize();
-	const Vector3 &GetPos(){return pos;}
-	void SetPos(const DirectX::XMFLOAT3 &pos){this->pos = Vector3(pos.x, pos.y, pos.z);}
+	const Vector3 &GetPos() { return pos; }
+	void SetPos(const DirectX::XMFLOAT3 &pos) { this->pos = Vector3(pos.x, pos.y, pos.z); }
 	void SetScale(float scale);
 	Object3D *GetObject3d();
 	float GetScale();
 	float GetStartScale();
+	const DirectX::XMFLOAT4 &GetColor();
 	//この世に存在する状態かどうかのフラグ
 	bool GetIsSpawn();
 
@@ -42,6 +41,8 @@ public:
 
 	void ColorChange();
 	void ColorOff();
+
+
 	bool GetIsColorChange();
 
 	std::unique_ptr<PlanetObject> object;
@@ -64,6 +65,12 @@ public:
 	bool GetIsNext();
 	void SetIsBloom(bool isBloom);
 	bool GetIsBloom();
+
+	/// <summary>
+	/// 色が変わり切った瞬間にtrueを返す
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsFinishedColorChange();
 	PlanetType GetType();
 	void Reset();
 private://静的メンバ変数
@@ -79,7 +86,7 @@ private://メンバ変数
 	bool isGrab_ = false;
 	bool isOnPlayer_ = false;
 	bool isSpawn_ = false;
-	
+
 	bool isSpawnAnimation_ = false;
 	DirectX::XMVECTOR GrabRotateAxisY = {};
 	DirectX::XMVECTOR GrabRotateAxisX = {};
@@ -100,6 +107,7 @@ private://メンバ変数
 	float colorRate = 0.0f;
 
 	bool isColorChange_ = false;
+	bool isFinishedColorChange = false;
 
 	bool isNext_ = false;
 	bool isNextLightup_ = true;

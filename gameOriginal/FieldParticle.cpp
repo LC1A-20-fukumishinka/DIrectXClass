@@ -90,7 +90,7 @@ void FieldParticle::AddFieldParticle()
 	p.dead_frame = 240;
 	p.scale = 0.0f;
 	p.s_scale = 0.0f;
-	p.e_scale = 1.0f;
+	p.e_scale = 3.0f;
 	p.s_color = { 1, 1, 1, 1 };
 	p.e_color = { 1, 1, 1, 1 };
 

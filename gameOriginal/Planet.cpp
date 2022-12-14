@@ -61,23 +61,14 @@ void Planet::Update()
 		SpawnAnimationUpdate();
 	}
 
-	if (!isGrab_)
-	{
-		NormalUpdate();
-	}
-	else
-	{
-		GrabUpdate();
-	}
-
 	if (isColorChange_)
 	{
+		//”¼Œa50‚Ì‹…‚ª“ñ•b‚ÅF‚ªØ‚è‘Ö‚í‚èØ‚é’l
 		float t = 0.25f;
-		t /= (startScale_ * 2);
+		t /= (startScale_ * 2.0f);
 		clearRate += t;
 		colorRate = 0.0f;
 		clearRate = std::clamp(clearRate, 0.0f, 1.0f);
-		colorRate = std::clamp(colorRate, 0.0f, 1.0f);
 	}
 	else
 	{
@@ -97,30 +88,6 @@ void Planet::Update()
 
 		ColorOnAngle = Vector3(sPlayerPos - pos).normalize();
 	}
-}
-
-void Planet::NormalUpdate()
-{
-	//Vector3 tmp = {};
-	//tmp.y += degree;
-	//object->AddRotation(tmp);
-	object->SetPosition(pos);
-	object->SetCamera(cam);
-	object->SetLightGroup(lights);
-	object->SetShadowCamera(shadowCam);
-	object->SetShadowTextureNum(shadowTextureNum);
-}
-
-void Planet::GrabUpdate()
-{
-	XMVECTOR Rot = XMQuaternionRotationAxis(GrabRotateAxisY, GameInput::Instance()->RStick().x * RotRate);
-	Rot = XMQuaternionMultiply(Rot, XMQuaternionRotationAxis(GrabRotateAxisX, GameInput::Instance()->RStick().y * RotRate));
-	object->AddRotation(Rot);
-	object->SetCamera(cam);
-	object->SetLightGroup(lights);
-	object->SetPosition(pos);
-	object->SetShadowCamera(shadowCam);
-	object->SetShadowTextureNum(shadowTextureNum);
 }
 
 void Planet::SpawnAnimationUpdate()
@@ -202,6 +169,11 @@ float Planet::GetScale()
 float Planet::GetStartScale()
 {
 	return startScale_;
+}
+
+const XMFLOAT4 &Planet::GetColor()
+{
+	return startColor_;
 }
 
 bool Planet::GetIsSpawn()
@@ -312,6 +284,20 @@ bool Planet::GetIsBloom()
 	return isBloom_;
 }
 
+
+
+bool Planet::GetIsFinishedColorChange()
+{
+	if (isFinishedColorChange)return false;
+
+	if (isColorChange_)
+	{
+		isFinishedColorChange = true;
+		return true;
+	}
+	return false;
+}
+
 PlanetType Planet::GetType()
 {
 	return type_;
@@ -336,6 +322,7 @@ void Planet::Reset()
 	clearRate = 0.0f;
 	isBloom_ = false;
 	isColorChange_ = false;
+	isFinishedColorChange = false;
 	object->SetPosition(startPos_);
 	object->SetColor(startColor_);
 }

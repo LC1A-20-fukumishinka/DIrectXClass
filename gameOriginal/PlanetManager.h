@@ -3,6 +3,9 @@
 #include "../Collision/Collision.h"
 #include <list>
 #include <memory>
+
+class PlanetParticle;
+
 class PlanetManager
 {
 private:
@@ -64,10 +67,10 @@ public:
 	void SetCamera(Camera *cam);
 	void SetShadowCamera(Camera *cam);
 	void SetShadowTexture(int shadowTextureNum);
-
 	void SetStagePlanets(int stageNum);
 	bool LoadStage(int stage);
 
+	void SetPlanetParticles(PlanetParticle *planetParticles);
 	// ToDo
 	// ステージの再読み込み関数
 	//bool ReloadStages(int stage);
@@ -106,5 +109,7 @@ private:
 
 	int orderCount = 0;
 	std::weak_ptr<Planet>playerStandPlanet_;
+
+	PlanetParticle *pPlanetParticles_ = nullptr;
 };
 

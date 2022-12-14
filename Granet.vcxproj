@@ -160,6 +160,7 @@
     <ClCompile Include="gameOriginal\ObjectOnSphere.cpp" />
     <ClCompile Include="gameOriginal\PlanetObject.cpp" />
     <ClCompile Include="3D\ModelManager.cpp" />
+    <ClCompile Include="gameOriginal\PlanetParticle.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="2D\PostEffect.cpp" />
     <ClCompile Include="2D\PostEffectTestPipeline.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="gameOriginal\ObjectOnSphere.h" />
     <ClInclude Include="gameOriginal\PlanetObject.h" />
     <ClInclude Include="3D\ModelManager.h" />
+    <ClInclude Include="gameOriginal\PlanetParticle.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="2D\PostEffect.h" />
     <ClInclude Include="2D\PostBasePipeline.h" />

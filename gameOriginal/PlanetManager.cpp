@@ -5,6 +5,7 @@
 #include "LoadObject.h"
 #include "gameConstData.h"
 #include <limits.h>
+#include "PlanetParticle.h"
 using namespace std;
 using namespace DirectX;
 bool PlanetManager::isMakeInstance = false;
@@ -42,6 +43,13 @@ void PlanetManager::Update()
 	for (auto &e : planets_)
 	{
 		e->Update();
+
+		if (e->GetIsFinishedColorChange())
+		{
+		Vector3 pos = e->GetPos();
+		float sclae = e->GetStartScale();
+			pPlanetParticles_->AddPlanetParticle(e->GetPos(), e->GetScale(), e->GetColor());
+		}
 	}
 
 	if (stagePlanets.size() > 0)
@@ -304,6 +312,11 @@ bool PlanetManager::LoadStage(int stage)
 	}
 
 	return isLoad;
+}
+
+void PlanetManager::SetPlanetParticles(PlanetParticle *planetParticles)
+{
+pPlanetParticles_ = planetParticles;
 }
 
 std::shared_ptr<Planet> PlanetManager::GetBasePlanet(int stageNum)

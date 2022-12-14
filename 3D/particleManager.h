@@ -15,7 +15,7 @@
 /// </summary>
 class ParticleManager
 {
-private: // エイリアス
+protected: // エイリアス
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// DirectX::を省略
 	using XMFLOAT2 = DirectX::XMFLOAT2;

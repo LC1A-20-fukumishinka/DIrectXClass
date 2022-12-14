@@ -194,10 +194,14 @@ void GameScene::Init()
 
 	//}
 
-	testPart.Init();
-	testPart.SetCamera(cam_->GetCamera());
-	testPart.SetTexture(white);
+	fieldParticles_.Init();
+	fieldParticles_.SetCamera(cam_->GetCamera());
+	fieldParticles_.SetTexture(white);
+	planetParticles_.Init();
+	planetParticles_.SetCamera(cam_->GetCamera());
+	planetParticles_.SetTexture(white);
 
+	PlanetManager::Instance()->SetPlanetParticles(&planetParticles_);
 	Restart();
 
 }
@@ -259,10 +263,9 @@ void GameScene::Update()
 	}
 
 	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
-	//testPart.Add(60, player_->GetPos(), Vector3(0, 0.3f, 0), Vector3(), 1.0f, 0.0f);
-	testPart.SetPlayerDatas(player_->GetPos(), XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard()), player_->GetGravityData());
-	testPart.Update();
-
+	fieldParticles_.SetPlayerDatas(player_->GetPos(), XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard()), player_->GetGravityData());
+	fieldParticles_.Update();
+	planetParticles_.Update();
 }
 
 void GameScene::PreDraw()
@@ -308,15 +311,15 @@ void GameScene::PreDraw()
 	{
 		pressStartText_->Draw();
 	}
-	testPart.Draw();
-
+	fieldParticles_.Draw();
+	planetParticles_.Draw();
 	//box.Draw();
 	StartTarget_->PostDrawScene();
 
 
 	BloomTarget_->PreDrawScene();
 	PlanetManager::Instance()->BloomDraw();
-	testPart.Draw();
+	fieldParticles_.Draw();
 	BloomTarget_->PostDrawScene();
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);

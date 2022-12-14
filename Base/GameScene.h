@@ -29,6 +29,7 @@
 #include "Bloom.h"
 #include "ModelManager.h"
 #include "../gameOriginal/GateManager.h"
+#include "../gameOriginal/PlanetParticle.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -123,6 +124,8 @@ private://ガイド流れ星管理
 	std::vector<GuidingStar> testStar;
 
 	void makeGuide();
+	FieldParticle fieldParticles_;
+	PlanetParticle planetParticles_;
 private://FlagManager用
 	void MakeFlag(std::weak_ptr<Planet> base, Vector3 angle, float scale);
 
@@ -134,6 +137,5 @@ private://FlagManager用
 	bool isClear = false;
 	bool isOldClear = false;
 
-	FieldParticle testPart;
 	int white;
 };
