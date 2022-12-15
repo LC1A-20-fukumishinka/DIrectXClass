@@ -181,19 +181,6 @@ void GameScene::Init()
 	Gate::SetModel(models_.GetModel("sphere"));
 	gates_.Init();
 
-	//for (int i = 0; i < 5; i++)
-	//{
-	//float height =50;
-	//		Gate gate;
-	//		gate.Init(Vector3(-80 + i * 30.0f, height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
-	//		gates_.push_back(gate);
-
-	//		Gate gateD;
-	//		gateD.Init(Vector3(-50 + i *  30.0f, -height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
-	//		gates_.push_back(gateD);
-
-	//}
-
 	fieldParticles_.Init();
 	fieldParticles_.SetCamera(cam_->GetCamera());
 	fieldParticles_.SetTexture(white);
@@ -263,7 +250,7 @@ void GameScene::Update()
 	}
 
 	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
-	fieldParticles_.SetPlayerDatas(player_->GetPos(), XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard()), player_->GetGravityData());
+	fieldParticles_.SetPlayerDatas(cam_->GetCamera()->GetEye(), XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard()), player_->GetGravityData());
 	fieldParticles_.Update();
 	planetParticles_.Update();
 }
@@ -286,10 +273,6 @@ void GameScene::PreDraw()
 	}
 	StartTarget_->DepthReset();
 
-	//for (auto &e : gates_)
-	//{
-	//	e.Draw();
-	//}
 	gates_.Draw();
 	PlanetManager::Instance()->Draw();
 	player_->Draw();
@@ -297,11 +280,6 @@ void GameScene::PreDraw()
 	{
 		flag.Draw();
 	}
-
-	//for (auto &e : testBlock_)
-	//{
-	//	e.Draw();
-	//}
 
 	for (auto &e : testBoards_)
 	{
@@ -313,7 +291,6 @@ void GameScene::PreDraw()
 	}
 	fieldParticles_.Draw();
 	planetParticles_.Draw();
-	//box.Draw();
 	StartTarget_->PostDrawScene();
 
 
@@ -324,14 +301,12 @@ void GameScene::PreDraw()
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);
 
-	if (true/*isBloom_*/)
-	{
-		bloom_.BrightUpdate(BloomTarget_->GetTextureNum(0));
-		BloomTarget_->PreDrawScene();
-		bloom_.Draw(DrawTexture_);
-		BloomTarget_->PostDrawScene();
-		DrawTexture_ = BloomTarget_->GetTextureNum(0);
-	}
+
+	bloom_.BrightUpdate(BloomTarget_->GetTextureNum(0));
+	BloomTarget_->PreDrawScene();
+	bloom_.Draw(DrawTexture_);
+	BloomTarget_->PostDrawScene();
+	DrawTexture_ = BloomTarget_->GetTextureNum(0);
 
 	if (isGameTitle_)
 	{
@@ -434,9 +409,6 @@ void GameScene::IngameUpdate()
 		PlanetManager::Instance()->IDSpawn(2);
 	}
 	PlanetManager::Instance()->Update();
-	//star->Update();
-	//temple_->Update();
-
 
 	bool isGetNow = false;
 
@@ -446,10 +418,6 @@ void GameScene::IngameUpdate()
 
 		flag.CollisionPlayer(1.0f, player_->GetPos());
 	}
-	//for (auto &e : testBlock_)
-	//{
-	//	e.Update();
-	//}
 
 	isOldClear = isClear;
 	isClear = (GetFlagCount() <= 0);
@@ -468,7 +436,6 @@ void GameScene::IngameUpdate()
 	shadowCam_->Update(player_->GetPos());
 	lightGroup_->Update();
 
-	//box.Update();
 	StageClearAnimationUpdate();
 
 	for (auto &e : testBoards_)
@@ -545,15 +512,7 @@ void GameScene::ObjectRestart()
 		e.Reset();
 	}
 
-	//for (auto &e : gates_)
-	//{
-	//	e.Reset();
-	//}
 	gates_.Reset();
-	//for (auto &e : testBlock_)
-	//{
-	//	e.Update();
-	//}
 }
 
 void GameScene::MovePlanet()
@@ -570,7 +529,6 @@ void GameScene::MovePlanet()
 		if (isMove)
 		{
 			player_->SetBasePlanet(basePlanet);
-			//cam_->CameraStop();
 		}
 	}
 }
