@@ -60,9 +60,14 @@ void PlanetParticle::AddPlanetParticle(const Vector3 &pos, float radius, const X
 		angle.z = static_cast<float>(rand() % 201 - 100);
 		angle = angle.normalize();
 
+		//惑星の半径から表面から出るように座標調整
 		p.position = angle * radius;
 		p.position += pos;
+
+		//中心から法線方向へ移動する
 		p.velocity = angle * 1.0f;
+
+		//徐々に減速するように
 		p.accel = -angle * 0.01f;
 		p.dead_frame = 120;
 		p.s_scale = 3.0f;
