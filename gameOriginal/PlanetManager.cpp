@@ -86,14 +86,14 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	float minDist = 10000.0f;
 	bool isCollision = false;
 	Ray cameraRay;
-	cameraRay.dir = VtoF3(angle);
+	cameraRay.dir = F3toV(angle);
 	XMFLOAT3 tmp = pos;
-	cameraRay.start = VtoF3(tmp);
+	cameraRay.start = F3toV(tmp);
 	Sphere planetCol;
 
 	for (auto &e : planets_)
 	{
-		planetCol.center = XMLoadFloat3(&e->GetPos());
+		planetCol.center = F3toV(e->GetPos());
 		planetCol.radius = e->GetScale();
 		float colDist;
 		if (!e->GetIsOnPlayer() && Collision::CheckRay2Sphere(cameraRay, planetCol, &colDist))
@@ -386,7 +386,7 @@ float PlanetManager::CameraCollision(Ray cameraRay)
 		NearLDistance -= e->GetScale();
 		if (distance > NearLDistance)
 		{
-			planetCol.center = XMLoadFloat3(&e->GetPos());
+			planetCol.center = F3toV(e->GetPos());
 			planetCol.radius = e->GetScale();
 			Collision::CheckRay2Sphere(cameraRay, planetCol, &distance);
 		}

@@ -47,4 +47,4 @@ const Vector3 operator/(const Vector3 &v, float s);
 /// </summary>
 /// /// <param name="v">入れるベクトル</param>
 /// /// <returns>帰ってくるXMVECTOR型</returns>
-DirectX::XMVECTOR VtoF3(const Vector3 &v);
+DirectX::XMVECTOR F3toV(const Vector3 &v);

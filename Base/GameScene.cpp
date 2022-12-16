@@ -546,7 +546,7 @@ void GameScene::ImguiUpdate()
 
 	angle = Vector3(directionalLightAngle[0], directionalLightAngle[1], directionalLightAngle[2]);
 
-	light_->SetLightDir(VtoF3(angle));
+	light_->SetLightDir(F3toV(angle));
 	ImGui::End();
 	shadowCam_->SetAngle(angle);
 
@@ -629,7 +629,7 @@ void GameScene::makeGuide()
 		Vector3 makePos = Vector3(0.0f, (static_cast<float>(rand() % 10)), (rand() % 50 + 30.0f));
 
 		//XMVECTORŒ^‚É
-		XMVECTOR makePosV = VtoF3(makePos);
+		XMVECTOR makePosV = F3toV(makePos);
 
 		//ƒJƒƒ‰‚ÌŽp¨‚ð‡‚í‚¹‚é
 		makePosV = XMVector3Transform(makePosV, cam_->GetCamera()->GetMatBillboard());
