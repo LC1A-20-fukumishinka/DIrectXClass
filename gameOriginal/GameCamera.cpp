@@ -46,7 +46,7 @@ void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, con
 		//次の対象の場所に即移動する
 		cam_.SetEye(nextEyePos_);
 		//基本の上ベクトルを回転させて確認
-		//cam_.up = XMVector3Rotate(XMLoadFloat3(&playerYVec), nextCamUpRot_);
+		//cam_.up = XMVector3Rotate(F3toV(playerYVec), nextCamUpRot_);
 		cam_.up = XMVector3Rotate(YVec, nextCamUpRot_);
 
 		//次のターゲット座標に移動
@@ -106,8 +106,8 @@ void GameCamera::StartCameraAnimation(bool isTargetEase, int EaseTimer)
 	CameraAnimationEase_.Init(EaseTimer);
 	oldEyePos_ = cam_.GetEye();
 	oldTargetPos_ = cam_.GetTarget();
-	XMVECTOR frontVec = XMLoadFloat3(&(cam_.GetTarget() - cam_.GetEye()));
-	XMVECTOR upVec = XMLoadFloat3(&cam_.up);
+	XMVECTOR frontVec = F3toV((cam_.GetTarget() - cam_.GetEye()));
+	XMVECTOR upVec = F3toV(cam_.up);
 	oldCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(upVec, frontVec));
 }
 
@@ -148,7 +148,7 @@ void GameCamera::TitleAnimationStart()
 
 	//正規化
 	eyeDir = eyeDir.normalize();
-	XMMATRIX rot = GetMatRot(YVec, XMLoadFloat3(&eyeDir));
+	XMMATRIX rot = GetMatRot(YVec, F3toV(eyeDir));
 
 	//ターゲットの位置を修正
 	nextTargetPos_ = Vector3(0, 0, 0);
@@ -189,7 +189,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVe
 	{//落下方向にカメラを向かせる
 		Vector3 cameraToPlayerDistance = planet_.lock()->GetPos() - nextTargetPos_;
 		camPos += nextTargetPos_ + (-cameraToPlayerDistance.normalize() * nowDistance);
-		nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&cam_.up), XMLoadFloat3(&cameraToPlayerDistance.normalize())));
+		nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(F3toV(cam_.up), F3toV(cameraToPlayerDistance.normalize())));
 
 		StartCameraAnimation(false, 120);
 	}
@@ -218,7 +218,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVe
 
 		//立ち姿勢における回転
 		XMVECTOR playerStandRot;
-		playerStandRot = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&cam_.GetAngle())));
+		playerStandRot = XMQuaternionRotationMatrix(GetMatRot(F3toV(playerYVec), F3toV(cam_.GetAngle())));
 
 		//上記二つの回転をSlerp
 		nextCamUpRot_ = XMQuaternionSlerp(nextCamUpRot_, playerStandRot, 0.03f);
@@ -239,14 +239,14 @@ bool GameCamera::GetIsAnimationEnd()
 
 void GameCamera::CameraReflesh(Vector3 UpVec, int timer)
 {
-	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&UpVec), XMLoadFloat3(&cam_.GetAngle())));
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(F3toV(UpVec), F3toV(cam_.GetAngle())));
 	StartCameraAnimation(false, timer);
 }
 
 void GameCamera::LandingCameraReflesh(Vector3 UpVec)
 {
 	if (!imCamLanding_) return;
-	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(XMLoadFloat3(&UpVec), XMLoadFloat3(&cam_.GetAngle())));
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(F3toV(UpVec), F3toV(cam_.GetAngle())));
 	StartCameraAnimation(false, 60);
 }
 
@@ -254,7 +254,7 @@ void GameCamera::Reset()
 {
 	nextEyePos_ = Vector3(0, 10, -15);
 	nextTargetPos_ = Vector3(0, 3, 0);
-	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(YVec, XMLoadFloat3(&(nextTargetPos_ - nextEyePos_))));
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(YVec, F3toV((nextTargetPos_ - nextEyePos_))));
 	gravity_.angle = -YVec;
 	isTitleMode_ = true;
 }
@@ -314,8 +314,8 @@ void GameCamera::LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVe
 	camPos += nextTargetPos_;
 	nextEyePos_ = camPos;
 
-	XMVECTOR frontV = XMLoadFloat3(&(nextTargetPos_ - nextEyePos_));
-	nextCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(XMLoadFloat3(&playerYVec), XMLoadFloat3(&playerZVec)));
+	XMVECTOR frontV = F3toV((nextTargetPos_ - nextEyePos_));
+	nextCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(F3toV(playerYVec), F3toV(playerZVec)));
 }
 
 void GameCamera::GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec)
@@ -386,8 +386,8 @@ void GameCamera::PlanetCollisionUpdate()
 
 	//カメラレイの情報用意
 	Vector3 cameraDir = Vector3(nextEyePos_ - nextTargetPos_);
-	cameraRay.start = XMLoadFloat3(&nextTargetPos_);
-	cameraRay.dir = XMLoadFloat3(&cameraDir.normalize());
+	cameraRay.start = F3toV(nextTargetPos_);
+	cameraRay.dir = F3toV(cameraDir.normalize());
 
 	//カメラの距離の最大値より少し大きく
 	float colDistance = GameDatas::camMaxLength + 1.0f;
@@ -399,7 +399,7 @@ void GameCamera::PlanetCollisionUpdate()
 	NearPlanetDistance -= planet_.lock()->GetScale();
 	if (colDistance > NearPlanetDistance)
 	{
-		planetCol.center = XMLoadFloat3(&planet_.lock()->GetPos());
+		planetCol.center = F3toV(planet_.lock()->GetPos());
 		planetCol.radius = planet_.lock()->GetScale();
 		Collision::CheckRay2Sphere(cameraRay, planetCol, &colDistance);
 	}
@@ -435,12 +435,12 @@ void GameCamera::camRot(const DirectX::XMFLOAT2 &rot, Vector3 playerUp)
 	//回転姿勢のクォータニオン
 	XMVECTOR rotQ = XMQuaternionIdentity();
 	//回転用X軸
-	XMVECTOR rotX = XMVector3Rotate(XMLoadFloat3(&cam_.GetRight()), XMQuaternionIdentity());
+	XMVECTOR rotX = XMVector3Rotate(F3toV(cam_.GetRight()), XMQuaternionIdentity());
 	//回転用Y軸
-	XMVECTOR rotY = XMVector3Rotate(XMLoadFloat3(&cam_.up), XMQuaternionIdentity());
+	XMVECTOR rotY = XMVector3Rotate(F3toV(cam_.up), XMQuaternionIdentity());
 	if (playerStatus_ == PlayerStatus::STAND)
 	{
-		rotY = XMVector3Rotate(XMLoadFloat3(&playerUp), XMQuaternionIdentity());
+		rotY = XMVector3Rotate(F3toV(playerUp), XMQuaternionIdentity());
 	}
 
 	rotQ = XMQuaternionMultiply(nextCamUpRot_, XMQuaternionRotationAxis(rotX, rot.y * RotRate));
@@ -449,7 +449,7 @@ void GameCamera::camRot(const DirectX::XMFLOAT2 &rot, Vector3 playerUp)
 
 	nextCamUpRot_ = rotQ;
 	//targetからnextPosの視点座標までのベクトルを計算
-	//XMVECTOR nextVec = XMLoadFloat3(&(nextEyePos_ - nextTargetPos_));
+	//XMVECTOR nextVec = F3toV((nextEyePos_ - nextTargetPos_));
 
 	float length = (nextEyePos_ - nextTargetPos_).length();
 	XMVECTOR nextVec = -ZVec;

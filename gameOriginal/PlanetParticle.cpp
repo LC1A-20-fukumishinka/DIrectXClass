@@ -39,7 +39,7 @@ void PlanetParticle::Update()
 		XMStoreFloat4(&it->draw_color, ((it->s_color * f )+ (it->e_color * (1.0f - f))));
 	}
 
-	SendBuffers(particles_);
+	SendBuffers();
 }
 
 void PlanetParticle::AddPlanetParticle(const Vector3 &pos, float radius, const XMFLOAT4 &color)

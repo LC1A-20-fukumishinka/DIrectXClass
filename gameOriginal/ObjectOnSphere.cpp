@@ -45,7 +45,7 @@ void ObjectOnSphere::Update()
 {
 	object_.SetCamera(sMainCamera);
 	object_.SetLightGroup(sLights);
-	object_.SetRotationVector(XMLoadFloat3(&frontVec_), XMLoadFloat3(&upVec_));
+	object_.SetRotationVector(F3toV(frontVec_), F3toV(upVec_));
 	RotationUpdate();
 }
 
@@ -125,13 +125,13 @@ void ObjectOnSphere::SetLights(LightGroup *Lights)
 
 void ObjectOnSphere::RotationUpdate()
 {
-	XMVECTOR frontVecV = XMLoadFloat3(&frontVec_);
-	XMVECTOR upVecV = XMLoadFloat3(&upVec_);
+	XMVECTOR frontVecV = F3toV(frontVec_);
+	XMVECTOR upVecV = F3toV(upVec_);
 	if (XMVector3Equal(frontVecV, upVecV))
 	{
 		frontVec_ = Vector3(0.0f, -1.0f, 0.0f);
 
-		frontVecV = XMLoadFloat3(&frontVec_);
+		frontVecV = F3toV(frontVec_);
 	}
 	object_.SetRotationVector(frontVecV, upVecV);
 }

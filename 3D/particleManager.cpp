@@ -334,7 +334,7 @@ void ParticleManager::Update()
 
 		it->scale += it->s_scale;
 	}
-	SendBuffers(particles_);
+	SendBuffers();
 }
 
 void ParticleManager::Draw()
@@ -400,7 +400,7 @@ void ParticleManager::SetTexture(int textureHandle)
 	textureHandle_ = textureHandle;
 }
 
-void ParticleManager::SendBuffers(std::forward_list<Particle> &particles)
+void ParticleManager::SendBuffers()
 {
 	HRESULT result;
 
@@ -410,8 +410,8 @@ void ParticleManager::SendBuffers(std::forward_list<Particle> &particles)
 	if (SUCCEEDED(result))
 	{
 		int count = 0;
-		for (std::forward_list<Particle>::iterator it = particles.begin();
-			it != particles.end();
+		for (std::forward_list<Particle>::iterator it = particles_.begin();
+			it != particles_.end();
 			it++)
 		{
 

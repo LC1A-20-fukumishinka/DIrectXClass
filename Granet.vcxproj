@@ -142,6 +142,7 @@
     <ClCompile Include="gameOriginal\GuidingStar.cpp" />
     <ClCompile Include="gameOriginal\Gate.cpp" />
     <ClCompile Include="gameOriginal\GateManager.cpp" />
+    <ClCompile Include="gameOriginal\GateParticle.cpp" />
     <ClCompile Include="imgui\ImguiManager.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="gameOriginal\GuidingStar.h" />
     <ClInclude Include="gameOriginal\Gate.h" />
     <ClInclude Include="gameOriginal\GateManager.h" />
+    <ClInclude Include="gameOriginal\GateParticle.h" />
     <ClInclude Include="imgui\ImguiManager.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

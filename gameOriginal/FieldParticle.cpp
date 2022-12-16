@@ -68,7 +68,7 @@ void FieldParticle::Update()
 		//	it->draw_color = harf - (it->draw_color - harf);
 		//}
 	}
-	SendBuffers(particles_);
+	SendBuffers();
 }
 
 void FieldParticle::AddFieldParticle()
@@ -78,7 +78,7 @@ void FieldParticle::AddFieldParticle()
 	spawnPos.y = (static_cast<float>(rand() % 201 - 100) / 100.0f) * SpawnRange_.y;
 	spawnPos.z = (static_cast<float>(rand() % 111 - 10) / 100.0f) * SpawnRange_.z;
 
-	spawnPos = XMVector3Rotate(XMLoadFloat3(&spawnPos), playerPosture_);
+	spawnPos = XMVector3Rotate(VtoF3(spawnPos), playerPosture_);
 	spawnPos += playerPos_;
 	//ƒŠƒXƒg‚É—v‘f‚ð’Ç‰Á
 	particles_.emplace_front();

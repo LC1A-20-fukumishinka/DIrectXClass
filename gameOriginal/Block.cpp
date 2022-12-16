@@ -34,7 +34,7 @@ std::vector<Triangle> Block::GetCollisionPlanes()
 	XMVECTOR upV = XMVector3Rotate(YVec, rotQ);
 	XMVECTOR rightV = XMVector3Rotate(XVec, rotQ);
 	XMVECTOR frontV = XMVector3Rotate(ZVec, rotQ);
-	XMVECTOR basePos = XMLoadFloat3(&GetWorldPos());
+	XMVECTOR basePos = F3toV(GetWorldPos());
 	upV *= radius;
 	rightV *= radius * 5.0f;
 	frontV *= radius * 5.0f;

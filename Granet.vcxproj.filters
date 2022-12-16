@@ -303,8 +303,11 @@
     <ClCompile Include="gameOriginal\FieldParticle.cpp">
       <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
+    <ClCompile Include="gameOriginal\GateParticle.cpp">
+      <Filter>ソース ファイル\GameOriginal</Filter>
+    </ClCompile>
     <ClCompile Include="gameOriginal\PlanetParticle.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -572,8 +575,11 @@
     <ClInclude Include="gameOriginal\FieldParticle.h">
       <Filter>ヘッダー ファイル\GameOriginal</Filter>
     </ClInclude>
+    <ClInclude Include="gameOriginal\GateParticle.h">
+      <Filter>ヘッダー ファイル\GameOriginal</Filter>
+    </ClInclude>
     <ClInclude Include="gameOriginal\PlanetParticle.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\GameOriginal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

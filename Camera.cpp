@@ -11,7 +11,7 @@ Camera::Camera()
 	this->up = Vector3(0.0f, 1.0f, 0.0f);
 	this->right = Vector3(1.0f, 0.0f, 0.0f);
 	this->shift = Vector3(0.0f, 0.0f, 0.0f);
-	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+	matView = XMMatrixLookAtLH(F3toV(eye), F3toV(target), F3toV(up));
 	matBillBoard = XMMatrixIdentity();
 	matBillBoardY = XMMatrixIdentity();
 
@@ -23,7 +23,7 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 	this->eye = eye;
 	this->target = target;
 	this->up = up;
-	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+	matView = XMMatrixLookAtLH(F3toV(eye), F3toV(target), F3toV(up));
 
 	bool isDefault = (projectionData.height <= 0.0f || projectionData.width <= 0.0f);
 	if (!isDefault)
@@ -93,13 +93,13 @@ DirectX::XMMATRIX Camera::GetMatBillboardY() const
 void Camera::MakeMatCamera()
 {
 	XMFLOAT3 tmpEye = eye + shift;
-	XMVECTOR eyePosition = XMLoadFloat3(&tmpEye);
+	XMVECTOR eyePosition = F3toV(tmpEye);
 	//注視点座標
 
 	XMFLOAT3 tmpTarget = target + shift;
-	XMVECTOR targetPosition = XMLoadFloat3(&tmpTarget);
+	XMVECTOR targetPosition = F3toV(tmpTarget);
 	//(仮の) 上方向
-	XMVECTOR upVector = XMLoadFloat3(&up);
+	XMVECTOR upVector = F3toV(up);
 
 	//カメラZ軸
 	XMVECTOR cameraAxisZ = XMVectorSubtract(targetPosition, eyePosition);
@@ -195,7 +195,7 @@ DirectX::XMFLOAT3 Camera::GetRight()
 void Camera::CameraRot(const DirectX::XMVECTOR &rotQ)
 {
 	//targetからcameraの視点座標までのベクトルを計算
-	XMVECTOR camVec = XMLoadFloat3(&(eye - target));
+	XMVECTOR camVec = F3toV((eye - target));
 	//回転させる
 	camVec = XMVector3Rotate(camVec, rotQ);
 
@@ -209,7 +209,7 @@ void Camera::CameraRot(const DirectX::XMVECTOR &rotQ)
 void Camera::TargetRot(const DirectX::XMVECTOR &rotQ)
 {
 	//targetからcameraの視点座標までのベクトルを計算
-	XMVECTOR camVec = XMLoadFloat3(&(target - eye));
+	XMVECTOR camVec = F3toV((target - eye));
 	//回転させる
 	camVec = XMVector3Rotate(camVec, rotQ);
 

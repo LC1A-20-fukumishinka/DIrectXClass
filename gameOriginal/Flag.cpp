@@ -120,7 +120,7 @@ void Flag::Init(std::weak_ptr<Planet> basePlanet, const Vector3 &angle, float sc
 		Vector3 pos = basePlanet_.lock()->GetPos();
 		//Žw’è‚µ‚½•ûŒü(upVec)‚É˜f¯‚Ì”¼Œa•ªˆÚ“®‚³‚¹‚½êŠ‚ª
 		pos += (upVec_ * basePlanet_.lock()->GetStartScale());
-		object_.SetRotationVector(XMLoadFloat3(&frontVec_), XMLoadFloat3(&upVec_));
+		object_.SetRotationVector(F3toV(frontVec_), F3toV(upVec_));
 
 		//À•W‚É‚È‚é
 		object_.SetPosition(pos);
@@ -145,7 +145,7 @@ void Flag::Update()
 {
 	object_.SetCamera(sMainCamera);
 	object_.SetLightGroup(sLights);
-	object_.SetRotationVector(XMLoadFloat3(&frontVec_), XMLoadFloat3(&upVec_));
+	object_.SetRotationVector(F3toV(frontVec_), F3toV(upVec_));
 
 	RotationUpdate();
 }
@@ -188,9 +188,9 @@ bool Flag::CollisionPlayer(float radius, const Vector3 &pos)
 	if (!isDraw_) return false;
 
 	Sphere playerSphere, flagSphere;
-	playerSphere.center = XMLoadFloat3(&pos);
+	playerSphere.center = F3toV(pos);
 	playerSphere.radius = radius;
-	flagSphere.center = XMLoadFloat3(&object_.GetWorldPos());
+	flagSphere.center = F3toV(object_.GetWorldPos());
 	flagSphere.radius = worldScale_;
 
 	bool isCollision = Collision::CheckSphere2Sphere(playerSphere, flagSphere);
@@ -227,14 +227,14 @@ void Flag::SetLights(LightGroup *Lights)
 void Flag::RotationUpdate()
 {
 	//XMVECTOR‚É•ÏŠ·
-	XMVECTOR frontVecV = XMLoadFloat3(&frontVec_);
-	XMVECTOR upVecV = XMLoadFloat3(&upVec_);
+	XMVECTOR frontVecV = F3toV(frontVec_);
+	XMVECTOR upVecV = F3toV(upVec_);
 	
 	//ã‚Æ³–Ê‚ªˆê’v‚µ‚½‚ç
 	if (XMVector3Equal(frontVecV, upVecV))
 	{//³–Ê‚ÌŒü‚«‚ðC³
 		frontVec_ = Vector3(0.0f, -1.0f, 0.0f);
-		frontVecV = XMLoadFloat3(&frontVec_);
+		frontVecV = F3toV(frontVec_);
 	}
 
 
@@ -306,7 +306,7 @@ void Flag::LightPillarUpdate()
 
 	Vector3 tmpRight = upVec_.cross(sMainCamera->GetAngle());
 
-	GetMatRot(XMLoadFloat3(&tmpRight), XMLoadFloat3(&upVec_), lightZ);
+	GetMatRot(F3toV(tmpRight), F3toV(upVec_), lightZ);
 
-	lightPillarObject_.SetRotationVector(lightZ, XMLoadFloat3(&upVec_));
+	lightPillarObject_.SetRotationVector(lightZ, F3toV(upVec_));
 }

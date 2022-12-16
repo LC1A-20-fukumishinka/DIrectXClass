@@ -41,3 +41,10 @@ const Vector3 operator*(const Vector3 &v, float s);
 const Vector3 operator*(float s, const Vector3 &v);
 const Vector3 operator*(const Vector3 &v1, const Vector3 &v2);
 const Vector3 operator/(const Vector3 &v, float s);
+
+/// <summary>
+/// Vector3型をXMVECTOR型にコンバートする
+/// </summary>
+/// /// <param name="v">入れるベクトル</param>
+/// /// <returns>帰ってくるXMVECTOR型</returns>
+DirectX::XMVECTOR VtoF3(const Vector3 &v);

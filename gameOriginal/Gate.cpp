@@ -47,7 +47,7 @@ void Gate::Reset()
 {
 	object_.SetScale(Vector3(scale_, scale_, 0.1f));
 	object_.SetPosition(pos_);
-	object_.SetRotationVector(DirectX::XMLoadFloat3(&angle_));
+	object_.SetRotationVector(VtoF3(angle_));
 	object_.Update();
 	isAlive_ = true;
 }
@@ -73,14 +73,14 @@ bool Gate::Collision(const Sphere &player)
 		return false;
 	}
 	Sphere gateSphere;
-	gateSphere.center = DirectX::XMLoadFloat3(&pos_);
+	gateSphere.center = VtoF3(pos_);
 	gateSphere.radius = scale_;
 
 	if (Collision::CheckSphere2Sphere(player, gateSphere))
 	{
 		Plane gatePlane;
-		gatePlane.pos = DirectX::XMLoadFloat3(&pos_);
-		gatePlane.normal = DirectX::XMLoadFloat3(&angle_);
+		gatePlane.pos = VtoF3(pos_);
+		gatePlane.normal = VtoF3(angle_);
 
 		//isAlive_ = false;
 		if (Collision::CheckSphere2Plane(player, gatePlane))

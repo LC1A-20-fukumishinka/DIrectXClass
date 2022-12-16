@@ -108,13 +108,13 @@ void InformationBoard::Init(const wchar_t *filename, std::weak_ptr<Planet> baseP
 
 	Vector3 frontVec = Vector3(tmpAngle.y, -tmpAngle.x, 0.0f).cross(tmpAngle);
 
-	XMVECTOR frontVecV = XMLoadFloat3(&frontVec);
-	XMVECTOR upVecV = XMLoadFloat3(&tmpAngle.normalize());
+	XMVECTOR frontVecV = F3toV(frontVec);
+	XMVECTOR upVecV = F3toV(tmpAngle.normalize());
 	if (XMVector3Equal(frontVecV, upVecV))
 	{
 		frontVec = Vector3(0.0f, -1.0f, 0.0f);
 
-		frontVecV = XMLoadFloat3(&frontVec);
+		frontVecV = F3toV(frontVec);
 	}
 	baseBoard_.SetRotationVector(frontVecV, upVecV);
 }
@@ -170,10 +170,10 @@ bool InformationBoard::CollisionPlayer(const Vector3 &pos)
 	Sphere pSphere, iSphere;
 
 
-	pSphere.center = XMLoadFloat3(&pos);
+	pSphere.center = F3toV(pos);
 	pSphere.radius = 0.1f;
 
-	iSphere.center = XMLoadFloat3(&basePos_);
+	iSphere.center = F3toV(basePos_);
 	iSphere.radius = drawLength_;
 
 	isInDrawLength_ = Collision::CheckSphere2Sphere(pSphere, iSphere);
@@ -214,7 +214,7 @@ void InformationBoard::BoardUpdate()
 	baseBoard_.SetPosition(pos);
 
 	XMVECTOR rot = baseBoard_.GetRotQuaternion();
-	XMMATRIX addRotMat = XMMatrixRotationAxis(XMLoadFloat3(&boardUp), FukuMath::degree);
+	XMMATRIX addRotMat = XMMatrixRotationAxis(F3toV(boardUp), FukuMath::degree);
 	rot =XMQuaternionMultiply(rot, XMQuaternionRotationMatrix(addRotMat));
 	baseBoard_.SetRotation(rot);
 }

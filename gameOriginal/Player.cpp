@@ -73,7 +73,7 @@ void Player::Update()
 
 		if (GameInput::Instance()->LockOnInput())
 		{
-			drawObject_.SetRotationVector(XMLoadFloat3(&cam_->GetAngle()), drawObject_.GetUpVec());
+			drawObject_.SetRotationVector(F3toV(cam_->GetAngle()), drawObject_.GetUpVec());
 		}
 		LockOnUpdate();
 	}
@@ -305,7 +305,7 @@ void Player::PostureUpdate(const Vector3 &move)
 		up = -gravity_.angle;
 	}
 	//ベクター型にする
-	XMVECTOR upV = XMLoadFloat3(&up.normalize());
+	XMVECTOR upV = F3toV(up.normalize());
 
 	//右
 	XMVECTOR rightV = {};
@@ -318,7 +318,7 @@ void Player::PostureUpdate(const Vector3 &move)
 
 	if (move.length() > 0.0f)
 	{
-		rightV = XMVector3Cross(upV, XMLoadFloat3(&move));
+		rightV = XMVector3Cross(upV, F3toV(move));
 
 		frontV = XMVector3Cross(rightV, upV);
 	}
@@ -344,11 +344,11 @@ void Player::FloorMove(bool isSetAngle)
 
 	//カメラの行列から入力を画面の向きに合わせて矯正
 
-	XMVECTOR moveV = XMLoadFloat3(&move);
+	XMVECTOR moveV = F3toV(move);
 
 	//入力の姿勢を作る
 	XMVECTOR moveUp = drawObject_.GetUpVec();
-	XMVECTOR moveFront = XMLoadFloat3(&Vector3(cam_->GetRight()).cross(moveUp));
+	XMVECTOR moveFront = F3toV(Vector3(cam_->GetRight()).cross(moveUp));
 	XMMATRIX moveMat = GetMatRot(moveUp, moveFront);
 
 	//姿勢に合わせてベクトルを配置
@@ -416,7 +416,7 @@ void Player::PostureReset()
 {
 	if (status_ == PlayerStatus::JUMP) return;
 	Vector3 BasePlanetToPlayer = pos_ - basePlanet.lock()->GetPos();
-	XMVECTOR BasePlanetToPlayerAngleV = XMLoadFloat3(&BasePlanetToPlayer.normalize());
+	XMVECTOR BasePlanetToPlayerAngleV = F3toV(BasePlanetToPlayer.normalize());
 	XMVECTOR frontVec = XMVector3Cross(drawObject_.GetRightVec(), BasePlanetToPlayerAngleV);
 
 	drawObject_.SetRotationVector(frontVec, BasePlanetToPlayerAngleV);
@@ -588,7 +588,7 @@ void Player::SetGrabPlanet(std::shared_ptr<Planet> planet)
 	{
 		grabPlanet.lock()->GrabOn();
 		XMFLOAT3 dist = grabPlanet.lock()->GetPos() - pos_;
-		XMVECTOR vec = XMLoadFloat3(&dist);
+		XMVECTOR vec = F3toV(dist);
 		//惑星に向き直る
 		drawObject_.SetRotationVector(vec, drawObject_.GetUpVec());
 		grabPlanet.lock()->SetGrabRotateAngle(drawObject_.GetUpVec(), drawObject_.GetRightVec());
@@ -655,7 +655,7 @@ void Player::GrabUpdate()
 		//二点間の距離が掴んだ瞬間より短いか
 		if (length <= baseLength)
 		{//短い場合
-			drawObject_.SetRotationVector(XMLoadFloat3(&planetPlayerDistance));
+			drawObject_.SetRotationVector(F3toV(planetPlayerDistance));
 		}
 		else
 		{
@@ -673,7 +673,7 @@ void Player::GrabUpdate()
 	vec *= length;
 
 	//それをプレイヤーの位置に加算して
-	XMVECTOR playerPos = XMLoadFloat3(&pos_);
+	XMVECTOR playerPos = F3toV(pos_);
 	vec += playerPos;
 
 	//惑星の位置完成
@@ -690,7 +690,7 @@ void Player::BlockCollision(const std::vector<Triangle> &boxPlanes)
 	XMVECTOR downVec = -drawObject_.GetUpVec();
 	Ray playerDownVec;
 	playerDownVec.dir = downVec;
-	playerDownVec.start = XMLoadFloat3(&(pos_ + (drawObject_.GetUpVec() * 0.5f)));
+	playerDownVec.start = F3toV((pos_ + (drawObject_.GetUpVec() * 0.5f)));
 
 	for (auto &e : boxPlanes)
 	{

@@ -86,9 +86,9 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	float minDist = 10000.0f;
 	bool isCollision = false;
 	Ray cameraRay;
-	cameraRay.dir = XMLoadFloat3(&angle);
+	cameraRay.dir = VtoF3(angle);
 	XMFLOAT3 tmp = pos;
-	cameraRay.start = XMLoadFloat3(&tmp);
+	cameraRay.start = VtoF3(tmp);
 	Sphere planetCol;
 
 	for (auto &e : planets_)

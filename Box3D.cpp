@@ -55,8 +55,8 @@ void BoxObj3D::Init(const Vector3 &pos, const Vector3 &front, const Vector3 &up)
 	matWorld = XMMatrixIdentity();
 
 	position = pos;
-	this->front = XMLoadFloat3(&front);
-	this->up = XMLoadFloat3(&up);
+	this->front = F3toV(front);
+	this->up = F3toV(up);
 	SetRotationVector(this->front, this->up);
 	matWorld = GetMatWorld();
 

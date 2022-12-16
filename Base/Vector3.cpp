@@ -36,6 +36,11 @@ const Vector3 operator/(const Vector3 &v, float s)
 	return v * (1 / s);
 }
 
+DirectX::XMVECTOR VtoF3(const Vector3 &v)
+{
+	return DirectX::XMLoadFloat3(&v);
+}
+
 Vector3::Vector3() :
 	Vector3(0, 0, 0)
 {

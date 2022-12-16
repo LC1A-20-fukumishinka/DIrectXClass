@@ -133,7 +133,7 @@ public: // メンバ関数
 
 	void SetTexture(int textureHandle);
 
-	void SendBuffers(std::forward_list<Particle> &particles);
+	void SendBuffers();
 
 protected:
 	std::forward_list<Particle> particles_;

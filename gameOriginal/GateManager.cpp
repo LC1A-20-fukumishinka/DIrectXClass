@@ -79,7 +79,7 @@ bool GateManager::LoadStage(int stage)
 bool GateManager::Collision(const Vector3 &pos, float speed)
 {
 	Sphere playerS;
-	playerS.center = DirectX::XMLoadFloat3(&pos);
+	playerS.center = F3toV(pos);
 	playerS.radius = speed;
 	bool isCollision = false;
 	for (auto &e : gates_)
