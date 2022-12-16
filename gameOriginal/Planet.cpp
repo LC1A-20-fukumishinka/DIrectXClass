@@ -194,6 +194,7 @@ void Planet::ColorChange()
 void Planet::ColorOff()
 {
 	isColorChange_ = false;
+	isFinishedColorChange = false;
 	clearRate = 0.0f;
 }
 
