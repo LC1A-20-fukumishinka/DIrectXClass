@@ -52,8 +52,8 @@ void GateParticle::AddGateParticle(const Vector3& gateAngle)
 		p.position = playerPos_;
 		p.position += (particleAngle * 1.0f);
 		p.scale = 3.0f;
-		p.velocity = (particleAngle * 10.0f);
-		p.velocity += playerMoveVec_;
+		p.velocity = (particleAngle * 20.0f);
+		p.velocity += playerMoveVec_ * 3.0f;
 		p.dead_frame = 20;
 		p.s_color = { 1.0f,1.0f ,1.0f , 1.0f };
 		p.e_color = { 1.0f,1.0f ,1.0f , 0.0f };
@@ -73,6 +73,11 @@ void GateParticle::SetPlayerData(const Vector3& pos, const Vector3& moveVec)
 void GateParticle::MoveUpdate(Particle& e)
 {
 	//‘¬“x‚É‰Á‘¬“x‚ð‰ÁŽZ
+	float power = e.velocity.length();
+
+	e.velocity = (e.velocity + playerMoveVec_).normalize() * power;
+
+
 	e.velocity *= 0.95f;
 
 
