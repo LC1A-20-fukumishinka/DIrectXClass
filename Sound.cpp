@@ -1,7 +1,6 @@
 #include "Sound.h"
 #include "d3dx12.h"
 #include <cassert>
-#include "SafeDelete.h"
 
 Microsoft::WRL::ComPtr<IXAudio2> Sound::xAudio2;
 IXAudio2MasteringVoice *Sound::masterVoice = nullptr;
