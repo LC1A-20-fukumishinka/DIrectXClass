@@ -546,6 +546,11 @@ const XMVECTOR Player::GetPosture()
 	return drawObject_.GetRotQuaternion();
 }
 
+const Vector3 &Player::GetMoveVec()
+{
+	return moveVec_;
+}
+
 float Player::GetBasePlanetScale()
 {
 	if (basePlanet.expired())

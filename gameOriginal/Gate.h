@@ -21,6 +21,8 @@ public:
 
 	bool Collision(const Sphere &player);
 
+	const DirectX::XMFLOAT3 &GetPos();
+	Vector3 GetAngle();
 public:
 	static void SetModel(Model *model);
 	static void SetCamera(Camera *camera);

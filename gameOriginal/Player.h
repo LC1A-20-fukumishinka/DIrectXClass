@@ -72,6 +72,7 @@ public://ゲッタセッタ
 	const XMFLOAT3 GetAngle();
 	const XMFLOAT3 GetUpVec();
 	const XMVECTOR GetPosture();
+	const Vector3 &GetMoveVec();
 	float GetBasePlanetScale();
 	const std::weak_ptr<Planet> &GetBasePlanet();
 	GameDatas::GravityData GetGravityData();

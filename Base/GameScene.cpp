@@ -78,7 +78,6 @@ void GameScene::Init()
 
 	int AToStartTextHandle = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/A_To_Start_2.png");
 
-	white = TextureMgr::Instance()->SpriteLoadTexture(L"Resources/effect.png");
 	pressStartText_ = make_unique<Sprite>();
 	pressStartText_->Init(AToStartTextHandle);
 	pressStartText_->position = { WINDOW_WIDTH / 2, WINDOW_HEIGHT * (3.0f / 4.0f) };
@@ -176,19 +175,15 @@ void GameScene::Init()
 		e.Create();
 	}
 
+	particles_.Init(cam_->GetCamera());
+
 	Gate::SetCamera(cam_->GetCamera());
 	Gate::SetLightGroup(lightGroup_.get());
 	Gate::SetModel(models_.GetModel("sphere"));
 	gates_.Init();
+	gates_.SetGateParticle(particles_.GetGateParticles());
 
-	fieldParticles_.Init();
-	fieldParticles_.SetCamera(cam_->GetCamera());
-	fieldParticles_.SetTexture(white);
-	planetParticles_.Init();
-	planetParticles_.SetCamera(cam_->GetCamera());
-	planetParticles_.SetTexture(white);
-
-	PlanetManager::Instance()->SetPlanetParticles(&planetParticles_);
+	PlanetManager::Instance()->SetPlanetParticles(particles_.GetPlanetParticles());
 	Restart();
 
 }
@@ -246,13 +241,19 @@ void GameScene::Update()
 
 	if (gates_.Collision(player_->GetPos(), 3.0f))
 	{
-		player_->Boost();
+		//player_->Boost();
 	}
 
 	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
-	fieldParticles_.SetPlayerDatas(cam_->GetCamera()->GetEye(), XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard()), player_->GetGravityData());
-	fieldParticles_.Update();
-	planetParticles_.Update();
+	
+	GranetParticleManager::MakeParticleDatas particleData;
+	particleData.cameraPos = cam_->GetCamera()->GetEye();
+	particleData.cameraRot = XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard());
+	particleData.playerGravity = player_->GetGravityData();
+	particleData.playerPos = player_->GetPos();
+	particleData.playerMoveVec = player_->GetMoveVec();
+	particles_.SetMakeParticleDatas(particleData);
+	particles_.Update();
 }
 
 void GameScene::PreDraw()
@@ -289,14 +290,15 @@ void GameScene::PreDraw()
 	{
 		pressStartText_->Draw();
 	}
-	fieldParticles_.Draw();
-	planetParticles_.Draw();
+
+	particles_.Draw();
 	StartTarget_->PostDrawScene();
 
 
 	BloomTarget_->PreDrawScene();
 	PlanetManager::Instance()->BloomDraw();
-	fieldParticles_.Draw();
+	//fieldParticles_.Draw();
+	particles_.Draw();
 	BloomTarget_->PostDrawScene();
 
 	DrawTexture_ = StartTarget_->GetTextureNum(0);

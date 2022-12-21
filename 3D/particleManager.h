@@ -49,6 +49,8 @@ public: // サブクラス
 		Vector3 velocity = {};
 		//加速度
 		Vector3 accel = {};
+		//死ぬべきか
+		bool isDead = false;
 		//現在のフレーム
 		int frame = 0;
 		//終了フレーム

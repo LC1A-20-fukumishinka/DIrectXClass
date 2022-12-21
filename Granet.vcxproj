@@ -137,6 +137,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="gameOriginal\GameCamera.cpp" />
     <ClCompile Include="gameOriginal\GameInput.cpp" />
+    <ClCompile Include="gameOriginal\GranetParticleManager.cpp" />
     <ClCompile Include="gameOriginal\Player.cpp" />
     <ClCompile Include="gameOriginal\LoadObject.cpp" />
     <ClCompile Include="gameOriginal\GuidingStar.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="gameOriginal\GameCamera.h" />
     <ClInclude Include="gameOriginal\gameConstData.h" />
     <ClInclude Include="gameOriginal\GameInput.h" />
+    <ClInclude Include="gameOriginal\GranetParticleManager.h" />
     <ClInclude Include="gameOriginal\Player.h" />
     <ClInclude Include="gameOriginal\LoadObject.h" />
     <ClInclude Include="gameOriginal\GuidingStar.h" />

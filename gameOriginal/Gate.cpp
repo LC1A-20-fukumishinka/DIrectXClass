@@ -2,9 +2,9 @@
 #include <DirectXMath.h>
 #include "../Collision/Collision.h"
 #include "ModelPhongPipeline.h"
-Model *Gate::sModel = nullptr;
-Camera *Gate::sCamera = nullptr;
-LightGroup *Gate::sLights = nullptr;
+Model* Gate::sModel = nullptr;
+Camera* Gate::sCamera = nullptr;
+LightGroup* Gate::sLights = nullptr;
 Gate::Gate()
 {
 }
@@ -13,7 +13,7 @@ Gate::~Gate()
 {
 }
 
-void Gate::Init(const Vector3 &pos, const Vector3 &angle, int index, bool isDraw)
+void Gate::Init(const Vector3& pos, const Vector3& angle, int index, bool isDraw)
 {
 	pos_ = pos;
 	angle_ = angle;
@@ -52,21 +52,32 @@ void Gate::Reset()
 	isAlive_ = true;
 }
 
-void Gate::SetModel(Model *model)
+const DirectX::XMFLOAT3& Gate::GetPos()
+{
+	return object_.GetPosition();
+}
+
+Vector3 Gate::GetAngle()
+{
+	Vector3 angle = DirectX::XMVector3Rotate(FukuMath::ZVec, object_.GetRotQuaternion());
+	return angle;
+}
+
+void Gate::SetModel(Model* model)
 {
 	sModel = model;
 }
 
-void Gate::SetCamera(Camera *camera)
+void Gate::SetCamera(Camera* camera)
 {
 	sCamera = camera;
 }
-void Gate::SetLightGroup(LightGroup *lights)
+void Gate::SetLightGroup(LightGroup* lights)
 {
 	sLights = lights;
 }
 
-bool Gate::Collision(const Sphere &player)
+bool Gate::Collision(const Sphere& player)
 {
 	if (!isAlive_)
 	{

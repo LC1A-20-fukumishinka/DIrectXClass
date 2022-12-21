@@ -6,7 +6,7 @@
 #include "SphereCollider.h"
 #include "../Collision/CollisionMgr.h"
 #include "particleManager.h"
-#include "../gameOriginal/FieldParticle.h"
+#include "../gameOriginal/GranetParticleManager.h"
 #include "../LightGroup.h"
 #include "../PointLight.h"
 #include "../SpotLight.h"
@@ -29,7 +29,6 @@
 #include "Bloom.h"
 #include "ModelManager.h"
 #include "../gameOriginal/GateManager.h"
-#include "../gameOriginal/PlanetParticle.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -120,12 +119,12 @@ private:
 	ModelManager models_;
 
 	GateManager gates_;
+
+	GranetParticleManager particles_;
 private://ÉKÉCÉhó¨ÇÍêØä«óù
 	std::vector<GuidingStar> testStar;
 
 	void makeGuide();
-	FieldParticle fieldParticles_;
-	PlanetParticle planetParticles_;
 private://FlagManageróp
 	void MakeFlag(std::weak_ptr<Planet> base, Vector3 angle, float scale);
 

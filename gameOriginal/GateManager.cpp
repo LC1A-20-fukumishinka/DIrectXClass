@@ -1,5 +1,7 @@
 #include "GateManager.h"
 #include "LoadObject.h"
+#include "GateParticle.h"
+
 GateManager::GateManager()
 {
 
@@ -87,7 +89,13 @@ bool GateManager::Collision(const Vector3 &pos, float speed)
 		if (e->Collision(playerS))
 		{
 			isCollision =true;
+			gateParticles_->AddGateParticle( e->GetAngle());
 		}
 	}
 	return isCollision;
+}
+
+void GateManager::SetGateParticle(GateParticle* gateParticle)
+{
+	gateParticles_ = gateParticle;
 }
