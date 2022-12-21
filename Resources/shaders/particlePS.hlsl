@@ -9,5 +9,4 @@ float4 main(GSOutput input) : SV_TARGET
 
 	drawColor *= input.color.a;
 	return drawColor;
-	//return float4(1, 1, 1, 1);
 }

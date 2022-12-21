@@ -171,7 +171,6 @@ void GameScene::Init()
 
 	for (auto &e : testStar)
 	{
-
 		e.Create();
 	}
 

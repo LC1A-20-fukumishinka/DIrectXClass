@@ -18,13 +18,13 @@ void GateManager::Init()
 		float height = 50;
 		std::unique_ptr<Gate> gate;
 		gate = std::make_unique<Gate>();
-		gate->Init(Vector3(-80 + i * 30.0f, height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
+		gate->Init(Vector3(-50, height, 100.0f + i * 50.0f), Vector3(0.0f, 0.0f, 1.0f), 0, true);
 		gates_.emplace_back(gate.get());
 		gate.release();
 
 		std::unique_ptr<Gate> gateD;
 		gateD = std::make_unique<Gate>();
-		gateD->Init(Vector3(-50 + i * 30.0f, -height, 200.0f), Vector3(1.0f, 0.0f, 0.0f), 0, true);
+		gateD->Init(Vector3(+50, height, 100.0f + i * 50.0f), Vector3(0.0f, 0.0f, 1.0f), 0, true);
 		gates_.emplace_back(gateD.get());
 		gateD.release();
 	}
@@ -34,7 +34,7 @@ void GateManager::Init()
 
 void GateManager::Update()
 {
-	for (auto &e : gates_)
+	for (auto& e : gates_)
 	{
 		e->Update();
 	}
@@ -42,7 +42,7 @@ void GateManager::Update()
 
 void GateManager::Draw()
 {
-	for (auto &e : gates_)
+	for (auto& e : gates_)
 	{
 		e->Draw();
 	}
@@ -54,7 +54,7 @@ void GateManager::Finalize()
 
 void GateManager::Reset()
 {
-	for (auto &e : gates_)
+	for (auto& e : gates_)
 	{
 		e->Reset();
 	}
@@ -68,7 +68,7 @@ bool GateManager::LoadStage(int stage)
 
 	if (isLoad)
 	{
-		for (auto &e : tmp)
+		for (auto& e : tmp)
 		{
 			gates_.emplace_back(e.get());
 			e.release();
@@ -78,18 +78,18 @@ bool GateManager::LoadStage(int stage)
 	return isLoad;
 }
 
-bool GateManager::Collision(const Vector3 &pos, float speed)
+bool GateManager::Collision(const Vector3& pos, float speed)
 {
 	Sphere playerS;
 	playerS.center = F3toV(pos);
 	playerS.radius = speed;
 	bool isCollision = false;
-	for (auto &e : gates_)
+	for (auto& e : gates_)
 	{
 		if (e->Collision(playerS))
 		{
-			isCollision =true;
-			gateParticles_->AddGateParticle( e->GetAngle());
+			isCollision = true;
+			gateParticles_->AddGateParticle(e->GetAngle());
 		}
 	}
 	return isCollision;
