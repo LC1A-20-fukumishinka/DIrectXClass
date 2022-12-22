@@ -6,7 +6,7 @@
 #include "gameConstData.h"
 #include "../Collision/CollisionPrimitive.h"
 class Planet;
-
+class PlayerRandingParticle;
 class Player
 {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
@@ -68,6 +68,7 @@ public://ゲッタセッタ
 	void SetCamera(Camera *cam);
 	void SetShadowCamera(Camera *cam);
 	void SetLight(LightGroup *lights);
+	void SetRandingParticle(PlayerRandingParticle *playerRandingParticle);
 	const XMFLOAT3 &GetPos();
 	const XMFLOAT3 GetAngle();
 	const XMFLOAT3 GetUpVec();
@@ -105,6 +106,11 @@ public://惑星周りの処理
 
 	bool LandingCamReset();
 
+	/// <summary>
+	/// ゲートを通過した際に呼び出す処理
+	/// ・通過カウントが増える
+	/// </summary>
+	void passedGate();
 private://アニメーション関連
 	//プレイヤーキャラクターの表情テクスチャハンドル
 	std::vector<int> faceTextureHandles_;
@@ -170,6 +176,10 @@ private:
 	int shakeTimer_ = 0;
 	//着地時のシェイクの時間
 	int shakeTimerMax_ = 15;
+
+	//連続でゲートを通過した個数
+	int continuousPassingCount_ = 0;
+	PlayerRandingParticle* randingParticle_ = nullptr;
 
 	//タコモデル
 	std::unique_ptr<Model> playerModel_;

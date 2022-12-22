@@ -11,6 +11,7 @@
 #include "../Shake.h"
 #include "TextureMgr.h"
 #include "../imgui/ImguiManager.h"
+#include "PlayerRandingParticle.h"
 using namespace DirectX;
 using namespace FukuMath;
 using namespace GameDatas;
@@ -231,6 +232,13 @@ void Player::PosUpdate(const Vector3 &move)
 				isGravityChanged_ = true;
 			}
 			status_ = PlayerStatus::STAND;
+
+			for (int i = 0; i < continuousPassingCount_;i++)
+			{
+				randingParticle_->AddRandingParticle(pos_, drawObject_.GetUpVec());
+			}
+
+			continuousPassingCount_ = 0;
 		}
 	}
 
@@ -459,6 +467,12 @@ bool Player::LandingCamReset()
 	return isReset;
 }
 
+void Player::passedGate()
+{
+	//’Ê‰ÝƒJƒEƒ“ƒg‚ª‰ÁŽZ
+	continuousPassingCount_++;
+}
+
 void Player::FaceUpdate()
 {
 	blinkTimer_--;
@@ -520,6 +534,11 @@ void Player::SetLight(LightGroup *lights)
 	leftTrackObject_.SetLightGroup(lights);
 	rightTrackObject_.SetLightGroup(lights);
 	shadowObject_.SetLightGroup(lights);
+}
+
+void Player::SetRandingParticle(PlayerRandingParticle* playerRandingParticle)
+{
+	randingParticle_ = playerRandingParticle;
 }
 
 const DirectX::XMFLOAT3 &Player::GetPos()

@@ -2,6 +2,7 @@
 #include "FieldParticle.h"
 #include "PlanetParticle.h"
 #include "GateParticle.h"
+#include "PlayerRandingParticle.h"
 #include "gameConstData.h"
 class Camera;
 
@@ -45,6 +46,8 @@ public:
 	PlanetParticle* GetPlanetParticles();
 	//GateParticleのオブジェクトのポインタ
 	GateParticle* GetGateParticles();
+	//
+	PlayerRandingParticle* GetPlayerRandingParticles();
 private:
 	//全体に常に出ているパーティクル
 	FieldParticle fieldParticles_;
@@ -53,6 +56,7 @@ private:
 	//リング通過時に生成されるパーティクル
 	GateParticle gateParticles_;
 
+	PlayerRandingParticle playerRandingParticles_;
 	//生成に必要なデータ
 	MakeParticleDatas makeData;
 };

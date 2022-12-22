@@ -1,6 +1,6 @@
 #include "PlanetParticle.h"
 #include "FukuMath.h"
-
+#include "../EaseClass.h"
 using namespace DirectX;
 PlanetParticle::PlanetParticle()
 {
@@ -36,7 +36,8 @@ void PlanetParticle::Update()
 
 		it->scale += it->s_scale;
 
-		XMStoreFloat4(&it->draw_color, ((it->s_color * f )+ (it->e_color * (1.0f - f))));
+		float easeF = Easing::easeOutCubic(f);
+		XMStoreFloat4(&it->draw_color, ((it->s_color * (1.0f - easeF))+ (it->e_color * easeF)));
 	}
 
 	SendBuffers();

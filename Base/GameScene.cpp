@@ -183,6 +183,7 @@ void GameScene::Init()
 	gates_.SetGateParticle(particles_.GetGateParticles());
 
 	PlanetManager::Instance()->SetPlanetParticles(particles_.GetPlanetParticles());
+	player_->SetRandingParticle(particles_.GetPlayerRandingParticles());
 	Restart();
 
 }
@@ -225,9 +226,6 @@ void GameScene::Update()
 		IngameUpdate();
 	}
 
-	cam_->SetBasePlanet(player_->GetBasePlanet());
-	cam_->SetGravityData(player_->GetGravityData());
-	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec(), player_->GetPlayerStatus());
 
 	objDome_->SetPosition(cam_->GetCameraPos());
 	objDome_->Update();
@@ -237,19 +235,31 @@ void GameScene::Update()
 		e.Update();
 	}
 
+
+	cam_->SetBasePlanet(player_->GetBasePlanet());
+	cam_->SetGravityData(player_->GetGravityData());
+	cam_->Update(player_->GetPos(), player_->GetAngle(), player_->GetUpVec(), player_->GetPlayerStatus());
+	//プレイヤーの状態を受け取る
 	gates_.ReceivePlayerStatus(player_->GetPlayerStatus());
 	gates_.Update();
-	gates_.Collision(player_->GetPos(), 3.0f);
+	//ゲートの通過処理
+	if (gates_.Collision(player_->GetPos(), 3.0f))
+	{
+		//ゲート通過時にプレイヤーにキャラクターにおこる変化
+		player_->passedGate();
+	}
 
-	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
 	
+	//パーティクルの更新処理に必要なデータを受け取る
 	GranetParticleManager::MakeParticleDatas particleData;
 	particleData.cameraPos = cam_->GetCamera()->GetEye();
-	particleData.cameraRot = XMQuaternionRotationMatrix(cam_->GetCamera()->GetMatBillboard());
+	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
+	particleData.cameraRot = XMQuaternionRotationMatrix(camRot);
 	particleData.playerGravity = player_->GetGravityData();
 	particleData.playerPos = player_->GetPos();
 	particleData.playerMoveVec = player_->GetMoveVec();
 	particles_.SetMakeParticleDatas(particleData);
+	//パーティクル更新
 	particles_.Update();
 }
 

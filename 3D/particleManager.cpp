@@ -333,6 +333,7 @@ void ParticleManager::Update()
 		it->scale = a * f;
 
 		it->scale += it->s_scale;
+		XMStoreFloat4(&it->draw_color, ((it->s_color * (1.0f - f)) + (it->e_color * f)));
 	}
 	SendBuffers();
 }

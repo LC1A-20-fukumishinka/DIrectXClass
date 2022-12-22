@@ -22,6 +22,10 @@ void GranetParticleManager::Init(Camera* camera)
 	gateParticles_.Init();
 	gateParticles_.SetCamera(camera);
 	gateParticles_.SetTexture(effectTextureHandle);
+
+	playerRandingParticles_.Init();
+	playerRandingParticles_.SetCamera(camera);
+	playerRandingParticles_.SetTexture(effectTextureHandle);
 }
 
 void GranetParticleManager::Update()
@@ -31,6 +35,7 @@ void GranetParticleManager::Update()
 	fieldParticles_.Update();
 	planetParticles_.Update();
 	gateParticles_.Update();
+	playerRandingParticles_.Update();
 }
 
 void GranetParticleManager::Draw()
@@ -38,6 +43,7 @@ void GranetParticleManager::Draw()
 	fieldParticles_.Draw();
 	planetParticles_.Draw();
 	gateParticles_.Draw();
+	playerRandingParticles_.Draw();
 }
 
 void GranetParticleManager::SetMakeParticleDatas(const MakeParticleDatas& data)
@@ -53,4 +59,9 @@ PlanetParticle* GranetParticleManager::GetPlanetParticles()
 GateParticle* GranetParticleManager::GetGateParticles()
 {
 	return &gateParticles_;
+}
+
+PlayerRandingParticle* GranetParticleManager::GetPlayerRandingParticles()
+{
+	return &playerRandingParticles_;
 }
