@@ -8,20 +8,28 @@
 class Gate
 {
 public:
+	//コンストラクタ
 	Gate();
+	//デストラクタ
 	~Gate();
 
-
+	//初期化生成処理
 	void Init(const Vector3 &pos, const Vector3 &angle, int index, bool isDraw);
+	//更新処理
 	void Update();
+	//描画処理
 	void Draw();
+	//終了処理
 	void Finalize();
-
+	//リセット処理(ゲームリセット時に使用する)
 	void Reset();
-
+	//復活処理(リングを復活させたいときに使う)
+	void Reborn();
+	//衝突処理
 	bool Collision(const Sphere &player);
-
+	//場所のゲッタ
 	const DirectX::XMFLOAT3 &GetPos();
+	//向いてる方向のゲッタ
 	Vector3 GetAngle();
 public:
 	static void SetModel(Model *model);

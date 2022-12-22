@@ -34,9 +34,15 @@ void GateManager::Init()
 
 void GateManager::Update()
 {
+	//プレイヤーが立ち丈太になっていたらゲートを復活させる
+	bool isReborn = playerStatus_ == GameDatas::PlayerStatus::STAND;
 	for (auto& e : gates_)
 	{
 		e->Update();
+		if (isReborn)
+		{
+			e->Reborn();
+		}
 	}
 }
 
@@ -98,4 +104,9 @@ bool GateManager::Collision(const Vector3& pos, float speed)
 void GateManager::SetGateParticle(GateParticle* gateParticle)
 {
 	gateParticles_ = gateParticle;
+}
+
+void GateManager::ReceivePlayerStatus(const GameDatas::PlayerStatus& playerStatus)
+{
+	playerStatus_ = playerStatus;
 }

@@ -237,11 +237,9 @@ void GameScene::Update()
 		e.Update();
 	}
 
-
-	if (gates_.Collision(player_->GetPos(), 3.0f))
-	{
-		//player_->Boost();
-	}
+	gates_.ReceivePlayerStatus(player_->GetPlayerStatus());
+	gates_.Update();
+	gates_.Collision(player_->GetPos(), 3.0f);
 
 	XMMATRIX camRot = cam_->GetCamera()->GetMatBillboard();
 	

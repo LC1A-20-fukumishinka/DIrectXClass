@@ -32,7 +32,7 @@ void Gate::Update()
 
 void Gate::Draw()
 {
-	if (isAlive_)
+	if (isAlive_ && isDraw_)
 	{
 		object_.Update();
 		object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
@@ -49,6 +49,11 @@ void Gate::Reset()
 	object_.SetPosition(pos_);
 	object_.SetRotationVector(F3toV(angle_));
 	object_.Update();
+	isAlive_ = true;
+}
+
+void Gate::Reborn()
+{
 	isAlive_ = true;
 }
 
@@ -79,7 +84,7 @@ void Gate::SetLightGroup(LightGroup* lights)
 
 bool Gate::Collision(const Sphere& player)
 {
-	if (!isAlive_)
+	if (!isAlive_ || !isDraw_)
 	{
 		return false;
 	}

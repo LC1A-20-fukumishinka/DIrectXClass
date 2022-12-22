@@ -114,8 +114,12 @@ private://アニメーション関連
 	int blinkTimer_ = 300;
 	void FaceUpdate();
 private:
+	//現在の座標
 	Vector3 pos_;
+	//描画用オブジェクト
 	Object3D drawObject_;
+
+	//キャタピラ
 	Object3D leftTrackObject_;
 	Object3D rightTrackObject_;
 
@@ -132,11 +136,13 @@ private:
 	//重力を変更したか
 	bool isGravityChanged_ = false;
 
+	//プレイヤーの姿勢
 	DirectX::XMVECTOR playerAngle;
 
+	//スティック入力による移動ベクトル
 	Vector3 warkVec_;
 
-
+	//移動するベクトル
 	Vector3 moveVec_;
 	//惑星と自分の距離
 	float baseLength = 0.0f;
@@ -149,8 +155,10 @@ private:
 	//ジャンプ力
 	const float jumpPower = 0.5f;
 
+	//ロックオン入力のトリガー確認用
 	bool oldLockonInput = false;
 
+	//プレイヤーが発生させる重力データ
 	GameDatas::GravityData gravity_;
 	//単方向時重力
 	Vector3 oneWayGravityAngle_;
@@ -158,15 +166,19 @@ private:
 	//世界からの重力
 	Vector3 worldGravity_;
 
-	//プレイヤーに最終的にかかる重力
-
-	int shakeTimer_ = 5;
+	//着地時シェイクのタイマー
+	int shakeTimer_ = 0;
+	//着地時のシェイクの時間
 	int shakeTimerMax_ = 15;
 
+	//タコモデル
 	std::unique_ptr<Model> playerModel_;
+
+	//キャタピラモデル
 	std::unique_ptr<Model> leftTrackModel_;
 	std::unique_ptr<Model> rightTrackModel_;
 
+	//矢印モデル
 	std::unique_ptr<Model> ArrowModel_;
 };
 
