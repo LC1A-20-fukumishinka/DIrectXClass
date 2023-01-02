@@ -6,6 +6,7 @@
 #include "gameConstData.h"
 #include <limits.h>
 #include "PlanetParticle.h"
+#include "../imgui/ImguiManager.h"
 using namespace std;
 using namespace DirectX;
 bool PlanetManager::isMakeInstance = false;
@@ -52,10 +53,12 @@ void PlanetManager::Update()
 		}
 	}
 
-	if (stagePlanets.size() > 0)
+	if (stagePlanets_.size() > 0)
 	{
 		StageUpdate();
 	}
+
+	EditUpdate();
 }
 
 void PlanetManager::Draw()
@@ -290,7 +293,7 @@ void PlanetManager::SetStagePlanets(int stageNum)
 	{
 		orderCount = 10000;
 	}
-	stagePlanets = tmp;
+	stagePlanets_ = tmp;
 }
 
 bool PlanetManager::LoadStage(int stage)
@@ -356,11 +359,11 @@ std::shared_ptr<Planet> PlanetManager::GetBasePlanet(int stageNum)
 
 bool PlanetManager::StageClear()
 {
-	bool isClear = (orderCount == static_cast<int>(stagePlanets.size()));
+	bool isClear = (orderCount == static_cast<int>(stagePlanets_.size()));
 
 	if (isClear)
 	{
-		for (auto &e : stagePlanets)
+		for (auto &e : stagePlanets_)
 		{
 			e.lock()->SetIsBloom(true);
 		}
@@ -408,7 +411,7 @@ void PlanetManager::StageUpdate()
 void PlanetManager::OrderUpdate()
 {
 	//一つのステージの惑星の数
-	int stagePlanetCount = static_cast<int>(stagePlanets.size());
+	int stagePlanetCount = static_cast<int>(stagePlanets_.size());
 
 	//対象なし
 	bool isNotFound = true;
@@ -416,10 +419,10 @@ void PlanetManager::OrderUpdate()
 	bool isFailed = false;
 
 	//すべての惑星を確認
-	for (auto &e : stagePlanets)
+	for (auto &e : stagePlanets_)
 	{
 		
-		int count = static_cast<int>(&e - &stagePlanets[0]);
+		int count = static_cast<int>(&e - &stagePlanets_[0]);
 		if (e.lock() == playerStandPlanet_.lock())
 		{
 			if (orderCount == count)
@@ -438,15 +441,15 @@ void PlanetManager::OrderUpdate()
 	}
 
 	//次の惑星が光っていない
-	bool isNextPlanetNotShining = (orderCount < static_cast<int>(stagePlanets.size()) && !stagePlanets[orderCount].lock()->GetIsNext());
+	bool isNextPlanetNotShining = (orderCount < static_cast<int>(stagePlanets_.size()) && !stagePlanets_[orderCount].lock()->GetIsNext());
 	if (isNextPlanetNotShining)
 	{
-		stagePlanets[orderCount].lock()->SetNextOrder(true);
+		stagePlanets_[orderCount].lock()->SetNextOrder(true);
 	}
 
 	if (isFailed && orderCount > 0)
 	{
-		for (auto &e : stagePlanets)
+		for (auto &e : stagePlanets_)
 		{
 			e.lock()->ColorOff();
 			e.lock()->SetNextOrder(false);
@@ -458,4 +461,102 @@ void PlanetManager::OrderUpdate()
 	{
 		playerStandPlanet_.lock()->ColorChange();
 	}
+}
+
+void PlanetManager::EditUpdate()
+{
+	EditMenu();
+}
+
+void PlanetManager::EditMenu()
+{
+	bool makeFlag = false;
+
+
+	ImGui::Begin("edit");
+	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
+	makeFlag = ImGui::Button("MakePlanet");
+
+	if (!controllPlanet_.expired())
+	{
+		//座標を受け取って加工して戻す
+		Vector3 pos = controllPlanet_.lock()->GetPos();
+		float ImguiPos[3] = { pos.x,pos.y ,pos.z };
+
+		float ImguiScale = controllPlanet_.lock()->GetScale();
+		ImGui::InputFloat3("position", ImguiPos);
+		ImGui::InputFloat("scale", &ImguiScale);
+		pos = Vector3(ImguiPos[0], ImguiPos[1], ImguiPos[2]);
+		
+		controllPlanet_.lock()->SetPos(pos);
+		controllPlanet_.lock()->SetScale(ImguiScale);
+
+
+
+
+		DirectX::XMFLOAT4 color = controllPlanet_.lock()->GetColor();
+		float ImguiColor[4] = { color.x,color.y ,color.z , color.w};
+
+		ImGui::SliderFloat4("color", ImguiColor, 0.0f, 1.0f);
+
+		color = DirectX::XMFLOAT4(ImguiColor[0], ImguiColor[1], ImguiColor[2], ImguiColor[3]);
+		controllPlanet_.lock()->SetColor(color);
+	}
+
+	bool isZero = (makePlanets_.size() <= 0);
+	int Num = controllPlanetNumber;
+	ImGui::InputInt("controllNumber", &Num);
+	bool isChange = (Num != controllPlanetNumber);
+	if (!isZero && isChange)
+	{
+		if (Num < makePlanets_.size() && Num >= 0)
+		{
+			controllPlanetNumber = Num;
+
+			controllPlanet_ = makePlanets_[Num];
+		}
+	}
+
+	
+	ImGui::End();
+
+	if (makeFlag)
+	{
+		MakePlanet();
+	}
+}
+
+void PlanetManager::MakePlanet()
+{
+	//この瞬間生成されるオブジェクト
+	shared_ptr<Planet> makePlanetObject;
+	makePlanetObject = make_shared<Planet>();
+	int ID = 0;
+
+	//すでに持っている場合
+	if (!controllPlanet_.expired())
+	{
+		Vector3 prePos = controllPlanet_.lock()->GetPos();
+		float preScale = controllPlanet_.lock()->GetScale();
+		XMFLOAT4 preColor = controllPlanet_.lock()->GetColor();
+		ID = controllPlanet_.lock()->GetID();
+		makePlanetObject->Init(prePos, preScale, preColor, ID, true, BASE);
+
+		controllPlanetNumber++;
+	}
+	else
+	{
+		//一番後ろのID＋１
+		ID = planets_.back()->GetID();
+		ID += 1;
+
+		makePlanetObject->Init(Vector3(), 50.0f, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), ID, true, BASE);
+	}
+
+	controllPlanet_ = makePlanetObject;
+
+	planets_.emplace_back(makePlanetObject);
+
+	makePlanets_.emplace_back(makePlanetObject);
+
 }

@@ -161,8 +161,9 @@ void GameCamera::TitleAnimationStart()
 	StartCameraAnimation(true, 60);
 }
 
-void GameCamera::ClearToIngme()
+void GameCamera::ClearToIngme(const Vector3& playerUp)
 {
+	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(F3toV(playerUp), F3toV(cam_.GetAngle())));
 	isClearMode_ = false;
 	StartCameraAnimation(true, 30);
 }

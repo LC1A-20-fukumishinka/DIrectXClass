@@ -209,7 +209,7 @@ void GameScene::Update()
 	{
 		isPause_ = false;
 		Restart();
-		cam_->ClearToIngme();
+		cam_->ClearToIngme(player_->GetUpVec());
 	}
 
 	if (isPause_) return;
@@ -604,7 +604,8 @@ void GameScene::StageClearAnimationUpdate()
 		//惑星の出現 内部にイージングがあるんでフラグ処理（状態３）カメラ回収状態に
 		if (PlanetManager::Instance()->SpawnAnimationEnd(stageNum))
 		{
-			cam_->ClearToIngme();
+			//カメラが戻る処理
+			cam_->ClearToIngme(player_->GetUpVec());
 			clearStatus_ = RETURNCAM;
 		}
 		break;

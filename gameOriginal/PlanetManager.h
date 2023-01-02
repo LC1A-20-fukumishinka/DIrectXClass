@@ -91,14 +91,31 @@ public:
 	void playerStand(std::weak_ptr<Planet> playerStandPlanet);
 
 	float CameraCollision(Ray cameraRay);
+
 private:
 	void StageUpdate();
 
 	void OrderUpdate();
+
+private://エディター
+	//エディタ用更新
+	void EditUpdate();
+
+	//Imguiによるエディットメニュ-
+	void EditMenu();
+	void MakePlanet();
+
+	std::vector<std::weak_ptr<Planet>> makePlanets_;
+
+	std::weak_ptr<Planet> controllPlanet_;
+
+	int controllPlanetNumber = 0;
 private:
 	std::list<std::shared_ptr<Planet>> planets_;
 
-	std::vector<std::weak_ptr<Planet>> stagePlanets;
+	std::vector<std::weak_ptr<Planet>> stagePlanets_;
+
+
 	bool isSpawnAnimation_ = false;
 
 	static bool isMakeInstance;

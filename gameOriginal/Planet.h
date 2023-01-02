@@ -20,19 +20,20 @@ public:
 	Planet();
 	~Planet();
 
-	void Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLOAT4 &color, int stageID, bool Spawn = true, const PlanetType &type = BRIDGE);
+	void Init(const DirectX::XMFLOAT3& pos, float size, const DirectX::XMFLOAT4& color, int stageID, bool Spawn = true, const PlanetType& type = BRIDGE);
 	void Update();
 	void SpawnAnimationUpdate();
 	void SpawnAnimationStart();
 	void Draw();
 	void Finalize();
-	const Vector3 &GetPos() { return pos; }
-	void SetPos(const DirectX::XMFLOAT3 &pos) { this->pos = Vector3(pos.x, pos.y, pos.z); }
+	const Vector3& GetPos() { return pos; }
+	void SetPos(const DirectX::XMFLOAT3& pos);
 	void SetScale(float scale);
-	Object3D *GetObject3d();
+	Object3D* GetObject3d();
 	float GetScale();
 	float GetStartScale();
-	const DirectX::XMFLOAT4 &GetColor();
+	const DirectX::XMFLOAT4& GetColor();
+	void SetColor(const DirectX::XMFLOAT4& color);
 	//この世に存在する状態かどうかのフラグ
 	bool GetIsSpawn();
 
@@ -48,9 +49,9 @@ public:
 	std::unique_ptr<PlanetObject> object;
 	std::unique_ptr <Model> model_;
 public:
-	static void SetLight(LightGroup *lights);
-	static void SetCamera(Camera *cam);
-	static void SetShadowCamera(Camera *shadowCam);
+	static void SetLight(LightGroup* lights);
+	static void SetCamera(Camera* cam);
+	static void SetShadowCamera(Camera* shadowCam);
 	static void SetShadowTexture(int texHandle);
 	static void SetPlayerPos(Vector3 playerPos);
 
@@ -58,7 +59,7 @@ public:
 	void ReleaseGrab();
 	void OnPlayer();
 	void ReleaseBase();
-	void SetGrabRotateAngle(const DirectX::XMVECTOR &AxisY, const DirectX::XMVECTOR &AxisX);
+	void SetGrabRotateAngle(const DirectX::XMVECTOR& AxisY, const DirectX::XMVECTOR& AxisX);
 	void SetNextOrder(bool isNext);
 	bool GetIsOnPlayer();
 	int GetID();
@@ -74,9 +75,9 @@ public:
 	PlanetType GetType();
 	void Reset();
 private://静的メンバ変数
-	static Camera *cam;
-	static Camera *shadowCam;
-	static LightGroup *lights;
+	static Camera* cam;
+	static Camera* shadowCam;
+	static LightGroup* lights;
 	static int shadowTextureNum;
 	static Vector3 sPlayerPos;
 private://メンバ変数
@@ -100,7 +101,7 @@ private://メンバ変数
 
 	//どのステージ番号で出現するか
 	int ID_ = -1;
-	DirectX::XMFLOAT4 startColor_;
+	DirectX::XMFLOAT4 baseColor_;
 	Easing SpawnAnimationEase_;
 
 	float clearRate = 0.0f;

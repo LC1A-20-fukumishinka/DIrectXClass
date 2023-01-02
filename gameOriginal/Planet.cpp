@@ -44,7 +44,7 @@ void Planet::Init(const DirectX::XMFLOAT3 &pos, float size, const DirectX::XMFLO
 	ID_ = stageID;
 	startPos_ = pos;
 	startScale_ = size;
-	startColor_ = color;
+	baseColor_ = color;
 	startIsSpawn_ = Spawn;
 	SpawnAnimationEase_.Init(20);
 	object->SetCamera(cam);
@@ -150,6 +150,14 @@ void Planet::Finalize()
 {
 }
 
+void Planet::SetPos(const DirectX::XMFLOAT3& pos)
+{
+	this->pos = pos;
+
+	startPos_ = pos;
+	object->SetPosition(pos);
+}
+
 void Planet::SetScale(float scale)
 {
 	this->scale = scale;
@@ -173,7 +181,14 @@ float Planet::GetStartScale()
 
 const XMFLOAT4 &Planet::GetColor()
 {
-	return startColor_;
+	return baseColor_;
+}
+
+void Planet::SetColor(const DirectX::XMFLOAT4& color)
+{
+	baseColor_ = color;
+	object->SetColor(baseColor_);
+
 }
 
 bool Planet::GetIsSpawn()
@@ -325,5 +340,5 @@ void Planet::Reset()
 	isColorChange_ = false;
 	isFinishedColorChange = false;
 	object->SetPosition(startPos_);
-	object->SetColor(startColor_);
+	object->SetColor(baseColor_);
 }

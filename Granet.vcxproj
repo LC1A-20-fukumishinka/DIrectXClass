@@ -46,12 +46,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\fbx_sdk\lib;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\DirectXTex\inc</IncludePath>
+    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\fbx_sdk\lib;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\DirectXTex\inc;$(ProjectDir)lib\nlohmann</IncludePath>
     <LibraryPath>$(ProjectDir)lib\fbx_sdk\lib;$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(IncludePath);$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\fbx_sdk\lib;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\DirectXTex\inc</IncludePath>
+    <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(IncludePath);$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\fbx_sdk\lib;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)lib\DirectXTex\inc;$(ProjectDir)lib\nlohmann</IncludePath>
     <LibraryPath>$(ProjectDir)lib\fbx_sdk\lib;$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

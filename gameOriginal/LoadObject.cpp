@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <json.hpp>
 using namespace std;
 using namespace DirectX;
 
@@ -248,3 +249,8 @@ bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
 	file.close();
 	return true;
 }
+
+void SaveStageFile(int stage, std::vector<std::shared_ptr<Planet>>& planets)
+{
+}
+

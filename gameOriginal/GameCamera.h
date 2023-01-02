@@ -36,7 +36,7 @@ public:
 	/// <summary>
 	/// クリアからゲームに遷移
 	/// </summary>
-	void ClearToIngme();
+	void ClearToIngme(const Vector3 &playerUp);
 
 	/// <summary>
 	/// タイトルからゲームに遷移
