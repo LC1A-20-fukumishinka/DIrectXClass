@@ -16,16 +16,34 @@ public:
 	void Reset();
 	bool LoadStage(int stage);
 
-	bool Collision(const Vector3 &pos, float speed);
+	bool Collision(const Vector3& pos, float speed);
 
 	//ゲートパーティクルのオブジェクトを受け取る
 	void SetGateParticle(GateParticle* gateParticle);
 
 	//プレイヤーのステータスを受け取る
-	void ReceivePlayerStatus(const GameDatas::PlayerStatus &playerStatus);
+	void ReceivePlayerStatus(const GameDatas::PlayerStatus& playerStatus);
+
+public://エディタ用
+
+	/// <summary>
+	/// ゲートを作成する
+	/// </summary>
+	/// <param name="controllGate">コピー元のオブジェクト</param>
+	/// <returns></returns>
+	std::weak_ptr<Gate> MakeGate(std::weak_ptr<Gate>& controllGate, int stageNum);
+
+	/// <summary>
+	/// 全ゲートから編集したい番号のステージを収集する
+	/// </summary>
+	/// <param name="editStageNum">編集するステージ番号</param>
+	/// <param name="makeGates">収集したステージを入れる配列</param>
+	/// <param name="controllGate">操作対象にとる惑星</param>
+	/// <returns></returns>
+	bool SetMakeGates(int &editStageNum, std::vector<std::weak_ptr<Gate>>& makeGates, std::weak_ptr<Gate>& controllGate);
 private:
 	//ゲーム内に配置されているゲート
-	std::vector<std::unique_ptr<Gate>> gates_;
+	std::vector<std::shared_ptr<Gate>> gates_;
 
 	//ゲート通過時に発生するパーティクル
 	GateParticle* gateParticles_ = nullptr;

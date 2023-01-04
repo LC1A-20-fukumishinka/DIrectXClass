@@ -97,19 +97,26 @@ private:
 
 	void OrderUpdate();
 
-private://エディター
-	//エディタ用更新
-	void EditUpdate();
+public://エディタ用
 
-	//Imguiによるエディットメニュ-
-	void EditMenu();
-	void MakePlanet();
+	/// <summary>
+	/// ゲートを作成する
+	/// </summary>
+	/// <param name="controllGate">コピー元のオブジェクト</param>
+	/// <returns></returns>
+	std::weak_ptr<Planet> MakePlanet(std::weak_ptr<Planet>& controllPlanet);
 
-	std::vector<std::weak_ptr<Planet>> makePlanets_;
+	/// <summary>
+	/// 全惑星から編集したい番号のステージを収集する
+	/// </summary>
+	/// <param name="editStageNum">編集するステージ番号</param>
+	/// <param name="makeGates">収集したステージを入れる配列</param>
+	/// <param name="controllGate">操作対象にとる惑星</param>
+	/// <returns></returns>
+	bool SetMakePlanet(int& editStageNum, std::vector<std::weak_ptr<Planet>>& makePlanets, std::weak_ptr<Planet>& controllPlanet);
 
-	std::weak_ptr<Planet> controllPlanet_;
 
-	int controllPlanetNumber = 0;
+
 private:
 	std::list<std::shared_ptr<Planet>> planets_;
 

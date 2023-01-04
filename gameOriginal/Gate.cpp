@@ -34,6 +34,8 @@ void Gate::Draw()
 {
 	if (isAlive_ && isDraw_)
 	{
+		object_.SetPosition(pos_);
+		object_.SetRotationVector(F3toV(angle_));
 		object_.Update();
 		object_.modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	}
@@ -66,6 +68,32 @@ Vector3 Gate::GetAngle()
 {
 	Vector3 angle = DirectX::XMVector3Rotate(FukuMath::ZVec, object_.GetRotQuaternion());
 	return angle;
+}
+
+void Gate::SetAngle(const Vector3& angle)
+{
+	angle_ = angle;
+}
+
+void Gate::SetPos(const Vector3& pos)
+{
+	pos_ = pos;
+	object_.SetPosition(pos_);
+}
+
+void Gate::SetColor(const DirectX::XMFLOAT4 &color)
+{
+	object_.SetColor(color);
+}
+
+const DirectX::XMFLOAT4& Gate::GetColor()
+{
+	return object_.GetColor();
+}
+
+int Gate::GetID()
+{
+	return index_;
 }
 
 void Gate::SetModel(Model* model)

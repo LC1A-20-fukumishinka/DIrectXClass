@@ -139,7 +139,7 @@ bool LoadStageFile(int stage, std::vector<std::shared_ptr<Planet>> &planets)
 	return true;
 }
 
-bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
+bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 {
 	string baseName = "gate";
 	string count = to_string(stage);
@@ -159,7 +159,7 @@ bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
 
 
 	std::vector<MakeGateData> datas;
-	std::vector<std::unique_ptr<Gate>>tmpGates;
+	std::vector<std::shared_ptr<Gate>>tmpGates;
 	Vector3 setColor;
 	int ID = stage;
 	bool isSpawn = false;
@@ -241,8 +241,7 @@ bool LoadGateFile(int stage, std::vector<std::unique_ptr<Gate>> &gates)
 	for (int i = 0; i < maxCount; i++)
 	{
 		tmpGates[i]->Init(datas[i].pos, datas[i].angle, ID, isSpawn);
-		gates.emplace_back(tmpGates[i].get());
-		tmpGates[i].release();
+		gates.emplace_back(tmpGates[i]);
 	}
 
 	//ファイルの読み込みが終わったので閉じる

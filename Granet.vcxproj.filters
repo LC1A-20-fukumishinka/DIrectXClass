@@ -315,6 +315,9 @@
     <ClCompile Include="gameOriginal\PlayerRandingParticle.cpp">
       <Filter>ソース ファイル\GameOriginal</Filter>
     </ClCompile>
+    <ClCompile Include="gameOriginal\GranetEditer.cpp">
+      <Filter>ソース ファイル\GameOriginal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2D\Bloom.h">
@@ -591,6 +594,9 @@
       <Filter>ヘッダー ファイル\GameOriginal</Filter>
     </ClInclude>
     <ClInclude Include="gameOriginal\GranetParticleManager.h">
+      <Filter>ヘッダー ファイル\GameOriginal</Filter>
+    </ClInclude>
+    <ClInclude Include="gameOriginal\GranetEditer.h">
       <Filter>ヘッダー ファイル\GameOriginal</Filter>
     </ClInclude>
   </ItemGroup>

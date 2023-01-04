@@ -1,7 +1,7 @@
 #include "GateManager.h"
 #include "LoadObject.h"
 #include "GateParticle.h"
-
+#include "../imgui/ImguiManager.h"
 GateManager::GateManager()
 {
 
@@ -16,17 +16,15 @@ void GateManager::Init()
 	for (int i = 0; i < 5; i++)
 	{
 		float height = 50;
-		std::unique_ptr<Gate> gate;
-		gate = std::make_unique<Gate>();
+		std::shared_ptr<Gate> gate;
+		gate = std::make_shared<Gate>();
 		gate->Init(Vector3(-50, height, 100.0f + i * 50.0f), Vector3(0.0f, 0.0f, 1.0f), 0, true);
-		gates_.emplace_back(gate.get());
-		gate.release();
+		gates_.emplace_back(gate);
 
-		std::unique_ptr<Gate> gateD;
-		gateD = std::make_unique<Gate>();
+		std::shared_ptr<Gate> gateD;
+		gateD = std::make_shared<Gate>();
 		gateD->Init(Vector3(+50, height, 100.0f + i * 50.0f), Vector3(0.0f, 0.0f, 1.0f), 0, true);
-		gates_.emplace_back(gateD.get());
-		gateD.release();
+		gates_.emplace_back(gateD);
 	}
 
 	LoadStage(1);
@@ -44,6 +42,7 @@ void GateManager::Update()
 			e->Reborn();
 		}
 	}
+
 }
 
 void GateManager::Draw()
@@ -68,7 +67,7 @@ void GateManager::Reset()
 
 bool GateManager::LoadStage(int stage)
 {
-	std::vector<std::unique_ptr<Gate>> tmp;
+	std::vector<std::shared_ptr<Gate>> tmp;
 
 	bool isLoad = LoadGateFile(stage, tmp);
 
@@ -76,8 +75,7 @@ bool GateManager::LoadStage(int stage)
 	{
 		for (auto& e : tmp)
 		{
-			gates_.emplace_back(e.get());
-			e.release();
+			gates_.emplace_back(e);
 		}
 	}
 
@@ -109,4 +107,61 @@ void GateManager::SetGateParticle(GateParticle* gateParticle)
 void GateManager::ReceivePlayerStatus(const GameDatas::PlayerStatus& playerStatus)
 {
 	playerStatus_ = playerStatus;
+}
+
+std::weak_ptr<Gate> GateManager::MakeGate(std::weak_ptr<Gate>& controllGate, int stageNum)
+{
+	//この瞬間生成されるオブジェクト
+	std::shared_ptr<Gate> makeGateObject;
+	makeGateObject = std::make_shared<Gate>();
+	int ID = 0;
+
+	//すでに持っている場合
+
+		//座標をコピーするために必要
+	if (!controllGate.expired())
+	{
+		//追加作成元のオブジェクトの情報から新規作成
+		Vector3 prePos = controllGate.lock()->GetPos();
+		Vector3 preAngle = controllGate.lock()->GetAngle();
+		DirectX::XMFLOAT4 preColor = controllGate.lock()->GetColor();
+		ID = controllGate.lock()->GetID();
+		makeGateObject->Init(prePos, preAngle, static_cast<int>(controllGate.lock()->GetID()), true);
+	}
+	else
+	{
+		makeGateObject->Init(Vector3(), Vector3(0.0f, 0.0f, 1.0f), stageNum, true);
+	}
+
+	gates_.emplace_back(makeGateObject);
+
+	return makeGateObject;
+}
+
+bool GateManager::SetMakeGates(int &editStageNum, std::vector<std::weak_ptr<Gate>>& makeGates, std::weak_ptr<Gate>& controllGate)
+{
+	//編集配列クリア
+	makeGates.clear();
+	for (auto& e : gates_)
+	{
+		//対象の惑星を収集
+		if (e->GetID() == editStageNum)
+		{
+			makeGates.emplace_back(e);
+		}
+	}
+
+	//対象の惑星が存在したかどうか
+	if (static_cast<int>(makeGates.size()) > 0)
+	{//対象の惑星が存在したら
+		//一番後ろの惑星を操作対象にとる
+		controllGate = makeGates.back();
+		return true;
+	}
+	else
+	{//対象の惑星が存在しなかったら
+		//捜査対象なしにして
+		controllGate.reset();
+		return false;
+	}
 }

@@ -29,6 +29,7 @@
 #include "Bloom.h"
 #include "ModelManager.h"
 #include "../gameOriginal/GateManager.h"
+#include "../gameOriginal/GranetEditer.h"
 class TouchableObject;
 class GameScene : public IScene
 {
@@ -121,6 +122,8 @@ private:
 	GateManager gates_;
 
 	GranetParticleManager particles_;
+
+	GranetEditer editer_;
 private://ƒKƒCƒh—¬‚ê¯ŠÇ—
 	std::vector<GuidingStar> testStar;
 

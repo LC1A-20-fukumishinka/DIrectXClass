@@ -184,6 +184,8 @@ void GameScene::Init()
 
 	PlanetManager::Instance()->SetPlanetParticles(particles_.GetPlanetParticles());
 	player_->SetRandingParticle(particles_.GetPlayerRandingParticles());
+
+	editer_.SetManagers(PlanetManager::Instance().get(), &gates_);
 	Restart();
 
 }
@@ -261,6 +263,8 @@ void GameScene::Update()
 	particles_.SetMakeParticleDatas(particleData);
 	//パーティクル更新
 	particles_.Update();
+
+	editer_.EditUpdate();
 }
 
 void GameScene::PreDraw()

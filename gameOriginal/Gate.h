@@ -14,7 +14,7 @@ public:
 	~Gate();
 
 	//初期化生成処理
-	void Init(const Vector3 &pos, const Vector3 &angle, int index, bool isDraw);
+	void Init(const Vector3& pos, const Vector3& angle, int index, bool isDraw);
 	//更新処理
 	void Update();
 	//描画処理
@@ -26,15 +26,34 @@ public:
 	//復活処理(リングを復活させたいときに使う)
 	void Reborn();
 	//衝突処理
-	bool Collision(const Sphere &player);
+	bool Collision(const Sphere& player);
 	//場所のゲッタ
-	const DirectX::XMFLOAT3 &GetPos();
+	const DirectX::XMFLOAT3& GetPos();
 	//向いてる方向のゲッタ
 	Vector3 GetAngle();
+
+	void SetAngle(const Vector3& angle);
+	/// <summary>
+	/// 座標のセッタ
+	/// </summary>
+	/// <param name="pos">入れる座標</param>
+	void SetPos(const Vector3& pos);
+	/// <summary>
+	/// 色をセットする
+	/// </summary>
+	/// <param name="color">セットする色</param>
+	void SetColor(const DirectX::XMFLOAT4& color);
+	/// <summary>
+	/// 自分の色を返す
+	/// </summary>
+	/// <returns>自分の色</returns>
+	const DirectX::XMFLOAT4& GetColor();
+
+	int GetID();
 public:
-	static void SetModel(Model *model);
-	static void SetCamera(Camera *camera);
-	static void SetLightGroup(LightGroup *lights);
+	static void SetModel(Model* model);
+	static void SetCamera(Camera* camera);
+	static void SetLightGroup(LightGroup* lights);
 private:
 
 	// 機能している状態か
@@ -59,11 +78,11 @@ private:
 	Object3D object_;
 
 	//モデル
-	static Model *sModel;
+	static Model* sModel;
 	//カメラ
-	static Camera *sCamera;
+	static Camera* sCamera;
 	//ライト
-	static LightGroup *sLights;
+	static LightGroup* sLights;
 
 };
 

@@ -17,6 +17,6 @@ bool LoadStageFile(int stage , std::vector<std::shared_ptr<Planet>> &planets);
 /// <param name="stage">ステージ番号</param>
 /// <param name="gates">ゲートリングのデータを入れる配列</param>
 /// <returns>読み込みに成功したか</returns>
-bool LoadGateFile(int stage , std::vector<std::unique_ptr<Gate>> &gates);
+bool LoadGateFile(int stage , std::vector<std::shared_ptr<Gate>> &gates);
 
 void SaveStageFile(int stage, std::vector<std::shared_ptr<Planet>>& planets);
