@@ -19,4 +19,13 @@ bool LoadStageFile(int stage , std::vector<std::shared_ptr<Planet>> &planets);
 /// <returns>読み込みに成功したか</returns>
 bool LoadGateFile(int stage , std::vector<std::shared_ptr<Gate>> &gates);
 
-void SaveStageFile(int stage, std::vector<std::shared_ptr<Planet>>& planets);
+/// <summary>
+/// 惑星データの保存
+/// </summary>
+/// <param name="planets">惑星データ</param>
+/// <param name="Gates">ゲートデータ</param>
+/// <param name="isStartDraw">初期描画</param>
+void SaveStageFile(const std::vector<std::weak_ptr<Planet>>& planets, const  std::vector<std::weak_ptr<Gate>>& Gates, bool isStartDraw);
+
+
+void SaveAllStageFile(const std::list<std::shared_ptr<Planet>>& planets, const  std::vector<std::shared_ptr<Gate>>& Gates);

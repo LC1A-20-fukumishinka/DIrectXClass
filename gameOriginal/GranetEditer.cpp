@@ -2,6 +2,7 @@
 #include "../imgui/ImguiManager.h"
 #include "PlanetManager.h"
 #include "GateManager.h"
+#include "LoadObject.h"
 GranetEditer::GranetEditer()
 {
 }
@@ -11,7 +12,7 @@ GranetEditer::~GranetEditer()
 void GranetEditer::EditUpdate()
 {
 	//どっちかのマネージャーが存在しなかったら戻る
-	if (planetManager_ == nullptr || planetManager_ == nullptr) return;
+	if (planetManager_ == nullptr || gateManager_ == nullptr) return;
 	EditMenu();
 }
 
@@ -47,6 +48,16 @@ void GranetEditer::EditMenu()
 	}
 	PlanetEditMenu();
 	GateEditMenu();
+
+	bool Save = false;
+	bool AllSave = false;
+	Save = ImGui::Button("Save");
+	AllSave = ImGui::Button("AllStageSave");
+
+	if (Save)
+	{
+		SaveStageFile(makePlanets_, makeGates_, true);
+	}
 	ImGui::End();
 
 }

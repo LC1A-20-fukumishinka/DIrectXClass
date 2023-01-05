@@ -116,7 +116,7 @@ public://エディタ用
 	bool SetMakePlanet(int& editStageNum, std::vector<std::weak_ptr<Planet>>& makePlanets, std::weak_ptr<Planet>& controllPlanet);
 
 
-
+	const std::list<std::shared_ptr<Planet>>& GetPlanets();
 private:
 	std::list<std::shared_ptr<Planet>> planets_;
 

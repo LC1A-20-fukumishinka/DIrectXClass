@@ -540,3 +540,8 @@ bool PlanetManager::SetMakePlanet(int& editStageNum, std::vector<std::weak_ptr<P
 		return false;
 	}
 }
+
+const std::list<std::shared_ptr<Planet>>& PlanetManager::GetPlanets()
+{
+	return planets_;
+}

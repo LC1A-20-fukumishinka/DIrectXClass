@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <json.hpp>
 using namespace std;
 using namespace DirectX;
 
@@ -36,7 +35,7 @@ bool LoadStageFile(int stage, std::vector<std::shared_ptr<Planet>> &planets)
 
 	string line;
 
-
+	
 	std::vector<MakePlanetData> datas;
 
 	Vector3 setColor;
@@ -249,7 +248,69 @@ bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 	return true;
 }
 
-void SaveStageFile(int stage, std::vector<std::shared_ptr<Planet>>& planets)
+void SaveStageFile(const std::vector<std::weak_ptr<Planet>>& planets, const std::vector<std::weak_ptr<Gate>>& Gates, bool isStartDraw)
+{
+
+	//
+	if (planets.size() <= 0)
+	{
+		return;
+	}
+
+	std::ofstream stage;
+	//ファイルを読み込む
+	string count = to_string(planets[0].lock()->GetID());
+
+	const string stageFileName = "Resources/Stage/stage" + count + ".txt";
+
+	stage.open(stageFileName, std::ios::out);
+
+
+	//惑星の個数のデータ
+	string planetCounts = "n " + to_string(static_cast<int>(planets.size())) + "\n";
+	//惑星の座標データ
+	string planetsPos;
+	//惑星のスケールデータ
+	string planetsScale;
+
+	//惑星の色データ
+	XMVECTOR colorV = XMLoadFloat4( &planets[0].lock()->GetColor());
+	colorV *= 255.0f;
+	XMFLOAT4 color;
+	XMStoreFloat4(&color, colorV);
+	int R, G, B;
+	R = static_cast<int>(color.x);
+	G = static_cast<int>(color.y);
+	B = static_cast<int>(color.z);
+	string planetsColor = "c " + to_string(R) + "," + to_string(G) + "," + to_string(B) + "\n";
+	//惑星の初期描画データ
+	string planetsStartDraw;
+	if (isStartDraw)
+	{
+		planetsStartDraw = "d 1";
+	}
+	else
+	{
+		planetsStartDraw = "d 0";
+	}
+
+	//すべての惑星の座標とスケール用意
+	for (auto &e: planets)
+	{
+		Vector3 pos = e.lock()->GetPos();
+		planetsPos += ("p " + to_string(pos.x) + " " + to_string(pos.y) + " " + to_string(pos.z) + "\n");
+
+		planetsScale += ("s " + to_string(e.lock()->GetScale()) + "\n");
+	}
+
+	stage << planetCounts << endl << planetsPos << endl << planetsScale << endl << planetsColor << endl << planetsStartDraw;
+
+	stage.close();
+	//const string gateFileName = "Resources/Stage/gate" + count + ".txt";
+
+}
+
+void SaveAllStageFile(const std::list<std::shared_ptr<Planet>>& planets, const std::vector<std::shared_ptr<Gate>>& Gates)
 {
 }
 

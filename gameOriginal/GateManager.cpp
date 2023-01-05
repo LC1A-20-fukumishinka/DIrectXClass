@@ -109,6 +109,11 @@ void GateManager::ReceivePlayerStatus(const GameDatas::PlayerStatus& playerStatu
 	playerStatus_ = playerStatus;
 }
 
+const std::vector<std::shared_ptr<Gate>>& GateManager::GetGates()
+{
+	return gates_;
+}
+
 std::weak_ptr<Gate> GateManager::MakeGate(std::weak_ptr<Gate>& controllGate, int stageNum)
 {
 	//この瞬間生成されるオブジェクト
