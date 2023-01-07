@@ -56,7 +56,12 @@ void GranetEditer::EditMenu()
 
 	if (Save)
 	{
-		SaveStageFile(makePlanets_, makeGates_, true);
+		SaveStageFile(makePlanets_, makeGates_, false);
+	}
+
+	if (AllSave)
+	{
+		SaveAllStageFile(planetManager_->GetPlanets(), gateManager_->GetGates());
 	}
 	ImGui::End();
 
@@ -65,8 +70,6 @@ void GranetEditer::EditMenu()
 void GranetEditer::GateEditMenu()
 {
 	bool makeFlag = false;
-
-	ImGui::SetWindowSize(ImVec2(100, 100), ImGuiCond_::ImGuiCond_FirstUseEver);
 
 	makeFlag = ImGui::Button("MakeGate");
 
@@ -80,8 +83,8 @@ void GranetEditer::GateEditMenu()
 		Vector3 angle = controllGate_.lock()->GetAngle();
 		float ImguiPos[3] = { pos.x,pos.y ,pos.z };
 		float ImguiAngle[3] = { angle.x,angle.y ,angle.z };
-		ImGui::InputFloat3("GatePosition", ImguiPos);
-		ImGui::SliderFloat3("GateAcngle", ImguiAngle, -1.0f, 1.0f);
+		ImGui::DragFloat3("GatePosition", ImguiPos, 0.5f);
+		ImGui::SliderFloat3("GateAngle", ImguiAngle, -1.0f, 1.0f);
 
 		pos = Vector3(ImguiPos[0], ImguiPos[1], ImguiPos[2]);
 		angle = Vector3(ImguiAngle[0], ImguiAngle[1], ImguiAngle[2]);
@@ -93,7 +96,7 @@ void GranetEditer::GateEditMenu()
 		DirectX::XMFLOAT4 color = controllGate_.lock()->GetColor();
 		float ImguiColor[4] = { color.x,color.y ,color.z , color.w };
 
-		ImGui::SliderFloat4("color", ImguiColor, 0.0f, 1.0f);
+		ImGui::SliderFloat4("gateColor", ImguiColor, 0.0f, 1.0f);
 
 		color = DirectX::XMFLOAT4(ImguiColor[0], ImguiColor[1], ImguiColor[2], ImguiColor[3]);
 		controllGate_.lock()->SetColor(color);
@@ -104,7 +107,7 @@ void GranetEditer::GateEditMenu()
 	//‘€ì‘ÎÛ•ÏX
 	bool isZero = (makeGates_.size() <= 0);
 	int Num = controllGateNumber;
-	ImGui::InputInt("controllNumber", &Num);
+	ImGui::InputInt("controllGateNumber", &Num);
 
 	bool isChange = (Num != controllGateNumber);
 
@@ -150,8 +153,8 @@ void GranetEditer::PlanetEditMenu()
 		float ImguiPos[3] = { pos.x,pos.y ,pos.z };
 
 		float ImguiScale = controllPlanet_.lock()->GetScale();
-		ImGui::InputFloat3("PlanetPosition", ImguiPos);
-		ImGui::InputFloat("PlanetScale", &ImguiScale);
+		ImGui::DragFloat3("PlanetPosition", ImguiPos, 0.5f);
+		ImGui::DragFloat("PlanetScale", &ImguiScale, 0.05f);
 		pos = Vector3(ImguiPos[0], ImguiPos[1], ImguiPos[2]);
 
 		controllPlanet_.lock()->SetPos(pos);
@@ -173,7 +176,7 @@ void GranetEditer::PlanetEditMenu()
 
 	bool isZero = (makePlanets_.size() <= 0);
 	int Num = controllPlanetNumber;
-	ImGui::InputInt("controllNumber", &Num);
+	ImGui::InputInt("controllPlanetNumber", &Num);
 	bool isChange = (Num != controllPlanetNumber);
 	if (!isZero && isChange)
 	{

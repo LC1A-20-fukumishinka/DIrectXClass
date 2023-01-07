@@ -13,21 +13,14 @@ GateManager::~GateManager()
 
 void GateManager::Init()
 {
-	for (int i = 0; i < 5; i++)
+
+	int stageNum = 0;
+
+	//すべてのステージを読み込む
+	while(LoadStage(stageNum))
 	{
-		float height = 50;
-		std::shared_ptr<Gate> gate;
-		gate = std::make_shared<Gate>();
-		gate->Init(Vector3(-50, height, 100.0f + i * 50.0f), Vector3(0.0f, 0.0f, 1.0f), 0, true);
-		gates_.emplace_back(gate);
-
-		std::shared_ptr<Gate> gateD;
-		gateD = std::make_shared<Gate>();
-		gateD->Init(Vector3(+50, height, 100.0f + i * 50.0f), Vector3(0.0f, 0.0f, 1.0f), 0, true);
-		gates_.emplace_back(gateD);
+		stageNum++;
 	}
-
-	LoadStage(1);
 }
 
 void GateManager::Update()
@@ -107,6 +100,17 @@ void GateManager::SetGateParticle(GateParticle* gateParticle)
 void GateManager::ReceivePlayerStatus(const GameDatas::PlayerStatus& playerStatus)
 {
 	playerStatus_ = playerStatus;
+}
+
+void GateManager::GateSpawn(int stageNum)
+{
+	for (auto& e : gates_)
+	{
+		if (e->GetID() == stageNum)
+		{
+			e->Spawn();
+		}
+	}
 }
 
 const std::vector<std::shared_ptr<Gate>>& GateManager::GetGates()

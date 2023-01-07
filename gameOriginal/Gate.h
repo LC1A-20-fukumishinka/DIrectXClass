@@ -23,6 +23,8 @@ public:
 	void Finalize();
 	//リセット処理(ゲームリセット時に使用する)
 	void Reset();
+
+	void Spawn();
 	//復活処理(リングを復活させたいときに使う)
 	void Reborn();
 	//衝突処理
@@ -60,7 +62,8 @@ private:
 	bool isAlive_ = false;
 	//描画しているか
 	bool isDraw_ = true;
-
+	//最初から描画しているか
+	bool isStartDraw_ = false;
 	//現在の座標
 	Vector3 pos_;
 

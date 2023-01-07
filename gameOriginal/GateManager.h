@@ -24,6 +24,7 @@ public:
 	//プレイヤーのステータスを受け取る
 	void ReceivePlayerStatus(const GameDatas::PlayerStatus& playerStatus);
 
+	void GateSpawn(int stageNum);
 	//現在のゲートデータを渡す
 	const std::vector<std::shared_ptr<Gate>>& GetGates();
 public://エディタ用

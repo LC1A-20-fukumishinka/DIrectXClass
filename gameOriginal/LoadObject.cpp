@@ -160,6 +160,7 @@ bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 	std::vector<MakeGateData> datas;
 	std::vector<std::shared_ptr<Gate>>tmpGates;
 	Vector3 setColor;
+	XMFLOAT4 color;
 	int ID = stage;
 	bool isSpawn = false;
 	PlanetType type = PlanetType::BASE;
@@ -181,7 +182,7 @@ bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 		//n 個数
 		if (key == "n")
 		{
-			//惑星の上限個数を設定する
+			//ゲートの上限個数を設定する
 			lineData >> maxCount;
 			//上限個数分生成
 			tmpGates.resize(maxCount);
@@ -228,6 +229,21 @@ bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 			//情報のインデックスを一つ進める
 			aCount++;
 		}
+
+		//c (カラー)
+		if (key == "c")
+		{
+			lineData >> setColor.x;
+			lineData >> setColor.y;
+			lineData >> setColor.z;
+
+
+			setColor *= (1.0f / 255.0f);
+			color.x = setColor.x;
+			color.y = setColor.y;
+			color.z = setColor.z;
+			color.w = 1.0f;
+		}
 		ID = stage;
 
 		//d(初期描画フラグ)
@@ -240,6 +256,7 @@ bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 	for (int i = 0; i < maxCount; i++)
 	{
 		tmpGates[i]->Init(datas[i].pos, datas[i].angle, ID, isSpawn);
+		tmpGates[i]->SetColor(color);
 		gates.emplace_back(tmpGates[i]);
 	}
 
@@ -250,67 +267,169 @@ bool LoadGateFile(int stage, std::vector<std::shared_ptr<Gate>> &gates)
 
 void SaveStageFile(const std::vector<std::weak_ptr<Planet>>& planets, const std::vector<std::weak_ptr<Gate>>& Gates, bool isStartDraw)
 {
-
-	//
-	if (planets.size() <= 0)
-	{
-		return;
-	}
-
-	std::ofstream stage;
-	//ファイルを読み込む
-	string count = to_string(planets[0].lock()->GetID());
-
-	const string stageFileName = "Resources/Stage/stage" + count + ".txt";
-
-	stage.open(stageFileName, std::ios::out);
-
-
-	//惑星の個数のデータ
-	string planetCounts = "n " + to_string(static_cast<int>(planets.size())) + "\n";
-	//惑星の座標データ
-	string planetsPos;
-	//惑星のスケールデータ
-	string planetsScale;
-
-	//惑星の色データ
-	XMVECTOR colorV = XMLoadFloat4( &planets[0].lock()->GetColor());
-	colorV *= 255.0f;
+	//惑星とゲートの色データ
 	XMFLOAT4 color;
-	XMStoreFloat4(&color, colorV);
-	int R, G, B;
-	R = static_cast<int>(color.x);
-	G = static_cast<int>(color.y);
-	B = static_cast<int>(color.z);
-	string planetsColor = "c " + to_string(R) + "," + to_string(G) + "," + to_string(B) + "\n";
-	//惑星の初期描画データ
-	string planetsStartDraw;
-	if (isStartDraw)
 	{
-		planetsStartDraw = "d 1";
+		//
+		if (planets.size() <= 0)
+		{
+			return;
+		}
+
+		std::ofstream stage;
+		//ファイルを読み込む
+		string count = to_string(planets[0].lock()->GetID());
+
+		const string stageFileName = "Resources/Stage/stage" + count + ".txt";
+
+		stage.open(stageFileName, std::ios::out);
+
+
+		//惑星の個数のデータ
+		string planetCounts = "n " + to_string(static_cast<int>(planets.size())) + "\n";
+		//惑星の座標データ
+		string planetsPos;
+		//惑星のスケールデータ
+		string planetsScale;
+
+		//惑星の色データ
+		XMVECTOR colorV = XMLoadFloat4(&planets[0].lock()->GetColor());
+		colorV *= 255.0f;
+		XMStoreFloat4(&color, colorV);
+		int R, G, B;
+		R = static_cast<int>(color.x);
+		G = static_cast<int>(color.y);
+		B = static_cast<int>(color.z);
+		string planetsColor = "c " + to_string(R) + "," + to_string(G) + "," + to_string(B) + "\n";
+		//惑星の初期描画データ
+		string planetsStartDraw;
+		if (isStartDraw)
+		{
+			planetsStartDraw = "d 1";
+		}
+		else
+		{
+			planetsStartDraw = "d 0";
+		}
+
+		//すべての惑星の座標とスケール用意
+		for (auto& e : planets)
+		{
+			Vector3 pos = e.lock()->GetPos();
+			planetsPos += ("p " + to_string(pos.x) + " " + to_string(pos.y) + " " + to_string(pos.z) + "\n");
+
+			planetsScale += ("s " + to_string(e.lock()->GetScale()) + "\n");
+		}
+
+		stage << planetCounts << endl << planetsPos << endl << planetsScale << endl << planetsColor << endl << planetsStartDraw;
+
+		stage.close();
 	}
-	else
+
 	{
-		planetsStartDraw = "d 0";
+		//
+		if (Gates.size() <= 0)
+		{
+			return;
+		}
+		std::ofstream gateFile;
+		//ファイルを読み込む
+		string count = to_string(Gates[0].lock()->GetID());
+
+		const string gateFileName = "Resources/Stage/gate" + count + ".txt";
+
+		gateFile.open(gateFileName, std::ios::out);
+
+
+		//惑星の個数のデータ
+		string gatesCounts = "n " + to_string(static_cast<int>(Gates.size())) + "\n";
+		//惑星の座標データ
+		string gatesPos;
+		//惑星のスケールデータ
+		string gatesAngle;
+
+
+		int R, G, B;
+		R = static_cast<int>(color.x);
+		G = static_cast<int>(color.y);
+		B = static_cast<int>(color.z);
+		string gatesColor = "c " + to_string(R) + "," + to_string(G) + "," + to_string(B) + "\n";
+		//惑星の初期描画データ
+		string gatesStartDraw;
+		if (isStartDraw)
+		{
+			gatesStartDraw = "d 1";
+		}
+		else
+		{
+			gatesStartDraw = "d 0";
+		}
+
+		//すべての惑星の座標とスケール用意
+		for (auto& e : Gates)
+		{
+			Vector3 pos = e.lock()->GetPos();
+			gatesPos += ("p " + to_string(pos.x) + " " + to_string(pos.y) + " " + to_string(pos.z) + "\n");
+
+			Vector3 angle = e.lock()->GetAngle();
+			gatesAngle += ("a " + to_string(angle.x) + " " + to_string(angle.y) + " " + to_string(angle.z) + "\n");
+		}
+
+		gateFile << gatesCounts << endl << gatesPos << endl << gatesAngle << endl << gatesColor << endl << gatesStartDraw;
+
+		gateFile.close();
 	}
-
-	//すべての惑星の座標とスケール用意
-	for (auto &e: planets)
-	{
-		Vector3 pos = e.lock()->GetPos();
-		planetsPos += ("p " + to_string(pos.x) + " " + to_string(pos.y) + " " + to_string(pos.z) + "\n");
-
-		planetsScale += ("s " + to_string(e.lock()->GetScale()) + "\n");
-	}
-
-	stage << planetCounts << endl << planetsPos << endl << planetsScale << endl << planetsColor << endl << planetsStartDraw;
-
-	stage.close();
-	//const string gateFileName = "Resources/Stage/gate" + count + ".txt";
-
 }
 
 void SaveAllStageFile(const std::list<std::shared_ptr<Planet>>& planets, const std::vector<std::shared_ptr<Gate>>& Gates)
 {
+	int stageNum = 0;
+
+	//先頭の惑星は中心のものだからスキップするフラグ
+	bool isNotFirst = false;
+	//ステージがなくなるまでステージをぶん回す
+	while (true)
+	{
+		std::vector<std::weak_ptr<Planet>> tmpPlanets;
+		std::vector<std::weak_ptr<Gate>> tmpGates;
+		for (auto& e : planets)
+		{
+
+			if (isNotFirst && e->GetID() == stageNum)
+			{
+				tmpPlanets.emplace_back(e);
+			}
+			else
+			{
+				isNotFirst = true;
+			}
+		}
+		for (auto& e : Gates)
+		{
+			if (e->GetID() == stageNum)
+			{
+				tmpGates.emplace_back(e);
+			}
+		}
+
+		//惑星があるかどうか
+		if (static_cast<int>(tmpPlanets.size()) > 0)
+		{//あったら保存する
+			if (stageNum > 0)
+			{//ステージ1以降は初期状態だと見えない
+				SaveStageFile(tmpPlanets, tmpGates, false);
+			}
+			else
+			{//ステージ0は初期配置ですでに見えているもの
+				SaveStageFile(tmpPlanets, tmpGates, true);
+			}
+			//ステージ番号を加算
+			stageNum++;
+		}
+		else
+		{//なかったら終了
+			break;
+		}
+	}
 }
 

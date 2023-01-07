@@ -17,7 +17,7 @@ void Gate::Init(const Vector3& pos, const Vector3& angle, int index, bool isDraw
 {
 	pos_ = pos;
 	angle_ = angle;
-	isDraw_ = isDraw;
+	isStartDraw_ = isDraw;
 	index_ = index;
 	object_.Init();
 	object_.SetCamera(sCamera);
@@ -52,6 +52,12 @@ void Gate::Reset()
 	object_.SetRotationVector(F3toV(angle_));
 	object_.Update();
 	isAlive_ = true;
+	isDraw_ = isStartDraw_;
+}
+
+void Gate::Spawn()
+{
+	isDraw_ = true;
 }
 
 void Gate::Reborn()

@@ -602,6 +602,8 @@ void GameScene::StageClearAnimationUpdate()
 		{
 			clearStatus_ = SPAWNPLANET;
 			PlanetManager::Instance()->IDSpawn(stageNum);
+			gates_.GateSpawn(stageNum - 1);
+
 		}
 		break;
 	case GameScene::SPAWNPLANET:
