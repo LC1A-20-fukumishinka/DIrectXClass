@@ -16,7 +16,7 @@ public:
 	void Reset();
 	bool LoadStage(int stage);
 
-	bool Collision(const Vector3& pos, float speed);
+	GameDatas::CollisionGateData Collision(const Vector3& pos, float speed);
 
 	//ゲートパーティクルのオブジェクトを受け取る
 	void SetGateParticle(GateParticle* gateParticle);
@@ -44,6 +44,8 @@ public://エディタ用
 	/// <param name="controllGate">操作対象にとる惑星</param>
 	/// <returns></returns>
 	bool SetMakeGates(int &editStageNum, std::vector<std::weak_ptr<Gate>>& makeGates, std::weak_ptr<Gate>& controllGate);
+
+	void AllSpawn();
 private:
 	//ゲーム内に配置されているゲート
 	std::vector<std::shared_ptr<Gate>> gates_;

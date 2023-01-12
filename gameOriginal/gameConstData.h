@@ -10,6 +10,15 @@ namespace GameDatas
 		Vector3 angle;
 		bool isOneWayGravity = false;
 	};
+
+	//ゲートを通過したかどうかの
+	struct CollisionGateData
+	{
+		//接触したか
+		bool isCollision;
+		//接触したゲートの色
+		Vector3 color;
+	};
 	//プレイヤーが取りうる状態
 	enum class PlayerStatus
 	{

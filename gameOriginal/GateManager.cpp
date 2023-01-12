@@ -75,21 +75,24 @@ bool GateManager::LoadStage(int stage)
 	return isLoad;
 }
 
-bool GateManager::Collision(const Vector3& pos, float speed)
+GameDatas::CollisionGateData GateManager::Collision(const Vector3& pos, float speed)
 {
+
+	GameDatas::CollisionGateData retData;
+
 	Sphere playerS;
 	playerS.center = F3toV(pos);
 	playerS.radius = speed;
-	bool isCollision = false;
 	for (auto& e : gates_)
 	{
 		if (e->Collision(playerS))
 		{
-			isCollision = true;
-			gateParticles_->AddGateParticle(e->GetAngle());
+			retData.isCollision = true;
+			retData.color = e->GetColor();
+			gateParticles_->AddGateParticle(e->GetAngle(), retData.color);
 		}
 	}
-	return isCollision;
+	return retData;
 }
 
 void GateManager::SetGateParticle(GateParticle* gateParticle)
@@ -172,5 +175,13 @@ bool GateManager::SetMakeGates(int &editStageNum, std::vector<std::weak_ptr<Gate
 		//‘{¸‘ÎÛ‚È‚µ‚É‚µ‚Ä
 		controllGate.reset();
 		return false;
+	}
+}
+
+void GateManager::AllSpawn()
+{
+	for (auto& e : gates_)
+	{
+		e->Spawn();
 	}
 }

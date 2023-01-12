@@ -231,13 +231,14 @@ void Player::PosUpdate(const Vector3 &move)
 				//重力変更をした
 				isGravityChanged_ = true;
 			}
+			gravity_.isOneWayGravity = false;
 			status_ = PlayerStatus::STAND;
 
-			for (int i = 0; i < continuousPassingCount_;i++)
+			for (auto &e : randingColors_)
 			{
-				randingParticle_->AddRandingParticle(pos_, drawObject_.GetUpVec());
+				randingParticle_->AddRandingParticle(pos_, drawObject_.GetUpVec(), e);
 			}
-
+			randingColors_.clear();
 			continuousPassingCount_ = 0;
 		}
 	}
@@ -467,8 +468,9 @@ bool Player::LandingCamReset()
 	return isReset;
 }
 
-void Player::passedGate()
+void Player::passedGate(const Vector3 &color)
 {
+	randingColors_.emplace_back(color);
 	//通貨カウントが加算
 	continuousPassingCount_++;
 }

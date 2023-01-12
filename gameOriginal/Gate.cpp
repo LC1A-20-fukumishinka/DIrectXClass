@@ -47,7 +47,7 @@ void Gate::Finalize()
 
 void Gate::Reset()
 {
-	object_.SetScale(Vector3(scale_, scale_, 0.1f));
+	object_.SetScale(Vector3(scale_, scale_,30.0f));
 	object_.SetPosition(pos_);
 	object_.SetRotationVector(F3toV(angle_));
 	object_.Update();

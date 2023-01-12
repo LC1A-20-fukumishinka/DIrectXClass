@@ -27,6 +27,7 @@ public:
 	void BloomDraw();
 	bool GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &angle);
 
+	bool GetIsAllSpawn();
 
 	bool MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos);
 
@@ -125,6 +126,7 @@ private:
 
 	bool isSpawnAnimation_ = false;
 
+	bool isAllSpawn_ = false;
 	static bool isMakeInstance;
 
 	int score = 0;

@@ -5,7 +5,7 @@ class Planet;
 class Gate;
 class GateManager;
 class PlanetManager;
-
+class Camera;
 class GranetEditer
 {
 public:
@@ -14,7 +14,7 @@ public:
 	//エディタ用更新
 	void EditUpdate();
 
-	void SetManagers(PlanetManager* planetManager, GateManager* gateManager);
+	void SetManagers(PlanetManager* planetManager, GateManager* gateManager, Camera* gameCamera);
 private:
 	//Imguiによるエディットメニュ-
 	void EditMenu();
@@ -29,7 +29,7 @@ private:
 
 	int controllPlanetNumber = 0;
 
-	int editStageNum = -1;
+	int editStageNum = 0;
 
 	std::vector<std::weak_ptr<Gate>> makeGates_;
 
@@ -39,5 +39,6 @@ private:
 
 	GateManager *gateManager_ = nullptr;
 	PlanetManager *planetManager_ = nullptr;
+	Camera* cam_ = nullptr;
 };
 

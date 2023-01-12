@@ -61,6 +61,11 @@ Vector3::Vector3(const DirectX::XMVECTOR &v) :
 {
 }
 
+Vector3::Vector3(const DirectX::XMFLOAT4& v) :
+	Vector3(v.x, v.y, v.z)
+{
+}
+
 Vector3::Vector3(const Vector3 &obj) :
 	Vector3(obj.x, obj.y, obj.z)
 {

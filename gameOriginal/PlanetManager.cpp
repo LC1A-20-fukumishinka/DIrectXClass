@@ -111,6 +111,11 @@ bool PlanetManager::GetGrabPlanet(std::shared_ptr<Planet> &planet, const DirectX
 	return isCollision;
 }
 
+bool PlanetManager::GetIsAllSpawn()
+{
+	return isAllSpawn_;
+}
+
 bool PlanetManager::MovePlanet(std::shared_ptr<Planet> &planet, const DirectX::XMFLOAT3 &pos)
 {
 	float minDist = 10000.0f;
@@ -194,6 +199,7 @@ void PlanetManager::Reset()
 	{
 		e->Reset();
 	}
+	isAllSpawn_ = false;
 }
 
 void PlanetManager::IDSpawn(int ID)
@@ -216,7 +222,7 @@ void PlanetManager::AllSpawn()
 {
 	//アニメーション中フラグをオンにする
 	isSpawnAnimation_ = true;
-
+	isAllSpawn_ = true;
 	for (auto &e : planets_)
 	{
 		//現在存在しない惑星を選択

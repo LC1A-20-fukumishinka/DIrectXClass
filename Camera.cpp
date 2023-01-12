@@ -25,6 +25,7 @@ void Camera::Init(const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target,
 	this->up = up;
 	matView = XMMatrixLookAtLH(F3toV(eye), F3toV(target), F3toV(up));
 
+	this->projectionData = projectionData;
 	bool isDefault = (projectionData.height <= 0.0f || projectionData.width <= 0.0f);
 	if (!isDefault)
 	{

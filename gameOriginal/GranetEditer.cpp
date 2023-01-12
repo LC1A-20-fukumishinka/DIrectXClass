@@ -3,6 +3,7 @@
 #include "PlanetManager.h"
 #include "GateManager.h"
 #include "LoadObject.h"
+#include "../Camera.h"
 GranetEditer::GranetEditer()
 {
 }
@@ -63,6 +64,15 @@ void GranetEditer::EditMenu()
 	{
 		SaveAllStageFile(planetManager_->GetPlanets(), gateManager_->GetGates());
 	}
+
+	bool AllSpawnFlag = false;
+
+	AllSpawnFlag = ImGui::Button("AllSpawn");
+	if (AllSpawnFlag)
+	{
+		planetManager_->AllSpawn();
+		gateManager_->AllSpawn();
+	}
 	ImGui::End();
 
 }
@@ -83,10 +93,15 @@ void GranetEditer::GateEditMenu()
 		Vector3 angle = controllGate_.lock()->GetAngle();
 		float ImguiPos[3] = { pos.x,pos.y ,pos.z };
 		float ImguiAngle[3] = { angle.x,angle.y ,angle.z };
+		float ImguiMove[3] = { 0, 0, 0 };
 		ImGui::DragFloat3("GatePosition", ImguiPos, 0.5f);
+		ImGui::DragFloat3("GateMove", ImguiMove, 0.5f);
 		ImGui::SliderFloat3("GateAngle", ImguiAngle, -1.0f, 1.0f);
 
+		DirectX::XMVECTOR moveV = { ImguiMove[0],ImguiMove[1] ,ImguiMove[2] };
+		Vector3 move = DirectX::XMVector3Rotate(moveV, DirectX::XMQuaternionRotationMatrix( cam_->GetMatBillboard()));
 		pos = Vector3(ImguiPos[0], ImguiPos[1], ImguiPos[2]);
+		pos += move;
 		angle = Vector3(ImguiAngle[0], ImguiAngle[1], ImguiAngle[2]);
 		controllGate_.lock()->SetPos(pos);
 		controllGate_.lock()->SetAngle(angle);
@@ -96,8 +111,17 @@ void GranetEditer::GateEditMenu()
 		DirectX::XMFLOAT4 color = controllGate_.lock()->GetColor();
 		float ImguiColor[4] = { color.x,color.y ,color.z , color.w };
 
-		ImGui::SliderFloat4("gateColor", ImguiColor, 0.0f, 1.0f);
 
+		for (int i = 0; i < 4;i++)
+		{
+			ImguiColor[i] *= 255.0f;
+		}
+		ImGui::DragFloat4("gateColor", ImguiColor, 1.0f, 0.0f, 255.0f);
+
+		for (int i = 0; i < 4; i++)
+		{
+			ImguiColor[i] /= 255.0f;
+		}
 		color = DirectX::XMFLOAT4(ImguiColor[0], ImguiColor[1], ImguiColor[2], ImguiColor[3]);
 		controllGate_.lock()->SetColor(color);
 
@@ -127,7 +151,11 @@ void GranetEditer::GateEditMenu()
 
 	if (makeFlag)
 	{
+		DirectX::XMFLOAT4 tmpColor = controllPlanet_.lock()->GetColor();
+
 		controllGate_ = gateManager_->MakeGate(controllGate_, editStageNum);
+
+		controllGate_.lock()->SetColor(tmpColor);
 
 		//操作ステージの一覧データに追加
 		makeGates_.emplace_back(controllGate_);
@@ -151,11 +179,17 @@ void GranetEditer::PlanetEditMenu()
 		//座標を受け取って加工して戻す
 		Vector3 pos = controllPlanet_.lock()->GetPos();
 		float ImguiPos[3] = { pos.x,pos.y ,pos.z };
+		float ImguiMove[3] = { 0, 0, 0 };
 
 		float ImguiScale = controllPlanet_.lock()->GetScale();
 		ImGui::DragFloat3("PlanetPosition", ImguiPos, 0.5f);
+		ImGui::DragFloat3("PlanetMove", ImguiMove, 0.5f);
 		ImGui::DragFloat("PlanetScale", &ImguiScale, 0.05f);
 		pos = Vector3(ImguiPos[0], ImguiPos[1], ImguiPos[2]);
+
+		DirectX::XMVECTOR moveV = { ImguiMove[0],ImguiMove[1] ,ImguiMove[2] };
+		Vector3 move = DirectX::XMVector3Rotate(moveV, DirectX::XMQuaternionRotationMatrix(cam_->GetMatBillboard()));
+		pos += move;
 
 		controllPlanet_.lock()->SetPos(pos);
 		controllPlanet_.lock()->SetScale(ImguiScale);
@@ -166,8 +200,15 @@ void GranetEditer::PlanetEditMenu()
 		DirectX::XMFLOAT4 color = controllPlanet_.lock()->GetColor();
 		float ImguiColor[4] = { color.x,color.y ,color.z , color.w };
 
-		ImGui::SliderFloat4("color", ImguiColor, 0.0f, 1.0f);
-
+		for (int i = 0; i < 4; i++)
+		{
+			ImguiColor[i] *= 255.0f;
+		}
+		ImGui::DragFloat4("color", ImguiColor, 1.0f, 0.0f, 255.0f);
+		for (int i = 0; i < 4; i++)
+		{
+			ImguiColor[i] /= 255.0f;
+		}
 		color = DirectX::XMFLOAT4(ImguiColor[0], ImguiColor[1], ImguiColor[2], ImguiColor[3]);
 		controllPlanet_.lock()->SetColor(color);
 
@@ -199,8 +240,9 @@ void GranetEditer::PlanetEditMenu()
 	}
 }
 
-void GranetEditer::SetManagers(PlanetManager* planetManager, GateManager* gateManager)
+void GranetEditer::SetManagers(PlanetManager* planetManager, GateManager* gateManager, Camera* gameCamera)
 {
 	planetManager_ = planetManager;
 	gateManager_ = gateManager;
+	cam_ = gameCamera;
 }

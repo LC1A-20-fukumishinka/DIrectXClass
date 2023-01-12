@@ -32,7 +32,7 @@ void GateParticle::Update()
 	SendBuffers();
 }
 
-void GateParticle::AddGateParticle(const Vector3& gateAngle)
+void GateParticle::AddGateParticle(const Vector3& gateAngle, const Vector3 color)
 {
 
 
@@ -55,11 +55,13 @@ void GateParticle::AddGateParticle(const Vector3& gateAngle)
 		p.velocity = (particleAngle * 20.0f);
 		p.velocity += playerMoveVec_ * 3.0f;
 		p.dead_frame = 20;
-		p.s_color = { 1.0f,1.0f ,1.0f , 1.0f };
-		p.e_color = { 1.0f,1.0f ,1.0f , 0.0f };
+		p.s_color = { color.x,color.y ,color.z , 1.0f };
+		p.e_color = { color.x,color.y ,color.z , 0.0f };
+		XMStoreFloat4(&p.draw_color, p.s_color);
 
 		p.s_scale = 1.0f;
 		p.e_scale = 10.0f;
+
 	}
 
 }

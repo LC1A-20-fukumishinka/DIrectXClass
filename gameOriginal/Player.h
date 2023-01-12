@@ -110,7 +110,7 @@ public://惑星周りの処理
 	/// ゲートを通過した際に呼び出す処理
 	/// ・通過カウントが増える
 	/// </summary>
-	void passedGate();
+	void passedGate(const Vector3& color);
 private://アニメーション関連
 	//プレイヤーキャラクターの表情テクスチャハンドル
 	std::vector<int> faceTextureHandles_;
@@ -179,6 +179,11 @@ private:
 
 	//連続でゲートを通過した個数
 	int continuousPassingCount_ = 0;
+
+	//着地時のパーティクルの色
+	std::vector<Vector3> randingColors_;
+
+
 	PlayerRandingParticle* randingParticle_ = nullptr;
 
 	//タコモデル

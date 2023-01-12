@@ -318,7 +318,14 @@ void SaveStageFile(const std::vector<std::weak_ptr<Planet>>& planets, const std:
 			Vector3 pos = e.lock()->GetPos();
 			planetsPos += ("p " + to_string(pos.x) + " " + to_string(pos.y) + " " + to_string(pos.z) + "\n");
 
-			planetsScale += ("s " + to_string(e.lock()->GetScale()) + "\n");
+			if (e.lock()->GetIsSpawn())
+			{
+				planetsScale += ("s " + to_string(e.lock()->GetScale()) + "\n");
+			}
+			else
+			{
+				planetsScale += ("s " + to_string(e.lock()->GetStartScale()) + "\n");
+			}
 		}
 
 		stage << planetCounts << endl << planetsPos << endl << planetsScale << endl << planetsColor << endl << planetsStartDraw;

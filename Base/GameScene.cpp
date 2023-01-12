@@ -89,7 +89,7 @@ void GameScene::Init()
 	pressStartTextAnimationEase_.Init(120);
 
 	models_.LoadModel("ground");
-	models_.LoadModel("sphere", true);
+	models_.LoadModel("gate", true);
 	domeModel_ = make_unique<Model>();
 	domeModel_->CreateModel("skydome");
 
@@ -118,11 +118,12 @@ void GameScene::Init()
 	int stageCount = 0;
 	while (true)
 	{
-		stageCount++;
 		if (!PlanetManager::Instance()->LoadStage(stageCount))
 		{
 			break;
 		}
+		stageCount++;
+
 	}
 
 	PlanetManager::Instance()->SetStagePlanets(1);
@@ -178,14 +179,14 @@ void GameScene::Init()
 
 	Gate::SetCamera(cam_->GetCamera());
 	Gate::SetLightGroup(lightGroup_.get());
-	Gate::SetModel(models_.GetModel("sphere"));
+	Gate::SetModel(models_.GetModel("gate"));
 	gates_.Init();
 	gates_.SetGateParticle(particles_.GetGateParticles());
 
 	PlanetManager::Instance()->SetPlanetParticles(particles_.GetPlanetParticles());
 	player_->SetRandingParticle(particles_.GetPlayerRandingParticles());
 
-	editer_.SetManagers(PlanetManager::Instance().get(), &gates_);
+	editer_.SetManagers(PlanetManager::Instance().get(), &gates_, cam_->GetCamera());
 	Restart();
 
 }
@@ -244,11 +245,13 @@ void GameScene::Update()
 	//プレイヤーの状態を受け取る
 	gates_.ReceivePlayerStatus(player_->GetPlayerStatus());
 	gates_.Update();
+
 	//ゲートの通過処理
-	if (gates_.Collision(player_->GetPos(), 3.0f))
+	GameDatas::CollisionGateData collGateData = gates_.Collision(player_->GetPos(), 3.0f);
+	if (collGateData.isCollision)
 	{
 		//ゲート通過時にプレイヤーにキャラクターにおこる変化
-		player_->passedGate();
+		player_->passedGate(collGateData.color);
 	}
 
 	
@@ -436,7 +439,7 @@ void GameScene::IngameUpdate()
 	isClear = (GetFlagCount() <= 0);
 
 	bool clearFlag = ((isClear && isOldClear != isClear) || PlanetManager::Instance()->StageClear());
-	if (clearFlag && !isGameClear_)
+	if (clearFlag && !isGameClear_  && !PlanetManager::Instance()->GetIsAllSpawn())
 	{
 		isGameClear_ = true;
 		stageNum++;
@@ -580,7 +583,7 @@ void GameScene::ImguiUpdate()
 void GameScene::StageClearAnimationUpdate()
 {
 	//クリア状態じゃなかったら抜ける
-	if (!isGameClear_) { return; }
+	if (!isGameClear_ || PlanetManager::Instance()->GetIsAllSpawn()) { return; }
 	switch (clearStatus_)
 	{
 	case GameScene::STANDBY:

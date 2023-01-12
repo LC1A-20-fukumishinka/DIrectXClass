@@ -6,7 +6,7 @@ class GateParticle : public ParticleManager
 public:
 	GateParticle();
 	void Update() override;
-	void AddGateParticle(const Vector3 &gateAngle);
+	void AddGateParticle(const Vector3 &gateAngle, const Vector3 color);
 	void SetPlayerData(const Vector3& pos, const Vector3 &moveVec);
 
 private:
