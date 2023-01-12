@@ -45,7 +45,7 @@ void PlayerRandingParticle::Update()
 	SendBuffers();
 }
 
-void PlayerRandingParticle::AddRandingParticle(const Vector3& pos, const Vector3& up, const Vector3& color)
+void PlayerRandingParticle::AddRandingParticle(const Vector3& pos, const Vector3& up, const Vector3 & front, const Vector3& color)
 {
 	
 	if(particles_.max_size())
@@ -59,11 +59,11 @@ void PlayerRandingParticle::AddRandingParticle(const Vector3& pos, const Vector3
 	p.position = pos;
 
 	Vector3 angle;
-	angle.x = static_cast<float>(rand() % 201 - 100);
+	angle.x = static_cast<float>(rand() % 200 - 100);
 	angle.y = 100.0f;
-	angle.z = static_cast<float>(rand() % 201 - 100);
+	angle.z = static_cast<float>(rand() % 200 - 100);
 	angle = angle.normalize();
-	angle = DirectX::XMVector3Rotate( F3toV(angle), DirectX::XMQuaternionRotationMatrix(FukuMath::GetMatRot(F3toV(up), FukuMath::ZVec)));
+	angle = DirectX::XMVector3Rotate( F3toV(angle), DirectX::XMQuaternionRotationMatrix(FukuMath::GetMatRot(F3toV(up), F3toV(front))));
 	p.velocity = angle * 0.3f;
 
 	p.accel = -p.velocity *= 0.003f;

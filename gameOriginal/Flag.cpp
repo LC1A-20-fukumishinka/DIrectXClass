@@ -306,7 +306,6 @@ void Flag::LightPillarUpdate()
 
 	Vector3 tmpRight = upVec_.cross(sMainCamera->GetAngle());
 
-	GetMatRot(F3toV(tmpRight), F3toV(upVec_), lightZ);
-
+	lightZ = F3toV(tmpRight.normalize().cross(upVec_));
 	lightPillarObject_.SetRotationVector(lightZ, F3toV(upVec_));
 }

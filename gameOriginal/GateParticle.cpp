@@ -36,8 +36,10 @@ void GateParticle::AddGateParticle(const Vector3& gateAngle, const Vector3 color
 {
 
 
+	
 	Vector3 cross = gateAngle.cross(FukuMath::YVec);
 
+	cross = cross.normalize();
 	for (int i = 0; i < 30; i++)
 	{
 		particles_.emplace_front();
@@ -50,9 +52,15 @@ void GateParticle::AddGateParticle(const Vector3& gateAngle, const Vector3 color
 		Vector3 particleAngle = DirectX::XMVector3Rotate(F3toV(cross), rotQ);
 		//particleAngle *= 15.0f;
 		p.position = playerPos_;
-		p.position += (particleAngle * 1.0f);
+		p.position += (particleAngle * 2.0f);
 		p.scale = 3.0f;
 		p.velocity = (particleAngle * 20.0f);
+
+		if (playerMoveVec_.length() <= 2.0f)
+		{
+			playerMoveVec_ = (playerMoveVec_.normalize() * 2.0f);
+		}
+
 		p.velocity += playerMoveVec_ * 3.0f;
 		p.dead_frame = 20;
 		p.s_color = { color.x,color.y ,color.z , 1.0f };

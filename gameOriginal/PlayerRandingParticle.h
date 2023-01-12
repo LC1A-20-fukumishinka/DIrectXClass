@@ -15,6 +15,7 @@ public:
 	/// </summary>
 	/// <param name="pos">座標</param>
 	/// <param name="up">キャラクターの上方向</param>
-	void AddRandingParticle(const Vector3& pos, const Vector3& up, const Vector3 &color);
+	/// <param name="front">キャラクターの正面方向</param>
+	void AddRandingParticle(const Vector3& pos, const Vector3& up, const Vector3& front, const Vector3 &color);
 };
 

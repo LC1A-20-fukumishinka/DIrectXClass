@@ -236,7 +236,10 @@ void Player::PosUpdate(const Vector3 &move)
 
 			for (auto &e : randingColors_)
 			{
-				randingParticle_->AddRandingParticle(pos_, drawObject_.GetUpVec(), e);
+				Vector3 UpVec = pos_ - basePlanet.lock()->GetPos();
+				Vector3 frontVec = UpVec.cross(drawObject_.GetRightVec());
+
+				randingParticle_->AddRandingParticle(pos_, UpVec.normalize(),frontVec.normalize(), e);
 			}
 			randingColors_.clear();
 			continuousPassingCount_ = 0;
