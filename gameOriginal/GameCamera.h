@@ -18,7 +18,7 @@ public:
 	Camera *GetCamera();
 	Vector3 GetCameraPos();
 	bool GetIsCameraStop();
-
+	bool GetIsAllClear();
 	void CameraStop();
 	void SetBasePlanet(const std::weak_ptr<Planet> planet);
 
@@ -59,6 +59,10 @@ public:
 	void LandingCameraReflesh(Vector3 UpVec);
 
 	void Reset();
+
+	void GameClear();
+
+	void GameClearUpdate();
 private://状況別更新処理
 
 	/// <summary>
@@ -123,10 +127,16 @@ private://挙動のイージング
 	float CToPCollAnimationRate = 1.0f;
 	GameDatas::PlayerStatus playerStatus_ = GameDatas::PlayerStatus::STAND;
 
+	bool isClearCameraMode_ = false;
+
+	float gameClearRotSpeed_ = 0.0f;
+
+	float nowClearRot_ = 0.0f;
 private://Imgui
 	bool imCamBackFlag_ = true;
 	bool imCamCollision_ = true;
 	bool imCamLanding_ = true;
+	bool isAllClear_ = false;
 	void ImguiUpdate();
 
 };

@@ -52,6 +52,7 @@ private:
 	void MovePlanet();
 	void ImguiUpdate();
 
+	void GameClear();
 private:
 
 	enum ClearAnimationStatus
@@ -133,7 +134,7 @@ private://FlagManager—p
 
 	int GetFlagCount();
 
-	bool isGameClear_ = false;
+	bool isStageClear_ = false;
 	bool isGameTitle_ = true;
 
 	bool isClear = false;

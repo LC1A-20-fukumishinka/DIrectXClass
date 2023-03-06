@@ -10,14 +10,15 @@ namespace Projection
 		float height;
 		float screenNear;
 		float screenFar;
-
+		bool isDefault;
 		ProjectionData()
 		{
 			angle = 60.0f;
-			width = 0.0f;
-			height = 0.0f;
+			width = 1280.0f;
+			height = 720.0f;
 			screenNear = 0.1f;
 			screenFar = 1000.0f;
+			isDefault = true;
 		}
 	};
 

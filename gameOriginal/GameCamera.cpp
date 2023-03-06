@@ -14,19 +14,27 @@ using namespace DirectX;
 
 void GameCamera::Init()
 {
-	cam_.Init(Vector3(0, 3, -15), Vector3(0, 3, 0));
+	Projection::ProjectionData p;
+
+	p.screenFar =10000.0f;
+	p.isDefault = false;
+	cam_.Init(Vector3(0, 3, -15), Vector3(0, 3, 0),Vector3(0, 1, 0), true, p);
 	CameraAnimationEase_.Init(60);
 
 	Reset();
 }
 
-void GameCamera::Update(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec, GameDatas::PlayerStatus playerStatus)
+void GameCamera::Update(const Vector3& playerPos, const Vector3& playerZVec, const Vector3& playerYVec, GameDatas::PlayerStatus playerStatus)
 {
 	//playerPos_ = playerPos;
 	playerStatus_ = playerStatus;
 	if (isTitleMode_)
 	{
 		TitleUpdate();
+	}
+	else if (isClearCameraMode_)
+	{
+		GameClearUpdate();
 	}
 	else if (isClearMode_)
 	{
@@ -73,7 +81,7 @@ void GameCamera::SetGravityData(GameDatas::GravityData gravity)
 	gravity_ = gravity;
 }
 
-Camera *GameCamera::GetCamera()
+Camera* GameCamera::GetCamera()
 {
 	return &cam_;
 }
@@ -86,6 +94,11 @@ Vector3 GameCamera::GetCameraPos()
 bool GameCamera::GetIsCameraStop()
 {
 	return isCameraStop_;
+}
+
+bool GameCamera::GetIsAllClear()
+{
+	return isAllClear_;
 }
 
 void GameCamera::CameraStop()
@@ -111,7 +124,7 @@ void GameCamera::StartCameraAnimation(bool isTargetEase, int EaseTimer)
 	oldCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(upVec, frontVec));
 }
 
-void GameCamera::ClearAnimationStart(const Vector3 &playerPos)
+void GameCamera::ClearAnimationStart(const Vector3& playerPos)
 {
 	//nextTargetPos = planet.lock()->GetPos();
 	nextTargetPos_ = nextPlanetPos_;
@@ -168,7 +181,7 @@ void GameCamera::ClearToIngme(const Vector3& playerUp)
 	StartCameraAnimation(true, 30);
 }
 
-void GameCamera::TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZVec)
+void GameCamera::TitleToIngame(const Vector3& playerPos, const Vector3& playerZVec)
 {
 	isTitleMode_ = false;
 	nextEyePos_ = playerPos - (playerZVec * 10);
@@ -176,7 +189,7 @@ void GameCamera::TitleToIngame(const Vector3 &playerPos, const Vector3 &playerZV
 	StartCameraAnimation(true, 30);
 }
 
-void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVec)
+void GameCamera::NormalUpdate(const Vector3& playerPos, const Vector3& playerYVec)
 {
 	//注視点をプレイヤの頭に合わせる
 	nextTargetPos_ = playerPos;
@@ -228,7 +241,7 @@ void GameCamera::NormalUpdate(const Vector3 &playerPos, const Vector3 &playerYVe
 	camRot(GameInput::Instance()->RStick(), playerYVec);
 }
 
-void GameCamera::SetNextPlantPos(const Vector3 &pos)
+void GameCamera::SetNextPlantPos(const Vector3& pos)
 {
 	nextPlanetPos_ = pos;
 }
@@ -258,6 +271,85 @@ void GameCamera::Reset()
 	nextCamUpRot_ = XMQuaternionRotationMatrix(GetMatRot(YVec, F3toV((nextTargetPos_ - nextEyePos_))));
 	gravity_.angle = -YVec;
 	isTitleMode_ = true;
+}
+
+void GameCamera::GameClear()
+{
+	nextTargetPos_ = Vector3();
+	nextEyePos_ = Vector3(0, 100, -200);
+	nextCamUpRot_ = XMQuaternionIdentity();
+	StartCameraAnimation(true, 30);
+	isClearCameraMode_ = true;
+}
+
+void GameCamera::GameClearUpdate()
+{
+	float dist = nextEyePos_.length();
+
+	if (dist <= 1000.0f)
+	{
+		gameClearRotSpeed_ += degree * 0.01f;
+
+		gameClearRotSpeed_ = std::clamp(gameClearRotSpeed_, 0.0f, 4.0f * degree);
+
+		nextEyePos_ = XMVector3Rotate(F3toV(nextEyePos_), XMQuaternionRotationRollPitchYaw(0.0f, gameClearRotSpeed_, 0.0f));
+		nowClearRot_ += gameClearRotSpeed_;
+
+		float len = (1.0f * degree);
+
+		if (gameClearRotSpeed_ >= len)
+		{
+			nextEyePos_ += (nextEyePos_.normalize() * 3.6f);
+		}
+	}
+	else
+	{
+
+		if (gameClearRotSpeed_ <= degree * 0.5f)
+		{
+			if (nowClearRot_ >= degree * 347.5f)
+			{
+				gameClearRotSpeed_ -= degree * 0.01f;
+			}
+		}
+		else
+		{
+			gameClearRotSpeed_ -= degree * 0.01f;
+		}
+
+		if (gameClearRotSpeed_ >= 0.0f)
+		{
+			gameClearRotSpeed_ = std::clamp(gameClearRotSpeed_, 0.0f, 4.0f * degree);
+			nextEyePos_ = XMVector3Rotate(F3toV(nextEyePos_), XMQuaternionRotationRollPitchYaw(0.0f, gameClearRotSpeed_, 0.0f));
+			nowClearRot_ += gameClearRotSpeed_;
+		}
+	}
+
+	if (gameClearRotSpeed_ <= 0.0f && nextTargetPos_.y <=800)
+	{
+		Vector3 pos = cam_.GetTarget();
+
+		pos += Vector3(0.0f, 6.0f, 0.0f);
+
+		nextTargetPos_ = pos;
+	}
+
+	if (nextTargetPos_.y > 800)
+	{
+		isAllClear_ = true;
+
+		if (GameInput::Instance()->A())
+		{
+			isClearCameraMode_ = false;
+			isAllClear_ = false;
+			StartCameraAnimation(true, 60);
+		}
+	}
+
+	if (nowClearRot_ >= degree * 360.0f)
+	{
+		nowClearRot_ -= degree * 360.0f;
+	}
 }
 
 void GameCamera::CameraAnimationUpdate()
@@ -297,7 +389,7 @@ void GameCamera::CameraAnimationUpdate()
 	}
 }
 
-void GameCamera::LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
+void GameCamera::LockonUpdate(const Vector3& playerPos, const Vector3& playerZVec, const Vector3& playerYVec)
 {
 	//たいしょうのざひょうをプレイヤーに
 	nextTargetPos_ = playerPos;
@@ -319,7 +411,7 @@ void GameCamera::LockonUpdate(const Vector3 &playerPos, const Vector3 &playerZVe
 	nextCamUpRot_ = XMQuaternionRotationMatrix(FukuMath::GetMatRot(F3toV(playerYVec), F3toV(playerZVec)));
 }
 
-void GameCamera::GrabUpdate(const Vector3 &playerPos, const Vector3 &playerZVec)
+void GameCamera::GrabUpdate(const Vector3& playerPos, const Vector3& playerZVec)
 {
 }
 
@@ -340,7 +432,7 @@ void GameCamera::ClearCameraUpdate()
 
 }
 
-void GameCamera::IngameCameraUpdate(const Vector3 &playerPos, const Vector3 &playerZVec, const Vector3 &playerYVec)
+void GameCamera::IngameCameraUpdate(const Vector3& playerPos, const Vector3& playerZVec, const Vector3& playerYVec)
 {
 	//注視点状態切り替えアニメーション
 	if (GameInput::Instance()->LockOnTrigger() || GameInput::Instance()->LockOnRelease())
@@ -431,7 +523,7 @@ void GameCamera::PlanetCollisionUpdate()
 	nextEyePos_ = nextTargetPos_ + (cameraDir.normalize() * rateDistance);
 }
 
-void GameCamera::camRot(const DirectX::XMFLOAT2 &rot, Vector3 playerUp)
+void GameCamera::camRot(const DirectX::XMFLOAT2& rot, Vector3 playerUp)
 {
 	//回転姿勢のクォータニオン
 	XMVECTOR rotQ = XMQuaternionIdentity();

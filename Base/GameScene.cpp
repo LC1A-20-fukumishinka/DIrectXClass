@@ -170,7 +170,7 @@ void GameScene::Init()
 
 	testStar.resize(1);
 
-	for (auto &e : testStar)
+	for (auto& e : testStar)
 	{
 		e.Create();
 	}
@@ -233,7 +233,7 @@ void GameScene::Update()
 	objDome_->SetPosition(cam_->GetCameraPos());
 	objDome_->Update();
 
-	for (auto &e : testStar)
+	for (auto& e : testStar)
 	{
 		e.Update();
 	}
@@ -254,7 +254,7 @@ void GameScene::Update()
 		player_->passedGate(collGateData.color);
 	}
 
-	
+
 	//パーティクルの更新処理に必要なデータを受け取る
 	GranetParticleManager::MakeParticleDatas particleData;
 	particleData.cameraPos = cam_->GetCamera()->GetEye();
@@ -282,7 +282,7 @@ void GameScene::PreDraw()
 
 	objDome_->modelDraw(ModelPhongPipeline::Instance()->GetPipeLine());
 	StartTarget_->DepthReset();
-	for (auto &e : testStar)
+	for (auto& e : testStar)
 	{
 		e.Draw();
 	}
@@ -291,12 +291,12 @@ void GameScene::PreDraw()
 	gates_.Draw();
 	PlanetManager::Instance()->Draw();
 	player_->Draw();
-	for (auto &flag : testFlag_)
+	for (auto& flag : testFlag_)
 	{
 		flag.Draw();
 	}
 
-	for (auto &e : testBoards_)
+	for (auto& e : testBoards_)
 	{
 		e.Draw();
 	}
@@ -372,7 +372,7 @@ void GameScene::MainDraw()
 
 	postTest_->Draw(NormalDrawPipeline_.GetPipeLine(), textureNum);
 
-	if (isGameClear_)
+	if (isStageClear_ || cam_->GetIsAllClear())
 	{
 		clearText_->Draw();
 	}
@@ -395,7 +395,7 @@ void GameScene::IngameUpdate()
 		{
 			player_->ReleasePlanet();
 		}
-		if (!isGameClear_)
+		if (!isStageClear_)
 		{
 			MovePlanet();
 		}
@@ -428,7 +428,7 @@ void GameScene::IngameUpdate()
 
 	bool isGetNow = false;
 
-	for (auto &flag : testFlag_)
+	for (auto& flag : testFlag_)
 	{
 		flag.Update();
 
@@ -439,14 +439,18 @@ void GameScene::IngameUpdate()
 	isClear = (GetFlagCount() <= 0);
 
 	bool clearFlag = ((isClear && isOldClear != isClear) || PlanetManager::Instance()->StageClear());
-	if (clearFlag && !isGameClear_  && !PlanetManager::Instance()->GetIsAllSpawn())
+	if (clearFlag && !isStageClear_ && !PlanetManager::Instance()->GetIsAllSpawn())
 	{
-		isGameClear_ = true;
+		isStageClear_ = true;
 		stageNum++;
 		cam_->ClearAnimationStart(player_->GetPos());
 	}
 
 
+	if (Input::Instance()->KeyTrigger(DIK_RETURN))
+	{
+		GameClear();
+	}
 	ImguiUpdate();
 
 	shadowCam_->Update(player_->GetPos());
@@ -454,7 +458,7 @@ void GameScene::IngameUpdate()
 
 	StageClearAnimationUpdate();
 
-	for (auto &e : testBoards_)
+	for (auto& e : testBoards_)
 	{
 		e.CollisionPlayer(player_->GetPos());
 		e.Update();
@@ -492,7 +496,7 @@ void GameScene::Restart()
 	ObjectRestart();
 	stageNum = 0;
 	cam_->SetNextPlantPos(PlanetManager::Instance()->GetBasePlanet(1)->GetPos());
-	isGameClear_ = false;
+	isStageClear_ = false;
 }
 
 void GameScene::lightsRestart()
@@ -523,7 +527,7 @@ void GameScene::ObjectRestart()
 	titlePostEffect_.Reset();
 	PlanetManager::Instance()->Reset();
 	player_->Init(PlanetManager::Instance()->GetBasePlanet(0));
-	for (auto &e : testFlag_)
+	for (auto& e : testFlag_)
 	{
 		e.Reset();
 	}
@@ -583,7 +587,7 @@ void GameScene::ImguiUpdate()
 void GameScene::StageClearAnimationUpdate()
 {
 	//クリア状態じゃなかったら抜ける
-	if (!isGameClear_ || PlanetManager::Instance()->GetIsAllSpawn()) { return; }
+	if (!isStageClear_ || PlanetManager::Instance()->GetIsAllSpawn()) { return; }
 	switch (clearStatus_)
 	{
 	case GameScene::STANDBY:
@@ -623,7 +627,7 @@ void GameScene::StageClearAnimationUpdate()
 		if (cam_->GetIsAnimationEnd())
 		{
 			//戻りきったらアニメーション終了（状態４）待機状態に
-			isGameClear_ = false;
+			isStageClear_ = false;
 			weak_ptr<Planet> nextPlanet = PlanetManager::Instance()->GetBasePlanet(stageNum + 1);
 			cam_->SetNextPlantPos(nextPlanet.lock()->GetPos());
 			clearStatus_ = STANDBY;
@@ -632,7 +636,7 @@ void GameScene::StageClearAnimationUpdate()
 		}
 		break;
 	default:
-		isGameClear_ = false;
+		isStageClear_ = false;
 		clearStatus_ = STANDBY;
 		GameInput::Instance()->SetIsControll(true);
 		break;
@@ -641,7 +645,7 @@ void GameScene::StageClearAnimationUpdate()
 
 void GameScene::makeGuide()
 {
-	for (auto &e : testStar)
+	for (auto& e : testStar)
 	{
 		if (e.GetIsDraw()) continue;
 		//正面方向に適当に出す
@@ -672,11 +676,24 @@ void GameScene::MakeFlag(std::weak_ptr<Planet> base, Vector3 angle, float scale)
 
 }
 
+
+void GameScene::GameClear()
+{
+	//カメラを中心の惑星に向ける
+	cam_->GameClear();
+	//少しずつ回転を早くする
+
+	//カメラの距離が少しずつ遠くなっていく
+
+	//でっかいパーティクルが出てクリアー
+
+}
+
 int GameScene::GetFlagCount()
 {
 	int aliveFlagCount = 0;
 
-	for (auto &flag : testFlag_)
+	for (auto& flag : testFlag_)
 	{
 		aliveFlagCount += static_cast<int>(flag.GetIsDraw());
 	}
